@@ -233,7 +233,9 @@ export async function decodeVin(store: VpicStore, rawVin: string, options: Decod
     .sort((a, b) => (GROUP_ORDER[a.groupName ?? ""] ?? 99) - (GROUP_ORDER[b.groupName ?? ""] ?? 99) || a.id - b.id);
 
   for (const e of sortedElements) {
-    const matches = items.filter((d) => d.elementId === e.id).sort((a, b) => a.seq - b.seq);
+    // Several rows only for multi-value elements; the live API lists them last-inserted
+    // first (e.g. "All Bulk Deliver Trailer, Bulk Delivery Trailer"), verified by parity.
+    const matches = items.filter((d) => d.elementId === e.id).sort((a, b) => b.seq - a.seq);
     if (matches.length === 0) {
       elements.push({ elementId: e.id, variable: e.name, code: e.code, groupName: e.groupName, dataType: e.dataType, value: null, attributeId: null, source: null, patternId: null, vinSchemaId: null });
       continue;

@@ -15,7 +15,6 @@
 
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
-import { validCharsInKey } from "../../src/vpic/keys";
 import { catalogModelsPath, fnv1a, schemaBucketPath, specBucketPath, wmiBucketPath } from "../../src/vpic/store";
 import { vinWmi } from "../../src/vpic/vin-functions";
 import type {
@@ -32,6 +31,7 @@ import type {
   WmiRecord,
 } from "../../src/vpic/types";
 import { ELEMENT_LOOKUP_TABLE } from "./lib/element-lookups";
+import { parseValidChars } from "./lib/valid-chars";
 import { LOOKUP_TABLES } from "./lib/tables";
 import { bool, int, readTable, requireInt } from "./lib/tsv";
 
@@ -157,6 +157,8 @@ function main(): void {
     (r) => vinWmi(r["vin"] ?? "")
   );
 
+  const validCharsByWmi = groupBy(readTable(dataDir, "wmiyearvalidchars"), (r) => r["wmi"] ?? "");
+
   const wmiRows = readTable(dataDir, "wmi");
   const duplicateWmis = [...groupBy(wmiRows, (r) => r["wmi"] ?? "").entries()].filter(([, rows]) => rows.length > 1);
   if (duplicateWmis.length > 0) {
@@ -192,6 +194,9 @@ function main(): void {
           ] as const
       ),
       checkDigitExceptions: (exceptions.get(wmi) ?? []).map((e) => e["vin"] ?? ""),
+      validCharsByYear: Object.fromEntries(
+        (validCharsByWmi.get(wmi) ?? []).map((v) => [v["year"] ?? "", parseValidChars(v["validchars"] ?? "")])
+      ),
     };
     const path = wmiBucketPath(wmi, BUCKETS.wmi);
     let bucket = wmiBuckets.get(path);
@@ -212,15 +217,6 @@ function main(): void {
     const all = (patternsBySchema.get(String(id)) ?? []).sort(
       (a, b) => requireInt(a["id"], "pattern.id") - requireInt(b["id"], "pattern.id")
     );
-
-    const validChars = new Map<number, Set<string>>();
-    for (const keys of new Set(all.map((p) => p["keys"] ?? ""))) {
-      for (const [pos, ch] of validCharsInKey(keys)) {
-        let set = validChars.get(pos);
-        if (!set) validChars.set(pos, (set = new Set()));
-        set.add(ch);
-      }
-    }
 
     const patterns: PatternRow[] = [];
     const path = schemaBucketPath(id, BUCKETS.schema);
@@ -261,9 +257,6 @@ function main(): void {
       id,
       toBeQCed: bool(s["tobeqced"]) ?? false,
       patterns,
-      validChars: Object.fromEntries(
-        [...validChars.entries()].sort(([a], [b]) => a - b).map(([pos, set]) => [String(pos), [...set].sort().join("")])
-      ),
     };
   }
   for (const [path, bucket] of schemaBuckets) writeJson(path, bucket satisfies SchemaBucket);

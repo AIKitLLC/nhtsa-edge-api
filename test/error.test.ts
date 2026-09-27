@@ -14,7 +14,7 @@ describe("Error boundary", () => {
       throw err;
     });
 
-    const res = await app.request("/api/v1/vin/1HGCG5655WA027834");
+    const res = await app.request("/vehicles/GetAllMakes");
     expect(res.status).toBe(504);
 
     const body = await res.text();
@@ -25,7 +25,7 @@ describe("Error boundary", () => {
   it("maps unexpected failures to a generic 500", async () => {
     vi.spyOn(globalThis, "fetch").mockRejectedValue(new Error("secret internal detail"));
 
-    const res = await app.request("/api/v1/vin/1HGCG5655WA027834");
+    const res = await app.request("/vehicles/GetAllMakes");
     expect(res.status).toBe(500);
 
     const body = await res.text();

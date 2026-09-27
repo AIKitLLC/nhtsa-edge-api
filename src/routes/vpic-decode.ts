@@ -16,10 +16,11 @@ type DecodeKind = "values" | "variables";
  * case-insensitive in vPIC): DecodeVinValues/:vin and DecodeVin/:vin.
  * The *Extended variants include private NCSA data and stay upstream.
  */
-export function matchOfflineDecode(lowerPath: string): { kind: DecodeKind; vin: string } | null {
-  const match = /^\/vehicles\/(decodevinvalues|decodevin)\/([^/]+)\/?$/.exec(lowerPath);
+export function matchOfflineDecode(path: string): { kind: DecodeKind; vin: string } | null {
+  const match = /^\/vehicles\/(decodevinvalues|decodevin)\/([^/]+)\/?$/i.exec(path);
   if (!match || !match[1] || !match[2]) return null;
-  return { kind: match[1] === "decodevinvalues" ? "values" : "variables", vin: decodeURIComponent(match[2]) };
+  // The VIN keeps the caller's spelling (echoed in SearchCriteria and VIN, as vPIC does)
+  return { kind: match[1].toLowerCase() === "decodevinvalues" ? "values" : "variables", vin: decodeURIComponent(match[2]) };
 }
 
 function parseModelYear(raw: string | null): number | null {

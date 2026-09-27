@@ -248,7 +248,7 @@ export async function spvindecodeCore(input: CorePassInput, ctx: CoreContext): P
       correctedVin = "";
       errorBytes = "";
     } else {
-      const err = spVinDecodeErrorCode(vin, modelYear, wmi, ctx.schemas, list.items);
+      const err = spVinDecodeErrorCode(vin, modelYear, wmi, list.items);
       returnCode = err.returnCode;
       correctedVin = err.correctedVin;
       errorBytes = err.errorBytes;

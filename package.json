@@ -1,23 +1,20 @@
 {
   "name": "nhtsa-edge-api",
   "version": "1.0.0",
-  "description": "High-performance Cloudflare Edge API and caching layer for NHTSA vehicle data",
+  "description": "Offline NHTSA vPIC VIN decoder and API gateway on Cloudflare Workers",
   "main": "src/index.ts",
   "type": "module",
   "scripts": {
-    "dev": "wrangler dev",
-    "deploy": "wrangler deploy",
-    "setup:cloudflare": "bash scripts/setup-cloudflare.sh",
-    "sync:dump": "bun scripts/sync-sql-dump.ts",
-    "test:50": "bun scripts/test-50-requests.ts",
     "build": "wrangler deploy --dry-run --outdir dist",
-    "typecheck": "tsc --noEmit && tsc --noEmit -p scripts",
+    "build:data": "bun scripts/vpic/build-assets.ts",
+    "deploy": "bun scripts/vpic/build-assets.ts && wrangler deploy",
+    "deploy:dev": "bun scripts/vpic/build-assets.ts && wrangler deploy --env dev",
+    "dev": "bun scripts/vpic/build-assets.ts && wrangler dev",
+    "ingest": "bun scripts/vpic/ingest-dump.ts",
+    "parity": "bun scripts/vpic/parity.ts",
     "test": "vitest run",
     "test:watch": "vitest",
-    "cf-typegen": "wrangler types",
-    "sync:api": "bun scripts/sync-from-api.ts",
-    "db:migrate:local": "wrangler d1 migrations apply nhtsa-db --local",
-    "db:migrate:remote": "wrangler d1 migrations apply nhtsa-db --remote"
+    "typecheck": "tsc --noEmit && tsc --noEmit -p scripts"
   },
   "keywords": [
     "cloudflare-workers",

@@ -75,7 +75,7 @@ vpicProxyRouter.get("/vehicles/*", async (c) => {
   const subPath = url.pathname.replace(/^\/api\//, "/");
   const lowerPath = subPath.toLowerCase();
 
-  const offline = matchOfflineDecode(lowerPath);
+  const offline = matchOfflineDecode(subPath);
   if (offline) {
     const response = await serveOfflineDecode(c, offline, url.searchParams);
     if (response) return response;

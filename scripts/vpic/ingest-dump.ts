@@ -20,6 +20,11 @@ import { pipeline } from "node:stream/promises";
 import { normalizeTimestamp, readCopyBlocks } from "./lib/pg-copy";
 import { TABLE_SPECS, deriveColumn, type TableSpec } from "./lib/tables";
 import { DOWNLOADS_URL, findLatestDumpName } from "./lib/downloads";
+import { ValidCharsAccumulator } from "./lib/valid-chars";
+import { fnv1a } from "../../src/vpic/store";
+
+const VALID_CHARS_TABLE = "wmiyearvalidchars";
+const VALID_CHARS_SHARDS = 8;
 
 const DATA_DIR = resolve(import.meta.dirname ?? ".", "../../data/vpic");
 
@@ -94,11 +99,16 @@ async function main(): Promise<void> {
   const rows = new Map<string, (string | null)[][]>();
   const columnIndex = new Map<string, readonly string[]>();
 
+  const validChars = new ValidCharsAccumulator();
   const { stream, done } = openSqlStream(zipPath);
   const seen = await readCopyBlocks(
     stream,
-    (table) => specs.has(table),
+    (table) => specs.has(table) || table === VALID_CHARS_TABLE,
     (header, fields) => {
+      if (header.table === VALID_CHARS_TABLE) {
+        validChars.add(header.columns, fields);
+        return;
+      }
       const spec = specs.get(header.table);
       if (!spec) return;
       if (!columnIndex.has(header.table)) columnIndex.set(header.table, header.columns);
@@ -121,7 +131,7 @@ async function main(): Promise<void> {
   );
   await done;
 
-  const missing = TABLE_SPECS.filter((s) => !seen.has(s.table)).map((s) => s.table);
+  const missing = [...TABLE_SPECS.map((s) => s.table), VALID_CHARS_TABLE].filter((t) => !seen.has(t));
   if (missing.length > 0) throw new Error(`Tables missing from dump: ${missing.join(", ")}`);
 
   // Rewrite data/vpic from scratch so tables dropped from the spec disappear too
@@ -164,6 +174,24 @@ async function main(): Promise<void> {
 
     manifestTables[spec.table] = { rows: list.length, files };
     console.log(`  ${spec.table.padEnd(36)} ${String(list.length).padStart(9)} rows`);
+  }
+
+  // WMIYearValidChars, aggregated per (wmi, year), sharded by WMI hash
+  {
+    const header = "#wmi\tyear\tvalidchars";
+    const buckets: string[][] = Array.from({ length: VALID_CHARS_SHARDS }, () => [header]);
+    const rowsOut = validChars.rows();
+    for (const row of rowsOut) buckets[fnv1a(row[0] ?? "") % VALID_CHARS_SHARDS]?.push(row.join("\t"));
+    mkdirSync(join(DATA_DIR, VALID_CHARS_TABLE), { recursive: true });
+    const files: Record<string, string> = {};
+    buckets.forEach((lines, i) => {
+      const text = lines.join("\n") + "\n";
+      const rel = `${VALID_CHARS_TABLE}/${String(i).padStart(2, "0")}.tsv`;
+      writeFileSync(join(DATA_DIR, rel), text);
+      files[rel] = sha256(text);
+    });
+    manifestTables[VALID_CHARS_TABLE] = { rows: rowsOut.length, files };
+    console.log(`  ${VALID_CHARS_TABLE.padEnd(36)} ${String(rowsOut.length).padStart(9)} (wmi, year) pairs`);
   }
 
   const manifest = {

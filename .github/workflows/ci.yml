@@ -11,7 +11,7 @@ concurrency:
 
 jobs:
   verify:
-    name: Typecheck, test and bundle
+    name: Typecheck, test (real vPIC data) and bundle
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -26,8 +26,13 @@ jobs:
           node-version: 22
           cache: pnpm
 
+      - uses: oven-sh/setup-bun@v2
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Build vPIC assets from data/vpic
+        run: pnpm build:data
 
       - name: Typecheck (worker + scripts)
         run: pnpm typecheck

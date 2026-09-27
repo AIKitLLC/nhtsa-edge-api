@@ -3,13 +3,13 @@
  * suggests corrections for VIN positions no pattern accepts (codes 2, 3, 4, 5)
  * and reports positions no decoding item used (code 14).
  *
- * The dump version first reads the WMIYearValidChars cache and falls back to
- * fExtractValidCharsPerWmiYear; the cache is derived from the same patterns, so
- * the valid characters are computed from the schemas' precomputed validChars.
+ * Valid characters come only from vpic.WMIYearValidChars. The PostgreSQL port
+ * falls back to fExtractValidCharsPerWmiYear when a (wmi, year) is missing, but the
+ * live API does not (verified by parity: no position errors for such VINs).
  */
 
 import { pgSubstring, validCharsInKey } from "./keys";
-import type { DecodingItem, SchemaRecord, WmiRecord } from "./types";
+import type { DecodingItem, WmiRecord } from "./types";
 import { vinCheckDigit, vinWmi } from "./vin-functions";
 
 export interface ErrorCodeResult {
@@ -28,25 +28,12 @@ function sortChars(chars: Iterable<string>): string[] {
   });
 }
 
-/** Valid characters per VIN position for the WMI's schemas active in `modelYear`. */
-function validCharsForYear(
-  wmi: WmiRecord | null,
-  schemas: ReadonlyMap<number, SchemaRecord>,
-  modelYear: number | null
-): Map<number, Set<string>> {
+/** Valid characters per VIN position for (wmi, modelYear), from WMIYearValidChars. */
+function validCharsForYear(wmi: WmiRecord | null, modelYear: number | null): Map<number, Set<string>> {
   const byPosition = new Map<number, Set<string>>();
   if (!wmi || modelYear === null) return byPosition;
-
-  for (const [schemaId, yearFrom, yearTo] of wmi.schemas) {
-    if (modelYear < yearFrom || modelYear > (yearTo ?? 2999)) continue;
-    const schema = schemas.get(schemaId);
-    if (!schema) continue;
-    for (const [pos, chars] of Object.entries(schema.validChars)) {
-      const vinPos = Number(pos) + 3;
-      let set = byPosition.get(vinPos);
-      if (!set) byPosition.set(vinPos, (set = new Set()));
-      for (const c of chars) set.add(c);
-    }
+  for (const [pos, chars] of Object.entries(wmi.validCharsByYear[String(modelYear)] ?? {})) {
+    byPosition.set(Number(pos), new Set(chars));
   }
   return byPosition;
 }
@@ -55,7 +42,6 @@ export function spVinDecodeErrorCode(
   rawVin: string,
   modelYear: number | null,
   wmi: WmiRecord | null,
-  schemas: ReadonlyMap<number, SchemaRecord>,
   passItems: readonly DecodingItem[]
 ): ErrorCodeResult {
   const result: ErrorCodeResult = { returnCode: "", correctedVin: "", errorBytes: "", unusedPositions: null };
@@ -67,7 +53,7 @@ export function spVinDecodeErrorCode(
     return result;
   }
 
-  const valid = validCharsForYear(wmi, schemas, modelYear);
+  const valid = validCharsForYear(wmi, modelYear);
 
   let corrected = "";
   let replacements = "";

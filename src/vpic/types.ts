@@ -81,6 +81,11 @@ export interface WmiRecord {
   readonly schemas: readonly WmiSchemaLink[];
   /** VINs of this WMI listed in vpic.VinException with CheckDigit = true. */
   readonly checkDigitExceptions: readonly string[];
+  /**
+   * vpic.WMIYearValidChars: model year -> VIN position -> accepted characters.
+   * The only source of the position checks behind error codes 2-5.
+   */
+  readonly validCharsByYear: Readonly<Record<string, Readonly<Record<string, string>>>>;
 }
 
 /** Pattern row: [id, keys, elementId, attributeId, resolvedValue, changedOn]. */
@@ -91,11 +96,6 @@ export interface SchemaRecord {
   readonly toBeQCed: boolean;
   /** Patterns that can take part in decoding (decodable/public or formula keys). */
   readonly patterns: readonly PatternRow[];
-  /**
-   * Valid characters per key position (index 1-based as in fValidCharsInKey),
-   * from all patterns of the schema; used by spVinDecode_ErrorCode.
-   */
-  readonly validChars: Readonly<Record<string, string>>;
 }
 
 export interface SchemaBucket {
