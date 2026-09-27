@@ -10,9 +10,10 @@ on:
         description: 'Dump name to ingest (default: newest on the NHTSA downloads page)'
         required: false
   push:
-    # Re-ingest when the ingestion code itself changes
+    # Re-run when the ingestion, asset build or decoder changes
     paths:
       - 'scripts/vpic/**'
+      - 'src/vpic/**'
       - '.github/workflows/vpic-data.yml'
 
 concurrency:
@@ -64,3 +65,39 @@ jobs:
             echo "## data/vpic updated to \`${VERSION}\`"
             echo "Revert with: \`git revert $(git rev-parse HEAD)\`"
           } >> "$GITHUB_STEP_SUMMARY"
+
+  verify:
+    name: Build assets and check parity with the live API
+    needs: ingest
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }} # includes the data commit pushed by the ingest job
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build vPIC assets
+        run: bun scripts/vpic/build-assets.ts
+
+      - name: Parity with live vPIC API
+        run: bun scripts/vpic/parity.ts --size=1000 --seed=1 --min-exact=${{ vars.VPIC_PARITY_MIN || '0' }}
+
+      - name: Upload parity report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vpic-parity
+          path: build/parity/
