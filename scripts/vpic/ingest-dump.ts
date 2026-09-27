@@ -13,7 +13,7 @@
 
 import { spawn } from "node:child_process";
 import { createHash } from "node:crypto";
-import { createWriteStream, existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { createWriteStream, existsSync, mkdirSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { basename, join, resolve } from "node:path";
 import { Readable } from "node:stream";
 import { pipeline } from "node:stream/promises";
@@ -38,7 +38,14 @@ async function downloadDump(dumpName: string, target: string): Promise<void> {
   console.log(`Downloading ${url}`);
   const res = await fetch(url, { headers: { "User-Agent": "nhtsa-edge-api-ingest/1.0" } });
   if (!res.ok || !res.body) throw new Error(`Download failed: HTTP ${res.status} for ${url}`);
+  const expected = Number(res.headers.get("content-length") ?? "0");
   await pipeline(Readable.fromWeb(res.body as never), createWriteStream(target));
+  const actual = statSync(target).size;
+  if (expected > 0 && actual !== expected) {
+    rmSync(target, { force: true });
+    throw new Error(`Incomplete download: ${actual} of ${expected} bytes`);
+  }
+  console.log(`Downloaded ${(actual / 1e6).toFixed(1)} MB`);
 }
 
 /** Streams the .sql member of the zip without extracting it to disk. */

@@ -4,7 +4,6 @@
  * the encoding of the TSV files written to data/vpic.
  */
 
-import { createInterface } from "node:readline";
 import type { Readable } from "node:stream";
 
 export interface CopyBlockHeader {
@@ -22,6 +21,29 @@ export function parseCopyHeader(line: string): CopyBlockHeader | null {
 }
 
 /**
+ * Yields the lines of a byte stream (LF-separated, UTF-8). Reads chunks directly
+ * instead of node:readline, whose async iterator can close early under Bun.
+ */
+export async function* readLines(input: Readable): AsyncGenerator<string> {
+  const decoder = new TextDecoder("utf-8");
+  let pending = "";
+  for await (const chunk of input) {
+    pending += typeof chunk === "string" ? chunk : decoder.decode(chunk as Uint8Array, { stream: true });
+    let start = 0;
+    let newline = pending.indexOf("\n", start);
+    while (newline >= 0) {
+      const end = newline > start && pending.charCodeAt(newline - 1) === 13 ? newline - 1 : newline;
+      yield pending.slice(start, end);
+      start = newline + 1;
+      newline = pending.indexOf("\n", start);
+    }
+    pending = pending.slice(start);
+  }
+  pending += decoder.decode();
+  if (pending !== "") yield pending;
+}
+
+/**
  * Calls `onRow` for every row of every COPY block. `wanted` limits which tables are
  * parsed; other blocks are skipped without splitting their lines.
  */
@@ -31,15 +53,16 @@ export async function readCopyBlocks(
   onRow: (header: CopyBlockHeader, fields: string[]) => void
 ): Promise<Set<string>> {
   const seen = new Set<string>();
-  const lines = createInterface({ input, crlfDelay: Infinity });
   let current: CopyBlockHeader | null = null;
   let skipping = false;
+  let unterminated: string | null = null;
 
-  for await (const line of lines) {
+  for await (const line of readLines(input)) {
     if (current || skipping) {
       if (line === "\\.") {
         current = null;
         skipping = false;
+        unterminated = null;
         continue;
       }
       if (current) onRow(current, line.split("\t"));
@@ -50,6 +73,7 @@ export async function readCopyBlocks(
       const header = parseCopyHeader(line);
       if (!header) throw new Error(`Unrecognized COPY header: ${line.slice(0, 120)}`);
       seen.add(header.table);
+      unterminated = header.table;
       if (wanted(header.table)) {
         current = header;
       } else {
@@ -58,6 +82,9 @@ export async function readCopyBlocks(
     }
   }
 
+  if (unterminated !== null) {
+    throw new Error(`Dump ended inside the COPY block of '${unterminated}' (truncated file?)`);
+  }
   return seen;
 }
 
