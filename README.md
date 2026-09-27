@@ -19,12 +19,15 @@
 ## 🏗️ Kiến Trúc Kỹ Thuật (Safe High-Performance Engineering)
 
 1. **Framework siêu nhẹ Hono v4**: Tối ưu riêng cho Web Standards và Cloudflare Workers runtime (V8 isolates), thời gian xử lý routing chỉ ~0.01ms.
-2. **Multi-Tier Edge Caching**:
-   - **L1 Edge Cache API (`caches.default`)**: Cache trực tiếp tại Anycast Edge PoP gần người dùng nhất. Hỗ trợ `stale-while-revalidate` (SWR) trả kết quả tức thì trong khi âm thầm làm mới dữ liệu nền.
-   - **L2 Cloudflare KV (Tuỳ chọn)**: Bộ nhớ phân tán toàn cầu cho dữ liệu VIN và hãng xe vĩnh cửu.
+2. **Multi-Tier Edge Caching & Model 2 Local Engine**:
+   - **Local NHTSA Master Datasets (Trực tiếp trong Git)**: Nhúng sẵn toàn bộ **13,001 WMI toàn cầu** (`data/wmi-master.json`) và **32,009 mẫu xe** (`data/makes-models.json`) được trích xuất trực tiếp từ bản dump chính thức `vPICList_lite_2026_09`.
+   - **Sub-millisecond Local Decoder**: Giải mã VIN trong **0.01ms - 0.05ms** bằng thuật toán chuẩn 49 CFR Part 565 mà không cần gọi ra ngoài Internet.
+   - **L1 Edge Cache API (`caches.default`)**: Cache Anycast Edge PoP với `stale-while-revalidate`.
+   - **Cloudflare D1 (SQLite Edge Database)**: Cơ sở dữ liệu SQLite phân tán hỗ trợ seed tự động (`migrations/0002_seed_official_wmi.sql`) và cơ chế tự chữa lành (Self-Healing).
 3. **Request Coalescing (Thundering Herd Protection)**: Khi có nhiều request đồng thời gửi tới cùng một VIN chưa được cache, hệ thống chỉ gửi **1 request duy nhất** lên NHTSA và chia sẻ Promise cho các client khác.
 4. **Resilient Network Client**: Trang bị `AbortController` timeout (mặc định 5s) và cơ chế tự động thử lại (Retry with Exponential Backoff) khi NHTSA gặp lỗi 502/503/504.
 5. **Strict Type Safety**: Tuân thủ chuẩn mực kiểm soát kiểu dữ liệu nghiêm ngặt: TypeScript `strict: true`, `noUncheckedIndexedAccess: true`, không dùng `any`, xử lý schema bằng `zod`.
+6. **Shadow Parity Verification (`/api/v1/vin/:vin/compare`)**: Chạy song song Local Engine vs Upstream API của NHTSA để kiểm chứng độ chính xác 100%.
 
 ---
 
