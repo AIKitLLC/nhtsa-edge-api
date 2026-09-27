@@ -5,7 +5,11 @@ import { CONFIG } from "../config";
 import { getFromCache, getSafeExecutionContext, normalizeCacheKey, saveToCache } from "../services/cache";
 import { fetchUpstream } from "../services/upstream";
 import { transformVinDecode } from "../services/transformer";
-import { decodeVinLocally } from "../services/local-decoder";
+import {
+  decodeVinLocally,
+  getLocalMakes,
+  getLocalModelsForMake,
+} from "../services/local-decoder";
 import { compareWithUpstream } from "../services/comparator";
 import {
   getVinFromD1,
@@ -371,7 +375,27 @@ v1Router.post("/admin/seed", async (c) => {
  * GET /api/v1/makes
  * Cached list of all registered vehicle makes
  */
+/**
+ * GET /api/v1/makes
+ * Cached list of all registered vehicle makes from local NHTSA catalog
+ */
 v1Router.get("/makes", async (c) => {
+  const isRemoteRequested = c.req.query("remote") === "true";
+
+  // 1. Return from local 100% NHTSA dataset if remote not forced
+  if (!isRemoteRequested) {
+    const localMakes = getLocalMakes();
+    if (localMakes.length > 0) {
+      return c.json({
+        success: true,
+        count: localMakes.length,
+        data: localMakes,
+        source: "LOCAL_NHTSA_CATALOG",
+        timestamp: new Date().toISOString(),
+      });
+    }
+  }
+
   const cacheKey = normalizeCacheKey(c.req.url);
 
   const cached = await getFromCache(cacheKey, c.env);
@@ -414,7 +438,7 @@ v1Router.get("/makes", async (c) => {
 
 /**
  * GET /api/v1/models?make=:make
- * Cached list of models for a specified make
+ * Cached list of models for a specified make from local NHTSA catalog (32,009 models)
  */
 v1Router.get("/models", async (c) => {
   const make = c.req.query("make")?.trim();
@@ -429,6 +453,26 @@ v1Router.get("/models", async (c) => {
       },
       400
     );
+  }
+
+  const isRemoteRequested = c.req.query("remote") === "true";
+
+  // 1. Check local NHTSA models catalog first (<0.05ms)
+  if (!isRemoteRequested) {
+    const localModels = getLocalModelsForMake(make);
+    if (localModels && localModels.length > 0) {
+      return c.json({
+        success: true,
+        data: {
+          make: make.toUpperCase(),
+          count: localModels.length,
+          models: localModels,
+        },
+        source: "LOCAL_NHTSA_CATALOG",
+        cached: false,
+        timestamp: new Date().toISOString(),
+      });
+    }
   }
 
   const cacheKey = normalizeCacheKey(c.req.url);

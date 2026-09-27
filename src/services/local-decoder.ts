@@ -1,7 +1,17 @@
-/**
- * NHTSA Official VIN Decoding Engine (49 CFR Part 565 compliant)
- * Executes locally at Cloudflare edge in < 1ms without calling NHTSA servers.
- */
+import wmiMasterJson from "../../data/wmi-master.json";
+import makesModelsJson from "../../data/makes-models.json";
+
+interface WmiMasterItem {
+  readonly make: string;
+  readonly country: string | null;
+  readonly vehicleType: string | null;
+}
+
+const WMI_MASTER: Readonly<Record<string, WmiMasterItem>> =
+  wmiMasterJson as unknown as Record<string, WmiMasterItem>;
+
+const MAKES_MODELS_MASTER: Readonly<Record<string, readonly string[]>> =
+  makesModelsJson as unknown as Record<string, readonly string[]>;
 
 export interface VinValidationResult {
   readonly isValid: boolean;
@@ -219,7 +229,8 @@ export function decodeModelYear(vin: string): number | null {
 }
 
 /**
- * Decodes WMI (first 3 chars) to country, make, and manufacturer
+ * Decodes WMI (first 3 chars, or 6 chars for low-volume manufacturers) to country, make, and vehicle type.
+ * Complies with official NHTSA vpic.fvinwmi stored procedure and 13,001 record master dataset.
  */
 export function decodeWmi(vin: string): {
   wmi: string;
@@ -229,19 +240,54 @@ export function decodeWmi(vin: string): {
   vehicleType: string | null;
 } {
   const cleanVin = vin.trim().toUpperCase();
-  const wmi = cleanVin.substring(0, 3);
-  const firstChar = cleanVin[0];
+  let wmi = cleanVin.substring(0, 3);
 
-  const plantCountry = firstChar ? REGION_COUNTRY_MAP[firstChar] ?? null : null;
-  const known = KNOWN_WMI_CATALOG[wmi];
+  // Official NHTSA 49 CFR Part 565 / vpic.fvinwmi low-volume rule:
+  // If the 3rd character is '9' and VIN length >= 14, positions 12-14 identify the manufacturer
+  if (wmi.length === 3 && wmi[2] === "9" && cleanVin.length >= 14) {
+    wmi = wmi + cleanVin.substring(11, 14);
+  }
+
+  const firstChar = cleanVin[0];
+  const regionCountry = firstChar ? REGION_COUNTRY_MAP[firstChar] ?? null : null;
+
+  // 1. Primary lookup in official 13,001 entry NHTSA WMI master catalog
+  const masterEntry = WMI_MASTER[wmi] || WMI_MASTER[wmi.substring(0, 3)];
+  if (masterEntry) {
+    return {
+      wmi,
+      plantCountry: masterEntry.country ?? regionCountry,
+      make: masterEntry.make.toUpperCase(),
+      manufacturer: masterEntry.make,
+      vehicleType: masterEntry.vehicleType,
+    };
+  }
+
+  // 2. Secondary fallback to known catalog
+  const known = KNOWN_WMI_CATALOG[wmi] || KNOWN_WMI_CATALOG[wmi.substring(0, 3)];
 
   return {
     wmi,
-    plantCountry,
+    plantCountry: regionCountry,
     make: known?.make ?? null,
     manufacturer: known?.manufacturer ?? null,
     vehicleType: known?.vehicleType ?? null,
   };
+}
+
+/**
+ * Returns models for a make directly from local NHTSA catalog (32,009 models)
+ */
+export function getLocalModelsForMake(make: string): readonly string[] | null {
+  const cleanMake = make.trim().toUpperCase();
+  return MAKES_MODELS_MASTER[cleanMake] ?? null;
+}
+
+/**
+ * Returns all registered vehicle makes from local dataset
+ */
+export function getLocalMakes(): readonly string[] {
+  return Object.keys(MAKES_MODELS_MASTER).sort();
 }
 
 /**
