@@ -1,0 +1,10 @@
+#id	name
+1	Stoichiometric gasoline direct injection (SGDI)
+2	Lean-burn gasoline direct injection (LBGDI)
+3	Multipoint Fuel Injection (MPFI)
+4	Sequential Fuel Injection (SFI)
+5	Throttle Body Fuel Injection (TBI)
+6	Common Rail Direct Injection Diesel (CRDI)
+7	Unit Injector Direct Injection Diesel (UDI)
+9	Compression Ignition
+10	Transistor Controlled Ignition (TCI)

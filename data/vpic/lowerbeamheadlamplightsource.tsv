@@ -1,0 +1,17 @@
+#id	name
+1	Halogen
+2	HID
+3	LED
+4	Other
+5	Halogen, HID
+6	Halogen, LED
+7	Halogen, Other
+8	HID, LED
+9	HID, Other
+10	LED, Other
+11	Halogen, HID, LED
+12	Halogen, HID, Other
+13	Halogen, LED, Other
+14	HID, LED, Other
+15	Halogen, HID, LED, Other
+16	Laser
