@@ -92,7 +92,9 @@ jobs:
           git config user.name "github-actions[bot]"
           git add data/vpic test/fixtures
           git commit -m "data(vpic): ${VERSION} (live parity ${RATE}%)"
-          git push
+          # Another run may have pushed meanwhile: replay this commit on top of it
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
           echo "committed=true" >> "$GITHUB_OUTPUT"
           {
             echo "## Committed \`${VERSION}\` (live parity ${RATE}%)"

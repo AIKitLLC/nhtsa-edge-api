@@ -107,6 +107,17 @@ and its parity rate is part of each data commit message. Most remaining differen
 are NHTSA data changes made after the dump was published (new patterns, re-cased names);
 they disappear with the next dump. Details: [docs/DATA.md](docs/DATA.md).
 
+### Performance
+
+Measured on 3,000 varied VINs (the parity corpus) with the production cache settings:
+
+| Metric | Value |
+| :-- | :-- |
+| Decode time p50 / p95 / p99 (including cold asset reads) | 1.4 ms / 6.2 ms / 10.9 ms |
+| Decode time, warm (asset already cached in the isolate) | ~1–3 ms |
+| Peak heap of the per-isolate data cache (4 MB JSON budget, LRU) | ~42 MB |
+| Worker script size | ~61 KB gzip (data ships as static assets) |
+
 ---
 
 ## Development
@@ -149,6 +160,10 @@ docs/vpic-reference/    NHTSA's decode functions, verbatim, as the porting refer
 
 The worker and its data deploy together (`assets` in `wrangler.jsonc`), so every
 deployment is one immutable version that `wrangler rollback` can restore.
+
+**Plan:** use **Workers Paid** for production. The free plan limits a request to 10 ms
+of CPU; a cold decode that parses a large data file, or a 50-VIN batch, can exceed it.
+Static assets (≈5.3k files) fit the free plan's 20,000-file limit either way.
 
 ### Dev worker (automatic)
 

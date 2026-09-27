@@ -48,6 +48,10 @@ on pushes that change the decoder or pipeline.
 6. **Deploy** the `nhtsa-edge-api-dev` worker and smoke-test it (health reports the
    new data version; a known VIN decodes).
 
+The workflow pushes with the default `GITHUB_TOKEN`. If the branch it runs on is
+protected, allow GitHub Actions to push to it (or change the commit step to open a pull
+request instead).
+
 ### Reverting a data update
 
 Each update is one commit containing both the data and the matching expectations:
