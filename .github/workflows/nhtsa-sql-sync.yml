@@ -2,9 +2,9 @@ name: NHTSA SQL Dump & Dataset Sync 🔄
 
 on:
   schedule:
-    # Chạy tự động lúc 03:00 UTC mỗi đêm Chủ Nhật (0) và đêm Thứ Hai (1)
+    # Runs at 03:00 UTC every Sunday night (0) and Monday night (1)
     - cron: '0 3 * * 0,1'
-  workflow_dispatch: # Cho phép kích hoạt thủ công từ GitHub Actions UI
+  workflow_dispatch: # Allows manual trigger from GitHub Actions UI
 
 concurrency:
   group: nhtsa-sync
@@ -15,7 +15,7 @@ jobs:
     name: Sync NHTSA SQL Dump & Deploy
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Quyền commit dữ liệu mới vào Git
+      contents: write # Permission to commit updated datasets into Git
 
     steps:
       - name: 📥 Checkout Repository

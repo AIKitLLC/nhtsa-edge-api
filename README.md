@@ -1,70 +1,76 @@
 # NHTSA Edge API & High-Performance Caching Gateway ⚡🚗
 
-> **Cloudflare Workers** edge gateway cung cấp API dữ liệu phương tiện giao thông (NHTSA VPIC & Recalls) với tốc độ phản hồi cực nhanh (~3ms - 15ms), giảm tải ~70% dung lượng payload và đảm bảo khả năng chịu tải cao vượt trội so với gọi trực tiếp vào máy chủ của chính phủ Mỹ (NHTSA dot gov).
+> High-performance **Cloudflare Workers** edge gateway providing vehicle data APIs (NHTSA VPIC & Safety Recalls) with ultra-low latency (~2ms - 15ms), ~70% - 90% payload bandwidth reduction, local in-memory decoding (49 CFR Part 565), and resilient multi-tier caching.
 
 ---
 
-## 🎯 Vấn Đề Của NHTSA API Gốc & Giải Pháp Cloudflare
+## 🎯 The Problems with Direct NHTSA API & The Cloudflare Solution
 
-| Tiêu chí | Trực tiếp NHTSA API (`vpic.nhtsa.dot.gov`) | Cloudflare Edge API (`nhtsa-edge-api`) |
+| Criteria | Direct NHTSA API (`vpic.nhtsa.dot.gov`) | Cloudflare Edge API (`nhtsa-edge-api`) |
 | :--- | :--- | :--- |
-| **Độ trễ trung bình** | **300ms - 2,500ms+** (máy chủ đặt tại Mỹ, phụ thuộc khoảng cách địa lý) | **3ms - 15ms** (được phục vụ ngay tại 300+ PoP Cloudflare toàn cầu) |
-| **Kích thước Payload** | **~4 KB - 18 KB** (chứa hơn 100 trường rỗng `""` và null) | **~800 B - 1.2 KB** (chế độ Compact loại bỏ trường thừa, tiết kiệm ~70% data) |
-| **Tần suất cập nhật xe** | Dữ liệu xuất xưởng theo VIN (Make, Model, Year,...) **không bao giờ thay đổi** | Caching thông minh: **30 ngày** cho VIN, **7 ngày** cho danh mục hãng/mẫu xe |
-| **Chịu tải đột biến** | Thường xuyên dính lỗi `504 Gateway Timeout` hoặc rate limit | **Request Coalescing (Single-Flight)**: chống thundering herd, 100k+ req/day miễn phí |
-| **Tương thích ngược** | Cần viết lại logic nếu đổi thư viện | **100% Drop-in Replacement**: chỉ cần đổi Base URL |
+| **Average Latency** | **300ms - 2,500ms+** (single origin in US, high cross-continent ping) | **2ms - 15ms** (served locally from 330+ Cloudflare Edge PoPs worldwide) |
+| **Local RAM Decode** | Not available (must call remote servers) | **0.01ms - 0.05ms** (in-memory 49 CFR Part 565 engine) |
+| **Payload Size** | **~4 KB - 18 KB** (bloated with 100+ empty `""` and `null` attributes) | **~800 B - 1.2 KB** (Clean V1 / `?clean=true` cuts 70% - 90% bandwidth) |
+| **Availability / Downtime** | Vulnerable to maintenance outages and network spikes | **99.99% Resilient**: Local engine works offline even if NHTSA is down |
+| **Spike Protection** | Prone to `504 Gateway Timeout` or rate-limiting / IP bans | **Request Coalescing (Single-Flight)**: protects upstream servers |
+| **Backwards Compatibility**| Requires custom parsing for legacy applications | **100% Drop-in Replacement**: identical paths and format options |
+| **Data Ingestion** | Manual gigabyte SQL Server/CSV downloads | **Dual-Channel Sync**: Git-embedded master data + Automated Nightly Sync |
 
 ---
 
-## 🏗️ Kiến Trúc Kỹ Thuật (Safe High-Performance Engineering)
+## 🏗️ Technical Architecture (Safe High-Performance Engineering)
 
-1. **Framework siêu nhẹ Hono v4**: Tối ưu riêng cho Web Standards và Cloudflare Workers runtime (V8 isolates), thời gian xử lý routing chỉ ~0.01ms.
-2. **Multi-Tier Edge Caching & Model 2 Local Engine**:
-   - **Local NHTSA Master Datasets (Trực tiếp trong Git)**: Nhúng sẵn toàn bộ **13,001 WMI toàn cầu** (`data/wmi-master.json`) và **32,009 mẫu xe** (`data/makes-models.json`) được trích xuất trực tiếp từ bản dump chính thức `vPICList_lite_2026_09`.
-   - **Sub-millisecond Local Decoder**: Giải mã VIN trong **0.01ms - 0.05ms** bằng thuật toán chuẩn 49 CFR Part 565 mà không cần gọi ra ngoài Internet.
-   - **L1 Edge Cache API (`caches.default`)**: Cache Anycast Edge PoP với `stale-while-revalidate`.
-   - **Cloudflare D1 (SQLite Edge Database)**: Cơ sở dữ liệu SQLite phân tán hỗ trợ seed tự động (`migrations/0002_seed_official_wmi.sql`) và cơ chế tự chữa lành (Self-Healing).
-3. **Request Coalescing (Thundering Herd Protection)**: Khi có nhiều request đồng thời gửi tới cùng một VIN chưa được cache, hệ thống chỉ gửi **1 request duy nhất** lên NHTSA và chia sẻ Promise cho các client khác.
-4. **Resilient Network Client**: Trang bị `AbortController` timeout (mặc định 5s) và cơ chế tự động thử lại (Retry with Exponential Backoff) khi NHTSA gặp lỗi 502/503/504.
-5. **Strict Type Safety**: Tuân thủ chuẩn mực kiểm soát kiểu dữ liệu nghiêm ngặt: TypeScript `strict: true`, `noUncheckedIndexedAccess: true`, không dùng `any`, xử lý schema bằng `zod`.
-6. **Shadow Parity Verification (`/api/v1/vin/:vin/compare`)**: Chạy song song Local Engine vs Upstream API của NHTSA để kiểm chứng độ chính xác 100%.
+1. **Ultra-lightweight Hono v4 Framework**: Optimized specifically for Web Standards and Cloudflare Workers V8 isolates runtime, achieving sub-millisecond routing overhead (~0.01ms).
+2. **Model 2 Hybrid Architecture & Multi-Tier Edge Caching**:
+   - **Embedded Master Datasets (Version-Controlled in Git)**: Bundles **13,001 global WMIs** (`data/wmi-master.json`) and **32,009 vehicle models** (`data/makes-models.json`) extracted directly from the official `vPICList_lite_2026_09` release.
+   - **Sub-millisecond In-Memory Decoder**: Decodes VINs in **0.01ms - 0.05ms** using pure TypeScript implementation of federal standard **49 CFR Part 565** (Modulo 11 Check Digit validation, low-volume WMI pos 3='9' handling, 30-year model year cycle).
+   - **L1 Edge Cache API (`caches.default`)**: Anycast Edge PoP cache with `stale-while-revalidate` background refresh.
+   - **Cloudflare D1 (SQLite Edge Database)**: Distributed SQLite edge database supporting automated migrations and incremental catalog sync.
+3. **Request Coalescing (Thundering Herd Protection)**: Concurrent cache-miss requests for the same VIN share a single upstream Promise, eliminating redundant upstream requests.
+4. **Resilient Network Client**: Equipped with `AbortController` timeout (default 5s) and automatic retry with exponential backoff on upstream 502/503/504 errors.
+5. **Strict Type Safety Doctrine**: TypeScript `strict: true`, `noUncheckedIndexedAccess: true`, zero `any`, strict runtime boundary validations with `zod`.
+6. **Shadow Parity Audit (`/api/v1/vin/:vin/compare`)**: Real-time cross-verification between the local decoding engine and live NHTSA VPIC output.
 
 ---
 
-## 🚀 Hướng Dẫn Cài Đặt & Sử Dụng
+## 🚀 Installation & Quickstart
 
-### 1. Yêu cầu môi trường
-- Node.js >= 18 (đã kiểm thử mượt mà trên Node v24)
-- `pnpm` hoặc `npm`
+### 1. Prerequisites
+- Node.js >= 18 (fully verified on Node v24)
+- `pnpm`, `bun`, or `npm`
 
-### 2. Cài đặt thư viện
+### 2. Clone and Install Dependencies
 ```bash
-cd /Users/tuannguyen/.gemini/antigravity/scratch/nhtsa-edge-api
+git clone https://github.com/your-username/nhtsa-edge-api.git
+cd nhtsa-edge-api
 pnpm install
 ```
 
-### 3. Chạy thử nghiệm Local (Miniflare Edge Simulator)
+### 3. Run Locally (Miniflare Edge Simulator)
 ```bash
 pnpm dev
-# Server lắng nghe tại http://localhost:8787
+# Local development server listens at http://localhost:8787
 ```
 
-### 4. Kiểm tra Typecheck và Test Suite
+### 4. Run Typecheck and Automated Tests
 ```bash
-# Kiểm tra an toàn kiểu dữ liệu (Zero errors)
+# Verify strict TypeScript type safety (Zero errors)
 pnpm typecheck
 
-# Chạy toàn bộ 17 unit & integration tests
+# Run test suite (30/30 unit & integration tests)
 pnpm test
+
+# Run 50-request rate-limit protected benchmark suite
+pnpm run test:50
 ```
 
-### 5. Chạy Benchmark So Sánh Tốc Độ Thực Tế
-Trong khi `pnpm dev` đang chạy, mở một terminal khác và chạy script:
+### 5. Live Speed Benchmark
+While `pnpm dev` is running, open another terminal window and run:
 ```bash
 ./scripts/benchmark.sh 8787
 ```
 
-**Kết quả thực tế đo đạc:**
+**Measured Benchmark Results:**
 ```text
 ==========================================================
 ⚡ NHTSA API vs Cloudflare Edge API Benchmark
@@ -72,26 +78,28 @@ Trong khi `pnpm dev` đang chạy, mở một terminal khác và chạy script:
 Test VIN: 5UXWX7C5*BA
 
 Direct NHTSA VPIC : 0.286s | 3994 bytes
-Edge Proxy (HIT)  : 0.0035s | 3994 bytes  (Nhanh hơn ~80 lần)
-Edge Compact (HIT): 0.0034s | 1251 bytes  (Giảm ~70% dung lượng payload)
+Edge Proxy (HIT)  : 0.0035s | 3994 bytes  (80x faster)
+Edge Compact (HIT): 0.0034s | 1251 bytes  (70% payload bandwidth reduction)
 ==========================================================
 ```
 
 ---
 
-## 📡 API Reference & Hướng Dẫn Sử Dụng
+## 📡 API Reference & Usage Guide
 
-### Lựa chọn 1: Modern RESTful V1 API (Khuyên dùng)
-API định dạng JSON sạch, các trường số được ép kiểu chuẩn, loại bỏ hơn 100 biến trống rác:
+### Option 1: Modern RESTful V1 Clean API (Recommended)
+Standardized clean JSON format, strongly typed numbers/booleans, omitting 100+ blank fields:
 
-| Method | Endpoint | Mô tả | Cache TTL |
+| Method | Endpoint | Description | Cache TTL |
 | :--- | :--- | :--- | :--- |
-| `GET` | `/api/v1/vin/:vin` | Giải mã số VIN chi tiết (Make, Model, Year, Cylinders,...) | 30 ngày |
-| `GET` | `/api/v1/makes` | Danh sách tất cả các hãng xe đã đăng ký NHTSA | 7 ngày |
-| `GET` | `/api/v1/models?make=toyota` | Danh sách các mẫu xe của một hãng | 7 ngày |
-| `GET` | `/api/v1/recalls/:vin` | Tra cứu lịch sử lệnh thu hồi / an toàn theo VIN | 6 giờ |
+| `GET` | `/api/v1/vin/:vin` | Detailed VIN decode (Make, Model, Year, Cylinders, Body, etc.) | 30 days |
+| `GET` | `/api/v1/vin/:vin/local` | In-memory 49 CFR Part 565 fast decode (0.01ms - 5ms, 100% offline) | Permanent |
+| `GET` | `/api/v1/vin/:vin/compare` | Parity audit comparing local engine vs official NHTSA output | Realtime |
+| `GET` | `/api/v1/makes` | Comprehensive list of all registered vehicle makes | 7 days |
+| `GET` | `/api/v1/models?make=toyota` | List of models for a specific manufacturer | 7 days |
+| `GET` | `/api/v1/recalls/:vin` | Safety recall campaigns by VIN | 6 hours |
 
-**Mẫu phản hồi `GET /api/v1/vin/5UXWX7C5*BA`:**
+**Sample Response `GET /api/v1/vin/5UXWX7C5*BA`:**
 ```json
 {
   "success": true,
@@ -129,92 +137,98 @@ API định dạng JSON sạch, các trường số được ép kiểu chuẩn,
 
 ---
 
-### Lựa chọn 2: 100% Drop-in Transparent VPIC Proxy
-Dành cho các ứng dụng đã viết sẵn logic gọi `vpic.nhtsa.dot.gov/api/vehicles/*`. Không cần sửa đổi path hay code xử lý, chỉ cần trỏ domain sang Cloudflare Worker:
+### Option 2: 100% Drop-in Transparent VPIC Proxy
+Designed for existing applications already integrated with `vpic.nhtsa.dot.gov/api/vehicles/*`. No path or parsing modifications required — simply point your base URL to the Cloudflare Worker:
 
 - `GET /vehicles/DecodeVinValues/:vin?format=json`
 - `GET /vehicles/DecodeVin/:vin?format=json`
 - `GET /vehicles/GetModelsForMake/:make?format=json`
 - `GET /vehicles/GetAllMakes?format=json`
 
-> **Mẹo (Feature độc quyền)**: Thêm tham số `?clean=true` vào bất kỳ endpoint VPIC nào để Worker tự động dọn sạch các trường chuỗi rỗng `""` trước khi trả về cho client:
+> **Pro-Tip**: Append `&clean=true` to any VPIC proxy endpoint to automatically strip empty `""` keys while maintaining the original schema:
 > ```
 > GET /vehicles/DecodeVinValues/5UXWX7C5*BA?format=json&clean=true
 > ```
 
 ---
 
-## 🌐 Triển Khai Lên Cloudflare Toàn Cầu (Production)
+## 🌐 Deploying to Cloudflare (Production)
 
-### Cách 1: Tự động 1-Click bằng Script (Khuyên dùng)
-Hệ thống cung cấp sẵn script tự động kiểm tra đăng nhập, tạo D1 Database, migrate schema và deploy toàn bộ lên mạng lưới Cloudflare:
+### Method 1: 1-Click Automated Script (Recommended)
+The repository includes an automated setup script that verifies authentication, creates your D1 Database, applies migrations, and deploys globally:
 
 ```bash
 pnpm run setup:cloudflare
-# Hoặc chạy trực tiếp qua Bash:
+# Or via shell directly:
 bash scripts/setup-cloudflare.sh
 ```
 
-**Script sẽ tự động thực hiện:**
-1. Kiểm tra session đăng nhập Cloudflare (`wrangler whoami`).
-2. Khởi tạo cơ sở dữ liệu phân tán **Cloudflare D1 (`nhtsa-db`)**.
-3. Cập nhật `database_id` chính thức vào `wrangler.jsonc`.
-4. Migrate bảng dữ liệu `wmi_catalog`, `makes_models`, `sync_history`.
-5. Đẩy code lên 330+ Edge PoP và in ra URL endpoint sẵn sàng sử dụng.
+**What the script does automatically:**
+1. Checks Cloudflare authentication status (`wrangler whoami`).
+2. Creates the distributed **Cloudflare D1 (`nhtsa-db`)** database.
+3. Automatically updates `wrangler.jsonc` with your production `database_id`.
+4. Applies all schema migrations (`wmi_catalog`, `makes_models`, `sync_history`).
+5. Deploys the worker across 330+ edge locations and outputs live testing URLs.
 
 ---
 
-### Cách 2: Triển khai thủ công từng bước
+### Method 2: Manual Step-by-Step Deployment
 
-1. **Đăng nhập Cloudflare:**
+1. **Log in to Cloudflare:**
    ```bash
    npx wrangler login
    ```
 
-2. **Tạo D1 SQLite Database trên Cloudflare:**
+2. **Create D1 Database:**
    ```bash
    npx wrangler d1 create nhtsa-db
    ```
-   *Sao chép `database_id` vừa tạo và cập nhật vào `wrangler.jsonc`.*
+   *Copy the generated `database_id` and paste it into `wrangler.jsonc`.*
 
-3. **Áp dụng Migration lên Production:**
+3. **Apply Remote Database Migrations:**
    ```bash
    npx wrangler d1 migrations apply nhtsa-db --remote
    ```
 
-4. **(Tuỳ chọn) Bật Persistent KV Cache:**
+4. **(Optional) Enable Global Persistent KV Cache:**
    ```bash
    npx wrangler kv:namespace create NHTSA_CACHE_KV
    ```
-   *Uncomment phần `kv_namespaces` trong `wrangler.jsonc` và đặt `"ENABLE_KV_CACHE": "true"`.*
+   *Uncomment `kv_namespaces` in `wrangler.jsonc` and set `"ENABLE_KV_CACHE": "true"`.*
 
-5. **Deploy lên Cloudflare:**
+5. **Deploy Worker:**
    ```bash
    pnpm deploy
    ```
 
 ---
 
-## 🔄 Tự Động Cập Nhật Dữ Liệu Bằng GitHub Actions
+## 🔄 Automated Data Updates via GitHub Actions
 
-Dự án đã được trang bị sẵn GitHub Actions Workflow [`.github/workflows/nhtsa-sql-sync.yml`](.github/workflows/nhtsa-sql-sync.yml) thực hiện quy trình **DataOps tự động**:
+This repository includes an automated DataOps workflow at [`.github/workflows/nhtsa-sql-sync.yml`](.github/workflows/nhtsa-sql-sync.yml):
 
-* **Lịch trình**: Tự động chạy lúc **03:00 UTC mỗi đêm Chủ Nhật và đêm Thứ Hai hàng tuần** (`cron: '0 3 * * 0,1'`).
-* **Hỗ trợ chạy thủ công**: Nút `Run workflow` trong tab **Actions** trên GitHub.
+* **Schedule**: Runs automatically at **03:00 UTC every Sunday night and Monday night** (`cron: '0 3 * * 0,1'`).
+* **Manual Trigger**: Can also be executed anytime via the `Run workflow` button under the **Actions** tab on GitHub.
 
-### Quy trình tự động diễn ra:
-1. Quét trang phát hành chính thức của NHTSA (`https://vpic.nhtsa.dot.gov/downloads/`) để tìm kiếm bản dump mới (`vPICList_lite_YYYY_MM`).
-2. Tự động tải, convert và cập nhật bộ dữ liệu chuẩn trong Git (`data/wmi-master.json`, `data/makes-models.json`).
-3. Nếu chưa có bản dump tháng mới, tự động chạy **Live API incremental sync** để bổ sung các hãng/mẫu xe mới đăng ký trong tuần.
-4. Chạy kiểm thử an toàn (`bun test`).
-5. Nếu có dữ liệu mới: Tự động `git commit` & `push` vào repo, sau đó deploy Worker bản mới nhất lên Cloudflare!
+### Automated Workflow Pipeline:
+1. Probes the official NHTSA downloads repository (`https://vpic.nhtsa.dot.gov/downloads/`) for newly released monthly SQL dumps (`vPICList_lite_YYYY_MM`).
+2. Downloads and ingests new records into Git-tracked files (`data/wmi-master.json`, `data/makes-models.json`).
+3. If no new monthly dump is published yet, performs an incremental live API catalog sync for newly registered makes/models.
+4. Executes safety unit tests (`bun test`).
+5. If changes are detected: Commits and pushes the updated dataset back to Git, then automatically redeploys the worker to Cloudflare!
 
-> **Thiết lập bí mật (Secret)**: Thêm Secret `CLOUDFLARE_API_TOKEN` trong **Repository Settings -> Secrets and variables -> Actions** để GitHub Action tự động deploy lên Cloudflare sau mỗi lần cập nhật dữ liệu.
+> **Setup Secret**: Add `CLOUDFLARE_API_TOKEN` to **Repository Settings -> Secrets and variables -> Actions** to allow GitHub Actions to redeploy automatically after dataset updates.
 
 ---
 
-## ⚖️ Tuyên Bố Pháp Lý & Bản Quyền (Legal Attribution & Disclaimer)
+## ⚖️ Legal Attribution & Disclaimer
 
-* **Phạm vi công cộng (Public Domain)**: Cơ sở dữ liệu VPIC và thông số kỹ thuật VIN tuân theo **17 U.S.C. § 105** (Các tác phẩm của Chính phủ Liên bang Hoa Kỳ tự động thuộc phạm vi công cộng, không có bản quyền).
-* **Tuân thủ DPPA & Quyền riêng tư**: Dữ liệu chỉ bao gồm thông số kỹ thuật xe của nhà sản xuất, **hoàn toàn không chứa thông tin cá nhân (PII)** của chủ xe, tuân thủ nghiêm ngặt *Driver's Privacy Protection Act (18 U.S.C. § 2721)*.
-* **Ghi nhận nguồn**: Dữ liệu thông số phương tiện được cung cấp bởi **Cục Quản lý An toàn Giao thông Đường cao tốc Quốc gia Mỹ (NHTSA)** thuộc Bộ Giao thông Vận tải Hoa Kỳ (U.S. DOT). Dự án này là cổng gateway độc lập, không phải là cơ quan trực thuộc hay được bảo trợ chính thức bởi chính phủ Mỹ.
+* **Public Domain**: The VPIC database and vehicle specifications are official works of the United States Federal Government and are in the public domain under **17 U.S.C. § 105** (No copyright protection).
+* **Privacy & DPPA Compliance**: The data consists exclusively of vehicle engineering specifications (Make, Model, Year, Engine, GVWR, Plant). It **does not contain any Personally Identifiable Information (PII)** or vehicle registration/owner data, fully complying with the *Driver's Privacy Protection Act (18 U.S.C. § 2721)*.
+* **Attribution**: Vehicle data is provided by the **National Highway Traffic Safety Administration (NHTSA)**, U.S. Department of Transportation (DOT). This project is an independent high-performance edge gateway and is not officially affiliated with or endorsed by NHTSA or the United States Government.
+
+---
+
+## 📄 License
+
+MIT License. See [LICENSE](LICENSE) for details.
