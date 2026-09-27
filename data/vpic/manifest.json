@@ -556,6 +556,19 @@
       "files": {
         "vehiclespecschema_year.tsv": "da21e2f43eb476461f1c3c591a94964f035164a99147323bcc4cc35a2652aa5d"
       }
+    },
+    "wmiyearvalidchars": {
+      "rows": 241377,
+      "files": {
+        "wmiyearvalidchars/00.tsv": "d577fd688f970cbe674b0ce957808539b1d2b4579b4ae2b7ec54656dac247834",
+        "wmiyearvalidchars/01.tsv": "71fcbe74c587fafdb7b6f200c833da0ee28956aea8d4a1c4e02034c8c4290e40",
+        "wmiyearvalidchars/02.tsv": "4122e0286ac70d84c263a1cc6a445ad0a20b25de73b9a3d6aad7f733358a9887",
+        "wmiyearvalidchars/03.tsv": "e72ce567f2f09145a4325f45937e54871c3e776489302d8f420a18f0221845ed",
+        "wmiyearvalidchars/04.tsv": "b48ca1e0e21dc43a967c3c6469114c4148245e88e7321696659b8a85ab43aad9",
+        "wmiyearvalidchars/05.tsv": "c4a66cf8a13748e90a92b60f5a0111b4fcc197d9dc336849ec08cb3c8600ca2a",
+        "wmiyearvalidchars/06.tsv": "6a4cfa28d2cfdad57024fc923a369a7319a1efdc7b4f37d7a62a6336bbadf8ad",
+        "wmiyearvalidchars/07.tsv": "db9543b44c977710e74f267ac78381ec0de8fa3f0a28e72a173c302637cc1f4b"
+      }
     }
   }
 }
