@@ -155,8 +155,9 @@ export async function seedInitialD1Data(db: D1Database): Promise<number> {
     });
 
     if (statements.length > 0) {
-      await db.batch(statements);
-      inserted = statements.length;
+      const results = await db.batch(statements);
+      // INSERT OR IGNORE: count rows actually written, not statements executed
+      inserted = results.reduce((sum, r) => sum + (r.meta?.changes ?? 0), 0);
     }
   } catch {
     // Seeding error
