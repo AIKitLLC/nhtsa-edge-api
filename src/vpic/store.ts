@@ -24,6 +24,12 @@ export function fnv1a(text: string): number {
 export const wmiBucketPath = (wmi: string, buckets: number): string => `vpic/wmi/${fnv1a(wmi) % buckets}.json`;
 export const schemaBucketPath = (schemaId: number, buckets: number): string => `vpic/schema/${schemaId % buckets}.json`;
 export const specBucketPath = (makeId: number, buckets: number): string => `vpic/spec/${makeId % buckets}.json`;
+export const catalogModelsPath = (makeId: number, buckets: number): string => `vpic/catalog/models/${makeId % buckets}.json`;
+
+export interface CatalogEntry {
+  readonly id: number;
+  readonly name: string;
+}
 
 export class AssetNotFoundError extends Error {
   constructor(path: string) {
@@ -84,6 +90,23 @@ export class VpicStore {
     const core = await this.getCore();
     const bucket = await this.load<SchemaBucket>(schemaBucketPath(schemaId, core.buckets.schema), true);
     return bucket?.modelMakes[String(modelId)] ?? [];
+  }
+
+  getMakes(): Promise<readonly CatalogEntry[]> {
+    return this.load<CatalogEntry[]>("vpic/catalog/makes.json", true).then((m) => m ?? []);
+  }
+
+  /** Models of every make whose name equals `makeName` (case-insensitive). */
+  async getModelsForMake(makeName: string): Promise<{ make: CatalogEntry; models: readonly CatalogEntry[] }[]> {
+    const core = await this.getCore();
+    const wanted = makeName.trim().toUpperCase();
+    const makes = (await this.getMakes()).filter((m) => m.name.trim().toUpperCase() === wanted);
+    return Promise.all(
+      makes.map(async (make) => {
+        const bucket = await this.load<Record<string, CatalogEntry[]>>(catalogModelsPath(make.id, core.buckets.catalog), false);
+        return { make, models: bucket?.[String(make.id)] ?? [] };
+      })
+    );
   }
 
   async getSpecSchemas(makeIds: Iterable<number>): Promise<SpecSchema[]> {

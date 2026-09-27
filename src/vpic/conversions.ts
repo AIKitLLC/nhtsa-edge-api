@@ -5,7 +5,7 @@
  */
 
 import { ItemList, nullsFirstDesc } from "./items";
-import { evaluateNumericExpression } from "./pg-numeric";
+import { evaluateDecimalExpression } from "./tsql-decimal";
 import type { ConversionDef } from "./types";
 
 export function applyConversions(list: ItemList, conversions: readonly ConversionDef[]): void {
@@ -23,7 +23,7 @@ export function applyConversions(list: ItemList, conversions: readonly Conversio
     const formula = c.formula.split("#x#").join(item.attributeId ?? "");
     let result: string;
     try {
-      result = evaluateNumericExpression(formula);
+      result = evaluateDecimalExpression(formula);
     } catch {
       result = "0"; // the source catches any SQL error and stores '0'
     }

@@ -28,5 +28,7 @@ export const CONFIG = {
     RESPONSE_TIME: "X-Response-Time-Ms",
     UPSTREAM_TIME: "X-Upstream-Time-Ms",
     SERVER_TIMING: "Server-Timing",
+    DATA_VERSION: "X-Vpic-Data-Version",
+    DECODE_SOURCE: "X-Decode-Source",
   },
 } as const;

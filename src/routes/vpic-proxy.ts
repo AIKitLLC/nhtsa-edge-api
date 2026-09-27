@@ -5,6 +5,7 @@ import { buildCacheKey, canonicalQuery } from "../services/cache";
 import { serveCachedUpstream } from "../services/cached-upstream";
 import { cleanEmptyFields } from "../services/transformer";
 import type { VpicRawResponse } from "../types/nhtsa";
+import { matchOfflineDecode, serveOfflineBatch, serveOfflineDecode } from "./vpic-decode";
 
 export const vpicProxyRouter = new Hono<{ Bindings: Env }>();
 
@@ -53,14 +54,32 @@ function cleanVpicBody(bodyText: string): string {
 }
 
 /**
- * Drop-in VPIC proxy. Matches both /vehicles/* and /api/vehicles/*
- * (the router is mounted at "/" and "/api").
+ * POST /vehicles/DecodeVINValuesBatch/ is answered by the offline decoder.
+ */
+vpicProxyRouter.post("/vehicles/*", async (c) => {
+  const lowerPath = new URL(c.req.url).pathname.replace(/^\/api\//, "/").toLowerCase();
+  if (/^\/vehicles\/decodevinvaluesbatch\/?$/.test(lowerPath)) {
+    return serveOfflineBatch(c);
+  }
+  return c.json({ success: false, error: { code: "METHOD_NOT_ALLOWED", message: "Only GET is supported here" } }, 405);
+});
+
+/**
+ * Drop-in VPIC API. Matches both /vehicles/* and /api/vehicles/*
+ * (the router is mounted at "/" and "/api"). DecodeVinValues and DecodeVin are
+ * answered by the offline decoder; every other endpoint is proxied and cached.
  */
 vpicProxyRouter.get("/vehicles/*", async (c) => {
   const url = new URL(c.req.url);
   // Strip optional '/api' prefix; VPIC paths are case-insensitive
   const subPath = url.pathname.replace(/^\/api\//, "/");
   const lowerPath = subPath.toLowerCase();
+
+  const offline = matchOfflineDecode(lowerPath);
+  if (offline) {
+    const response = await serveOfflineDecode(c, offline, url.searchParams);
+    if (response) return response;
+  }
 
   const query = canonicalQuery(url.searchParams, VPIC_QUERY_PARAMS);
   if (!query.has("format")) {

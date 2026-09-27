@@ -16,7 +16,7 @@
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { validCharsInKey } from "../../src/vpic/keys";
-import { fnv1a, schemaBucketPath, specBucketPath, wmiBucketPath } from "../../src/vpic/store";
+import { catalogModelsPath, fnv1a, schemaBucketPath, specBucketPath, wmiBucketPath } from "../../src/vpic/store";
 import { vinWmi } from "../../src/vpic/vin-functions";
 import type {
   CoreAsset,
@@ -35,7 +35,7 @@ import { ELEMENT_LOOKUP_TABLE } from "./lib/element-lookups";
 import { LOOKUP_TABLES } from "./lib/tables";
 import { bool, int, readTable, requireInt } from "./lib/tsv";
 
-const BUCKETS = { wmi: 1024, schema: 4096, spec: 256 } as const;
+const BUCKETS = { wmi: 1024, schema: 4096, spec: 256, catalog: 128 } as const;
 /** Elements the pattern query never collects (Make, Manufacturer, Model Year, Vehicle Type). */
 const WMI_LEVEL_ELEMENTS = new Set([26, 27, 29, 39]);
 
@@ -318,7 +318,27 @@ function main(): void {
   }
   for (const [path, byMake] of specBuckets) writeJson(path, { byMake } satisfies SpecBucket);
 
-  const fileCount = 1 + wmiBuckets.size + schemaBuckets.size + specBuckets.size;
+  // ---- catalog (makes and their models) --------------------------------------
+  const makes = [...(lookups.get("make") ?? new Map()).entries()]
+    .map(([id, name]) => ({ id: Number(id), name }))
+    .sort((a, b) => a.name.localeCompare(b.name) || a.id - b.id);
+  writeJson("vpic/catalog/makes.json", makes);
+
+  const catalogBuckets = new Map<string, Record<string, { id: number; name: string }[]>>();
+  for (const mm of readTable(dataDir, "make_model")) {
+    const makeId = requireInt(mm["makeid"], "make_model.makeid");
+    const modelId = requireInt(mm["modelid"], "make_model.modelid");
+    const path = catalogModelsPath(makeId, BUCKETS.catalog);
+    let bucket = catalogBuckets.get(path);
+    if (!bucket) catalogBuckets.set(path, (bucket = {}));
+    (bucket[String(makeId)] ??= []).push({ id: modelId, name: nameOf("model", modelId) ?? "" });
+  }
+  for (const [path, bucket] of catalogBuckets) {
+    for (const list of Object.values(bucket)) list.sort((a, b) => a.name.localeCompare(b.name) || a.id - b.id);
+    writeJson(path, bucket);
+  }
+
+  const fileCount = 2 + wmiBuckets.size + schemaBuckets.size + specBuckets.size + catalogBuckets.size;
   console.log(
     `  wrote ${fileCount} files: ${wmiRows.length} WMIs, ${Object.keys(core.elements).length} elements, ${patternCount} decodable patterns`
   );

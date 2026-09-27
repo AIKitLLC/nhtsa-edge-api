@@ -26,6 +26,8 @@ export interface DecodedElement {
 export interface DecodeResult {
   readonly vin: string;
   readonly dumpVersion: string;
+  /** "Manu. Id" item (element 157, which has no row in vpic.Element). */
+  readonly manufacturerId: string | null;
   /** Decode-able, public elements; `value` null when nothing was decoded for it. */
   readonly elements: readonly DecodedElement[];
 }
@@ -252,5 +254,6 @@ export async function decodeVin(store: VpicStore, rawVin: string, options: Decod
     }
   }
 
-  return { vin, dumpVersion: core.dumpVersion, elements };
+  const manufacturerId = items.find((d) => d.elementId === 157)?.value ?? null;
+  return { vin, dumpVersion: core.dumpVersion, manufacturerId, elements };
 }

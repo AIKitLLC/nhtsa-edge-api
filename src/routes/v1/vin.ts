@@ -1,145 +1,93 @@
-import { Hono, type Context } from "hono";
+import { Hono } from "hono";
 import type { Env } from "../../types/env";
-import type { CompactVehicleSpec } from "../../types/nhtsa";
 import { CONFIG } from "../../config";
-import { buildCacheKey, getSafeExecutionContext } from "../../services/cache";
-import { serveCachedUpstream } from "../../services/cached-upstream";
 import { fetchUpstream, upstreamTimeoutMs } from "../../services/upstream";
-import { specFromUpstream, vinDecodeUrl } from "../../services/vin-upstream";
-import { decodeWithEnrichment } from "../../services/local-enrichment";
-import { compareWithUpstream } from "../../services/comparator";
-import { logParityAudit, saveVinToD1 } from "../../services/d1-database";
 import { jsonError } from "../../services/responses";
-import { parseVin } from "../../validation/vin";
+import { decodeVin } from "../../vpic/decode";
+import { toDecodeVinValues } from "../../vpic/format";
+import { toV1Spec } from "../../vpic/v1-format";
+import { getVpicStore } from "../../vpic/worker-store";
+import { parseModelYear, parseVin } from "../../validation/vin";
 
 export const vinRouter = new Hono<{ Bindings: Env }>();
 
-/**
- * Runs a background task after the response when an ExecutionContext exists,
- * otherwise (tests, local scripts) awaits it inline.
- */
-async function runInBackground(c: Context<{ Bindings: Env }>, task: Promise<unknown>): Promise<void> {
-  const execCtx = getSafeExecutionContext(c);
-  if (execCtx) {
-    execCtx.waitUntil(task);
-  } else {
-    await task;
-  }
-}
-
-function roundMs(ms: number): number {
-  return Math.round(ms * 100) / 100;
-}
+/** Decodes are deterministic for a given data version; let clients and the CDN keep them. */
+const DECODE_CACHE_CONTROL = "public, max-age=86400, stale-while-revalidate=604800";
 
 /**
- * GET /api/v1/vin/:vin
- * Compact VIN decode backed by NHTSA VPIC, cached for 30 days.
+ * GET /api/v1/vin/:vin[?modelyear=YYYY]
+ * Full offline decode (port of vPIC spVinDecode over the bundled NHTSA dataset).
  */
 vinRouter.get("/vin/:vin", async (c) => {
   const parsed = parseVin(c.req.param("vin"));
-  if (!parsed.ok) {
-    return jsonError(c, 400, "INVALID_VIN_FORMAT", parsed.message);
-  }
-  const vin = parsed.vin;
+  if (!parsed.ok) return jsonError(c, 400, "INVALID_VIN_FORMAT", parsed.message);
 
-  // Holder object: TS does not track assignments made inside the transform callback
-  const decoded: { spec: CompactVehicleSpec | null } = { spec: null };
+  const year = parseModelYear(c.req.query("modelyear"));
+  if (!year.ok) return jsonError(c, 400, "INVALID_MODEL_YEAR", year.message);
 
-  const response = await serveCachedUpstream(c, {
-    cacheKey: buildCacheKey(c.req.url, ["v1", "vin", vin]),
-    upstreamUrl: vinDecodeUrl(vin),
-    ttlSeconds: CONFIG.CACHE.VIN_TTL_SECONDS,
-    transform: (upstream) => {
-      const result = specFromUpstream(upstream, vin);
-      if (!result.ok) {
-        return {
-          status: result.status,
-          body: JSON.stringify({
-            success: false,
-            error: { code: result.code, message: result.message },
-            timestamp: new Date().toISOString(),
-          }),
-        };
-      }
+  const started = performance.now();
+  const result = await decodeVin(getVpicStore(c.env.ASSETS), parsed.vin, { modelYear: year.value });
+  const decodeMs = Math.round((performance.now() - started) * 100) / 100;
 
-      decoded.spec = result.spec;
-      const payload = {
-        success: true,
-        data: result.spec,
-        source: "UPSTREAM",
-        cached: false,
-        timestamp: new Date().toISOString(),
-      };
-      return {
-        status: 200,
-        body: JSON.stringify(payload),
-        cacheBody: JSON.stringify({ ...payload, source: "EDGE_CACHE", cached: true }),
-      };
-    },
-  });
-
-  if (decoded.spec && c.env?.DB) {
-    await runInBackground(c, saveVinToD1(c.env.DB, decoded.spec));
-  }
-
-  return response;
-});
-
-/**
- * GET /api/v1/vin/:vin/local
- * In-memory 49 CFR Part 565 decode (check digit, model year, WMI), no upstream call.
- * Enriched from D1 when bound. Always returns the LocalDecodedVehicle shape.
- */
-vinRouter.get("/vin/:vin/local", async (c) => {
-  const parsed = parseVin(c.req.param("vin"));
-  if (!parsed.ok) {
-    return jsonError(c, 400, "INVALID_VIN_FORMAT", parsed.message);
-  }
-
-  const startTime = performance.now();
-  const result = await decodeWithEnrichment(parsed.vin, c.env);
-
+  c.header("Cache-Control", DECODE_CACHE_CONTROL);
+  c.header(CONFIG.HEADERS.DATA_VERSION, result.dumpVersion);
   return c.json({
     success: true,
-    data: result,
-    source: result.decodeSource,
-    latencyMs: roundMs(performance.now() - startTime),
+    data: toV1Spec(result),
+    source: "LOCAL_VPIC",
+    dataVersion: result.dumpVersion,
+    decodeMs,
+    timestamp: new Date().toISOString(),
   });
 });
 
 /**
- * GET /api/v1/vin/:vin/compare
- * Parity audit: local engine vs live NHTSA VPIC (never cached).
+ * GET /api/v1/vin/:vin/compare[?modelyear=YYYY]
+ * Field-by-field comparison of the offline decode with the live vPIC API (never cached).
  */
 vinRouter.get("/vin/:vin/compare", async (c) => {
   const parsed = parseVin(c.req.param("vin"));
-  if (!parsed.ok) {
-    return jsonError(c, 400, "INVALID_VIN_FORMAT", parsed.message);
-  }
-  const vin = parsed.vin;
+  if (!parsed.ok) return jsonError(c, 400, "INVALID_VIN_FORMAT", parsed.message);
 
-  const localStart = performance.now();
-  const localResult = await decodeWithEnrichment(vin, c.env, { useStoredVin: false });
-  const localLatencyMs = roundMs(performance.now() - localStart);
+  const year = parseModelYear(c.req.query("modelyear"));
+  if (!year.ok) return jsonError(c, 400, "INVALID_MODEL_YEAR", year.message);
 
-  const upstream = await fetchUpstream(vinDecodeUrl(vin), { timeoutMs: upstreamTimeoutMs(c.env) });
-  const result = specFromUpstream(upstream, vin);
-  if (!result.ok) {
-    return jsonError(c, result.status, result.code, result.message, { localResult });
-  }
+  const result = await decodeVin(getVpicStore(c.env.ASSETS), parsed.vin, { modelYear: year.value });
+  const local = toDecodeVinValues(result, parsed.vin);
 
-  const comparison = compareWithUpstream(localResult, result.spec, localLatencyMs, upstream.latencyMs);
-
-  if (c.env?.DB) {
-    await runInBackground(
-      c,
-      Promise.all([saveVinToD1(c.env.DB, result.spec), logParityAudit(c.env.DB, comparison)])
-    );
+  const query = new URLSearchParams({ format: "json" });
+  if (year.value !== null) query.set("modelyear", String(year.value));
+  const upstream = await fetchUpstream(
+    `${CONFIG.UPSTREAM.VPIC_BASE_URL}/vehicles/DecodeVinValues/${encodeURIComponent(parsed.vin)}?${query.toString()}`,
+    { timeoutMs: upstreamTimeoutMs(c.env) }
+  );
+  if (upstream.status !== 200) {
+    return jsonError(c, 502, "UPSTREAM_ERROR", `NHTSA vPIC returned status ${upstream.status}`);
   }
 
+  let live: Record<string, string>;
+  try {
+    const body = JSON.parse(upstream.bodyText) as { Results?: Record<string, string>[] };
+    live = body.Results?.[0] ?? {};
+  } catch {
+    return jsonError(c, 502, "INVALID_UPSTREAM_PAYLOAD", "Unable to parse the NHTSA vPIC response");
+  }
+
+  const differences = [...new Set([...Object.keys(local), ...Object.keys(live)])]
+    .filter((key) => (local[key] ?? "").trim() !== (live[key] ?? "").trim())
+    .sort()
+    .map((field) => ({ field, local: local[field] ?? null, live: live[field] ?? null }));
+
+  c.header("Cache-Control", "no-store");
   return c.json({
     success: true,
-    data: comparison,
+    data: {
+      vin: parsed.vin,
+      identical: differences.length === 0,
+      differences,
+      dataVersion: result.dumpVersion,
+      upstreamMs: upstream.latencyMs,
+    },
     timestamp: new Date().toISOString(),
   });
 });

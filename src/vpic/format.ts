@@ -10,8 +10,25 @@ function joinValues(rows: readonly DecodedElement[]): string {
   return rows
     .map((r) => r.value ?? "")
     .filter((v) => v !== "")
-    .join("; ");
+    .join(", ");
 }
+
+/**
+ * Keys the live DecodeVinValues always returns although their elements are private
+ * or not decodable; the public API leaves them empty.
+ */
+const ALWAYS_PRESENT_KEYS = [
+  "AdaptiveHeadlights",
+  "CashForClunkers",
+  "DriverAssist",
+  "NCSABodyType",
+  "NCSAMake",
+  "NCSAMapExcApprovedBy",
+  "NCSAMapExcApprovedOn",
+  "NCSAMappingException",
+  "NCSAModel",
+  "NCSANote",
+];
 
 function groupByElement(result: DecodeResult): Map<number, DecodedElement[]> {
   const map = new Map<number, DecodedElement[]>();
@@ -28,7 +45,7 @@ function groupByElement(result: DecodeResult): Map<number, DecodedElement[]> {
  * plus VIN, MakeID and ModelID.
  */
 export function toDecodeVinValues(result: DecodeResult, searchVin: string): Record<string, string> {
-  const out: Record<string, string> = {};
+  const out: Record<string, string> = Object.fromEntries(ALWAYS_PRESENT_KEYS.map((k) => [k, ""]));
   let makeId = "";
   let modelId = "";
 
@@ -42,6 +59,7 @@ export function toDecodeVinValues(result: DecodeResult, searchVin: string): Reco
 
   out["MakeID"] = makeId;
   out["ModelID"] = modelId;
+  out["ManufacturerId"] = result.manufacturerId ?? "";
   out["VIN"] = searchVin;
   return Object.fromEntries(Object.entries(out).sort(([a], [b]) => a.localeCompare(b)));
 }

@@ -168,11 +168,21 @@ async function main(): Promise<void> {
   ];
   if (keysOnlyLive.size > 0) lines.push("", `Keys only in live output: ${[...keysOnlyLive].sort().join(", ")}`);
   if (keysOnlyLocal.size > 0) lines.push("", `Keys only in local output: ${[...keysOnlyLocal].sort().join(", ")}`);
-  lines.push("", "<details><summary>First mismatches</summary>", "", "```");
-  for (const m of mismatches.slice(0, 60)) {
-    lines.push(`${m.vin}${m.modelYear ? `,${m.modelYear}` : ""} [${m.kind}] ${m.field}: local=${JSON.stringify(m.local)} live=${JSON.stringify(m.live)}`);
+  lines.push("", "<details><summary>Examples per field</summary>", "", "```");
+  for (const [field] of topFields) {
+    for (const m of mismatches.filter((x) => x.field === field).slice(0, 4)) {
+      lines.push(`${m.vin}${m.modelYear ? `,${m.modelYear}` : ""} [${m.kind}] ${m.field}: local=${JSON.stringify(m.local)} live=${JSON.stringify(m.live)}`);
+    }
   }
   lines.push("```", "</details>");
+  if (keysOnlyLive.size > 0) {
+    lines.push("", "<details><summary>Values of keys only in live output</summary>", "", "```");
+    for (const key of [...keysOnlyLive].sort()) {
+      const values = [...new Set(live.map((row) => row[key] ?? ""))].slice(0, 5);
+      lines.push(`${key}: ${values.map((v) => JSON.stringify(v)).join(" | ")}`);
+    }
+    lines.push("```", "</details>");
+  }
 
   const summary = lines.join("\n") + "\n";
   writeFileSync(join(outDir, "summary.md"), summary);

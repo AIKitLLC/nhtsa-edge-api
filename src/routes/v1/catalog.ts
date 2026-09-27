@@ -1,78 +1,56 @@
 import { Hono } from "hono";
 import type { Env } from "../../types/env";
 import { CONFIG } from "../../config";
-import { buildCacheKey } from "../../services/cache";
-import { serveCachedUpstream } from "../../services/cached-upstream";
-import { getLocalMakes, getLocalModelsForMake } from "../../services/local-decoder";
-import { getModelsFromD1 } from "../../services/d1-database";
 import { jsonError } from "../../services/responses";
+import { getVpicStore } from "../../vpic/worker-store";
 
 export const catalogRouter = new Hono<{ Bindings: Env }>();
 
+const CATALOG_CACHE_CONTROL = "public, max-age=86400, stale-while-revalidate=604800";
+
 /**
- * GET /api/v1/makes[?remote=true]
- * All registered makes from the bundled NHTSA catalog; `remote=true` proxies VPIC.
+ * GET /api/v1/makes
+ * Every make in the bundled vPIC dataset (vpic.Make).
  */
 catalogRouter.get("/makes", async (c) => {
-  if (c.req.query("remote") !== "true") {
-    const localMakes = getLocalMakes();
-    if (localMakes.length > 0) {
-      return c.json({
-        success: true,
-        count: localMakes.length,
-        data: localMakes,
-        source: "LOCAL_NHTSA_CATALOG",
-        timestamp: new Date().toISOString(),
-      });
-    }
-  }
+  const store = getVpicStore(c.env.ASSETS);
+  const [core, makes] = await Promise.all([store.getCore(), store.getMakes()]);
 
-  return serveCachedUpstream(c, {
-    cacheKey: buildCacheKey(c.req.url, ["v1", "makes", "remote"]),
-    upstreamUrl: `${CONFIG.UPSTREAM.VPIC_BASE_URL}/vehicles/GetAllMakes?format=json`,
-    ttlSeconds: CONFIG.CACHE.CATALOG_TTL_SECONDS,
+  c.header("Cache-Control", CATALOG_CACHE_CONTROL);
+  c.header(CONFIG.HEADERS.DATA_VERSION, core.dumpVersion);
+  return c.json({
+    success: true,
+    count: makes.length,
+    data: makes,
+    source: "LOCAL_VPIC",
+    dataVersion: core.dumpVersion,
+    timestamp: new Date().toISOString(),
   });
 });
 
 /**
- * GET /api/v1/models?make=:make[&remote=true]
- * Lookup order: bundled catalog -> D1 (filled by the live API sync) -> VPIC.
+ * GET /api/v1/models?make=:make
+ * Models of a make (vpic.Make_Model), matched on the make name case-insensitively.
  */
 catalogRouter.get("/models", async (c) => {
-  const make = c.req.query("make")?.trim().toUpperCase();
+  const make = c.req.query("make")?.trim();
   if (!make) {
     return jsonError(c, 400, "MISSING_MAKE", "Query parameter 'make' is required (e.g. ?make=toyota)");
   }
 
-  if (c.req.query("remote") !== "true") {
-    const localModels = getLocalModelsForMake(make);
-    if (localModels && localModels.length > 0) {
-      return c.json({
-        success: true,
-        data: { make, count: localModels.length, models: localModels },
-        source: "LOCAL_NHTSA_CATALOG",
-        cached: false,
-        timestamp: new Date().toISOString(),
-      });
-    }
-
-    if (c.env?.DB) {
-      const d1Models = await getModelsFromD1(c.env.DB, make);
-      if (d1Models.length > 0) {
-        return c.json({
-          success: true,
-          data: { make, count: d1Models.length, models: d1Models },
-          source: "LOCAL_D1_DATABASE",
-          cached: false,
-          timestamp: new Date().toISOString(),
-        });
-      }
-    }
+  const store = getVpicStore(c.env.ASSETS);
+  const [core, matches] = await Promise.all([store.getCore(), store.getModelsForMake(make)]);
+  if (matches.length === 0) {
+    return jsonError(c, 404, "MAKE_NOT_FOUND", `No make named '${make}' in ${core.dumpVersion}`);
   }
 
-  return serveCachedUpstream(c, {
-    cacheKey: buildCacheKey(c.req.url, ["v1", "models", make]),
-    upstreamUrl: `${CONFIG.UPSTREAM.VPIC_BASE_URL}/vehicles/GetModelsForMake/${encodeURIComponent(make)}?format=json`,
-    ttlSeconds: CONFIG.CACHE.CATALOG_TTL_SECONDS,
+  c.header("Cache-Control", CATALOG_CACHE_CONTROL);
+  c.header(CONFIG.HEADERS.DATA_VERSION, core.dumpVersion);
+  return c.json({
+    success: true,
+    data: matches.map(({ make: m, models }) => ({ makeId: m.id, make: m.name, count: models.length, models })),
+    source: "LOCAL_VPIC",
+    dataVersion: core.dumpVersion,
+    timestamp: new Date().toISOString(),
   });
 });

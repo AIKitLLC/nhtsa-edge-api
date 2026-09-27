@@ -59,7 +59,7 @@ export interface CoreAsset {
   /** vpic.VinDescriptor: descriptor -> model year. */
   readonly vinDescriptors: Readonly<Record<string, number>>;
   /** Asset bucket counts, so the runtime and the build agree on file names. */
-  readonly buckets: { readonly wmi: number; readonly schema: number; readonly spec: number };
+  readonly buckets: { readonly wmi: number; readonly schema: number; readonly spec: number; readonly catalog: number };
 }
 
 /** vpic.Wmi_VinSchema row: [vinSchemaId, yearFrom, yearTo | null]. */
