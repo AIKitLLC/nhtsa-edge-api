@@ -207,7 +207,7 @@ export function validateVinCheckDigit(vin: string): VinValidationResult {
 /**
  * Decodes Model Year from 10th position using NHTSA 30-year cycle
  */
-export function decodeModelYear(vin: string): number | null {
+export function decodeModelYear(vin: string, now: Date = new Date()): number | null {
   const cleanVin = vin.trim().toUpperCase();
   if (cleanVin.length < 10) return null;
 
@@ -217,15 +217,23 @@ export function decodeModelYear(vin: string): number | null {
   const mapping = YEAR_CODES[yearChar];
   if (!mapping) return null;
 
-  // 49 CFR § 565.15 rule: If 7th position is numeric, year is 2010-2039.
-  // If 7th position is alphabetic, year is 1980-2009.
-  // Note: For vehicles from 2010 onward, position 7 is typically numeric for light duty.
+  // A model year may be sold up to one calendar year ahead
+  const latestPlausibleYear = now.getUTCFullYear() + 1;
+
+  // 49 CFR § 565.15 rule (passenger cars, MPVs, trucks <= 10,000 lb GVWR):
+  // position 7 numeric -> 1980-2009, position 7 alphabetic -> 2010-2039.
   const pos7 = cleanVin[6];
   if (pos7 && /\d/.test(pos7)) {
-    return mapping.modern;
+    return mapping.legacy;
+  }
+  if (pos7 && /[A-Z]/.test(pos7)) {
+    // Heavy vehicles and non-North-American VINs do not follow the rule,
+    // so never report a model year that cannot exist yet.
+    return mapping.modern <= latestPlausibleYear ? mapping.modern : mapping.legacy;
   }
 
-  return mapping.modern; // Default to modern cycle for modern fleet
+  // Position 7 unknown (short or wildcard VIN): pick the most recent plausible cycle
+  return mapping.modern <= latestPlausibleYear ? mapping.modern : mapping.legacy;
 }
 
 /**

@@ -53,6 +53,26 @@ describe("NHTSA Local Decoding Engine (49 CFR Part 565)", () => {
       expect(decodeModelYear("5UXWX7C50RA000001")).toBe(2024); // R = 2024
       expect(decodeModelYear("WAUZZZF27SA000001")).toBe(2025); // S = 2025
     });
+
+    it("should use the 1980-2009 cycle when position 7 is numeric", () => {
+      expect(decodeModelYear("1HGCG5655WA027834")).toBe(1998); // W + numeric pos 7
+      expect(decodeModelYear("1FAFP34N55W100000")).toBe(2005); // 5 + numeric pos 7
+      expect(decodeModelYear("1G1ZT51816F100000")).toBe(2006); // 6 + numeric pos 7
+    });
+
+    it("should never return a model year beyond next calendar year", () => {
+      const now = new Date("2026-09-27T00:00:00Z");
+      // Alphabetic pos 7 but year code W (2028) is implausible in 2026 -> legacy 1998
+      expect(decodeModelYear("WDBAB23A1WA000001", now)).toBe(1998);
+      // V = 2027 is allowed (next model year)
+      expect(decodeModelYear("1FM5K8D84VGA00001", now)).toBe(2027);
+    });
+
+    it("should pick the most recent plausible year for wildcard VINs", () => {
+      const now = new Date("2026-09-27T00:00:00Z");
+      expect(decodeModelYear("5UXWX7C5*BA", now)).toBe(2011);
+      expect(decodeModelYear("5UXWX7*5*WA", now)).toBe(1998);
+    });
   });
 
   describe("decodeWmi", () => {
