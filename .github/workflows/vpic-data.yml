@@ -1,0 +1,66 @@
+name: vPIC data refresh
+
+on:
+  schedule:
+    # Every Monday 06:17 UTC (NHTSA publishes a new dump around mid-month)
+    - cron: '17 6 * * 1'
+  workflow_dispatch:
+    inputs:
+      dump:
+        description: 'Dump name to ingest (default: newest on the NHTSA downloads page)'
+        required: false
+  push:
+    # Re-ingest when the ingestion code itself changes
+    paths:
+      - 'scripts/vpic/**'
+      - '.github/workflows/vpic-data.yml'
+
+concurrency:
+  group: vpic-data-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  ingest:
+    name: Ingest dump and commit data/vpic
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      changed: ${{ steps.commit.outputs.changed }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Ingest vPIC dump
+        run: bun scripts/vpic/ingest-dump.ts ${{ inputs.dump && format('--dump={0}', inputs.dump) || '' }}
+
+      - name: Commit data/vpic when it changed
+        id: commit
+        run: |
+          if [[ -z "$(git status --porcelain data/vpic)" ]]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "data/vpic unchanged."
+            exit 0
+          fi
+          VERSION=$(node -p 'require("./data/vpic/manifest.json").dumpVersion')
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git add data/vpic
+          git commit -m "data(vpic): ingest ${VERSION}"
+          git push
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+          {
+            echo "## data/vpic updated to \`${VERSION}\`"
+            echo "Revert with: \`git revert $(git rev-parse HEAD)\`"
+          } >> "$GITHUB_STEP_SUMMARY"
