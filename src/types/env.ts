@@ -27,6 +27,12 @@ export interface Env {
    * Cloudflare D1 Serverless Database for NHTSA local data & parity audit
    */
   readonly DB?: D1Database;
+
+  /**
+   * Bearer token guarding /api/v1/sync/* writes and /api/v1/admin/*.
+   * Set with: npx wrangler secret put ADMIN_TOKEN
+   */
+  readonly ADMIN_TOKEN?: string;
 }
 
 export type AppVariables = {

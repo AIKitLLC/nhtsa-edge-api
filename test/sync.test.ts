@@ -1,6 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import app from "../src/index";
 
+const TEST_ENV = { ADMIN_TOKEN: "test-admin-token" };
+const AUTH = { Authorization: "Bearer test-admin-token" };
+
 describe("Dual-Channel Sync Router (/api/v1/sync)", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
@@ -19,7 +22,7 @@ describe("Dual-Channel Sync Router (/api/v1/sync)", () => {
 
   describe("POST /api/v1/sync/models", () => {
     it("should require ?make parameter", async () => {
-      const res = await app.fetch(new Request("http://localhost/api/v1/sync/models", { method: "POST" }));
+      const res = await app.fetch(new Request("http://localhost/api/v1/sync/models", { method: "POST", headers: AUTH }), TEST_ENV);
       expect(res.status).toBe(400);
 
       const json = await res.json() as Record<string, unknown>;
@@ -43,7 +46,7 @@ describe("Dual-Channel Sync Router (/api/v1/sync)", () => {
       );
 
       const res = await app.fetch(
-        new Request("http://localhost/api/v1/sync/models?make=tesla", { method: "POST" })
+        new Request("http://localhost/api/v1/sync/models?make=tesla", { method: "POST", headers: AUTH }), TEST_ENV
       );
       expect(res.status).toBe(200);
 
@@ -56,7 +59,7 @@ describe("Dual-Channel Sync Router (/api/v1/sync)", () => {
 
   describe("POST /api/v1/sync/wmi", () => {
     it("should require ?wmi parameter", async () => {
-      const res = await app.fetch(new Request("http://localhost/api/v1/sync/wmi", { method: "POST" }));
+      const res = await app.fetch(new Request("http://localhost/api/v1/sync/wmi", { method: "POST", headers: AUTH }), TEST_ENV);
       expect(res.status).toBe(400);
     });
 
@@ -82,7 +85,7 @@ describe("Dual-Channel Sync Router (/api/v1/sync)", () => {
       );
 
       const res = await app.fetch(
-        new Request("http://localhost/api/v1/sync/wmi?wmi=5YJ", { method: "POST" })
+        new Request("http://localhost/api/v1/sync/wmi?wmi=5YJ", { method: "POST", headers: AUTH }), TEST_ENV
       );
       expect(res.status).toBe(200);
 

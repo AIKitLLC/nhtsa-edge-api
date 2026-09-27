@@ -3,6 +3,7 @@ import type { Env, AppVariables } from "./types/env";
 import { timingMiddleware } from "./middleware/timing";
 import { corsMiddleware } from "./middleware/cors";
 import { errorHandler } from "./middleware/error";
+import { adminAuthMiddleware } from "./middleware/admin-auth";
 import { healthRouter } from "./routes/health";
 import { v1Router } from "./routes/v1-optimized";
 import { vpicProxyRouter } from "./routes/vpic-proxy";
@@ -19,7 +20,11 @@ app.use("*", corsMiddleware());
 // 2. Global Error Handler
 app.onError(errorHandler);
 
-// 3. Mount Routes
+// 3. Admin protection: every write/sync operation requires the ADMIN_TOKEN bearer
+app.use("/api/v1/admin/*", adminAuthMiddleware());
+app.on("POST", "/api/v1/sync/*", adminAuthMiddleware());
+
+// 4. Mount Routes
 // Health & API Catalog at root
 app.route("/", healthRouter);
 
@@ -36,7 +41,7 @@ app.route("/", vpicProxyRouter);
 // NHTSA Recalls drop-in proxy (/recalls/*)
 app.route("/", recallsProxyRouter);
 
-// 4. 404 Not Found Handler
+// 5. 404 Not Found Handler
 app.notFound((c) => {
   return c.json(
     {
