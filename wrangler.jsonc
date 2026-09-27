@@ -11,7 +11,15 @@
     "ENVIRONMENT": "production",
     "UPSTREAM_TIMEOUT_MS": "5000",
     "ENABLE_KV_CACHE": "false"
-  }
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "nhtsa-db",
+      "database_id": "local-nhtsa-db",
+      "migrations_dir": "migrations"
+    }
+  ]
   /**
    * Optional: Uncomment to enable persistent global KV caching across all edge PoPs
    * Run: npx wrangler kv:namespace create NHTSA_CACHE_KV

@@ -22,6 +22,11 @@ export interface Env {
    * Optional Cloudflare KV Namespace for global persistent cache
    */
   readonly NHTSA_CACHE_KV?: KVNamespace;
+
+  /**
+   * Cloudflare D1 Serverless Database for NHTSA local data & parity audit
+   */
+  readonly DB?: D1Database;
 }
 
 export type AppVariables = {

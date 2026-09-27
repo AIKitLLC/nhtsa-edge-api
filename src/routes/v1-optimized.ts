@@ -5,6 +5,15 @@ import { CONFIG } from "../config";
 import { getFromCache, getSafeExecutionContext, normalizeCacheKey, saveToCache } from "../services/cache";
 import { fetchUpstream } from "../services/upstream";
 import { transformVinDecode } from "../services/transformer";
+import { decodeVinLocally } from "../services/local-decoder";
+import { compareWithUpstream } from "../services/comparator";
+import {
+  getVinFromD1,
+  saveVinToD1,
+  getWmiFromD1,
+  logParityAudit,
+  seedInitialD1Data,
+} from "../services/d1-database";
 import type { RawVinValuesResult, VpicRawResponse } from "../types/nhtsa";
 
 export const v1Router = new Hono<{ Bindings: Env }>();
@@ -114,7 +123,17 @@ v1Router.get("/vin/:vin", async (c) => {
   const responseBody = JSON.stringify(responsePayload);
   const ttl = CONFIG.CACHE.VIN_TTL_SECONDS;
 
-  // 4. Save to Cache
+  // 4. Save to Cache and D1 Database
+  if (c.env?.DB) {
+    const execCtx = getSafeExecutionContext(c);
+    const saveTask = saveVinToD1(c.env.DB, compactSpec);
+    if (execCtx) {
+      execCtx.waitUntil(saveTask);
+    } else {
+      await saveTask;
+    }
+  }
+
   await saveToCache(
     cacheKey,
     JSON.stringify({ ...responsePayload, source: "EDGE_CACHE", cached: true }),
@@ -133,6 +152,218 @@ v1Router.get("/vin/:vin", async (c) => {
       [CONFIG.HEADERS.CACHE_TIER]: "UPSTREAM",
       [CONFIG.HEADERS.UPSTREAM_TIME]: `${upstreamRes.latencyMs}`,
     },
+  });
+});
+
+/**
+ * GET /api/v1/vin/:vin/local
+ * 100% Local Engine VIN Decoder (Zero upstream calls, sub-millisecond execution).
+ * Executes 49 CFR Part 565 check digit, model year, and WMI algorithms natively.
+ */
+v1Router.get("/vin/:vin/local", async (c) => {
+  const rawVin = c.req.param("vin").trim().toUpperCase();
+  const validation = VinParamSchema.safeParse(rawVin);
+
+  if (!validation.success) {
+    return c.json(
+      {
+        success: false,
+        error: {
+          code: "INVALID_VIN_FORMAT",
+          message: validation.error.errors[0]?.message ?? "Invalid VIN format",
+        },
+      },
+      400
+    );
+  }
+
+  const vin = validation.data;
+  const startTime = performance.now();
+
+  // 1. Check Cloudflare D1 local database if bound
+  if (c.env?.DB) {
+    const d1Record = await getVinFromD1(c.env.DB, vin);
+    if (d1Record) {
+      const latencyMs = Math.round((performance.now() - startTime) * 100) / 100;
+      return c.json({
+        success: true,
+        data: d1Record,
+        source: "LOCAL_D1_DATABASE",
+        latencyMs,
+      });
+    }
+  }
+
+  // 2. Execute local NHTSA standard decoder
+  let localResult = decodeVinLocally(vin);
+
+  // 3. Enrich with D1 WMI catalog if needed
+  if (c.env?.DB && (!localResult.make || !localResult.manufacturer)) {
+    const wmiRecord = await getWmiFromD1(c.env.DB, localResult.wmi);
+    if (wmiRecord) {
+      localResult = {
+        ...localResult,
+        make: wmiRecord.make,
+        manufacturer: wmiRecord.manufacturer,
+        vehicleType: wmiRecord.vehicle_type ?? localResult.vehicleType,
+        decodeSource: "LOCAL_D1_DATABASE",
+      };
+    }
+  }
+
+  const latencyMs = Math.round((performance.now() - startTime) * 100) / 100;
+
+  return c.json({
+    success: true,
+    data: localResult,
+    source: localResult.decodeSource,
+    latencyMs,
+  });
+});
+
+/**
+ * GET /api/v1/vin/:vin/compare
+ * Parity and Accuracy Verification Engine:
+ * Concurrently calls Local Engine and Upstream NHTSA VPIC,
+ * calculates accuracy parity score (0-100%), and detects any discrepancies.
+ */
+v1Router.get("/vin/:vin/compare", async (c) => {
+  const rawVin = c.req.param("vin").trim().toUpperCase();
+  const validation = VinParamSchema.safeParse(rawVin);
+
+  if (!validation.success) {
+    return c.json(
+      {
+        success: false,
+        error: {
+          code: "INVALID_VIN_FORMAT",
+          message: validation.error.errors[0]?.message ?? "Invalid VIN format",
+        },
+      },
+      400
+    );
+  }
+
+  const vin = validation.data;
+
+  // 1. Run Local Engine
+  const localStart = performance.now();
+  let localResult = decodeVinLocally(vin);
+  if (c.env?.DB && (!localResult.make || !localResult.manufacturer)) {
+    const wmiRecord = await getWmiFromD1(c.env.DB, localResult.wmi);
+    if (wmiRecord) {
+      localResult = {
+        ...localResult,
+        make: wmiRecord.make,
+        manufacturer: wmiRecord.manufacturer,
+        vehicleType: wmiRecord.vehicle_type ?? localResult.vehicleType,
+        decodeSource: "LOCAL_D1_DATABASE",
+      };
+    }
+  }
+  const localLatencyMs = Math.round((performance.now() - localStart) * 100) / 100;
+
+  // 2. Fetch Upstream NHTSA VPIC
+  const upstreamUrl = `${CONFIG.UPSTREAM.VPIC_BASE_URL}/vehicles/DecodeVinValues/${encodeURIComponent(
+    vin
+  )}?format=json`;
+
+  const upstreamRes = await fetchUpstream(upstreamUrl);
+  if (upstreamRes.status !== 200) {
+    return c.json(
+      {
+        success: false,
+        error: {
+          code: "UPSTREAM_ERROR",
+          message: `NHTSA upstream returned status ${upstreamRes.status}`,
+        },
+        localResult,
+      },
+      502
+    );
+  }
+
+  let rawData: VpicRawResponse<RawVinValuesResult>;
+  try {
+    rawData = JSON.parse(upstreamRes.bodyText) as VpicRawResponse<RawVinValuesResult>;
+  } catch {
+    return c.json(
+      {
+        success: false,
+        error: {
+          code: "INVALID_UPSTREAM_PAYLOAD",
+          message: "Unable to parse upstream JSON",
+        },
+      },
+      502
+    );
+  }
+
+  const upstreamSpec = transformVinDecode(rawData);
+  if (!upstreamSpec) {
+    return c.json(
+      {
+        success: false,
+        error: {
+          code: "NOT_FOUND",
+          message: `No vehicle records found for VIN: ${vin}`,
+        },
+      },
+      404
+    );
+  }
+
+  // 3. Compare Local vs Upstream
+  const comparison = compareWithUpstream(
+    localResult,
+    upstreamSpec,
+    localLatencyMs,
+    upstreamRes.latencyMs
+  );
+
+  // 4. Self-healing: persist upstream spec to D1 and log audit asynchronously
+  if (c.env?.DB) {
+    const execCtx = getSafeExecutionContext(c);
+    const saveTask = Promise.all([
+      saveVinToD1(c.env.DB, upstreamSpec),
+      logParityAudit(c.env.DB, comparison),
+    ]);
+    if (execCtx) {
+      execCtx.waitUntil(saveTask);
+    } else {
+      await saveTask;
+    }
+  }
+
+  return c.json({
+    success: true,
+    data: comparison,
+    timestamp: new Date().toISOString(),
+  });
+});
+
+/**
+ * POST /api/v1/admin/seed
+ * Seeds initial top manufacturer WMI data into Cloudflare D1
+ */
+v1Router.post("/admin/seed", async (c) => {
+  if (!c.env?.DB) {
+    return c.json(
+      {
+        success: false,
+        error: {
+          code: "D1_NOT_BOUND",
+          message: "Cloudflare D1 database binding 'DB' is not configured.",
+        },
+      },
+      400
+    );
+  }
+
+  const inserted = await seedInitialD1Data(c.env.DB);
+  return c.json({
+    success: true,
+    message: `Successfully seeded ${inserted} WMI entries into Cloudflare D1.`,
   });
 });
 
