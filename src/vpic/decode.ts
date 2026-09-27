@@ -140,11 +140,42 @@ export async function decodeVin(store: VpicStore, rawVin: string, options: Decod
 
   const varWmi = vinWmi(vin);
   const wmi = await store.getWmi(varWmi);
-  const schemas: ReadonlyMap<number, SchemaRecord> = wmi
-    ? await store.getSchemas(wmi.schemas.map(([id]) => id))
-    : new Map();
-
   const vLimit = now.getUTCFullYear() + 2;
+
+  // Plan the passes first (only needs the WMI record), so that only the schemas of
+  // the candidate model years are loaded: large WMIs have hundreds of schemas.
+  const dmy = core.vinDescriptors[vinDescriptor("")] ?? null; // descriptor of '' (see below)
+  let rmy: number | null = null;
+  let omy: number | null = null;
+  let conclusive = true;
+  if (!(dmy !== null && dmy >= 1980 && dmy <= vLimit)) {
+    rmy = vinModelYear2(vin, wmi && wmi.wmi === varWmi ? wmi : null, now);
+    if (rmy !== null && rmy < 0) {
+      omy = -rmy - 30;
+      rmy = -rmy;
+      conclusive = false;
+    }
+    if (conclusive && rmy !== null) {
+      let altMY: number | null = null;
+      if (rmy >= 1980 && rmy <= vLimit - 30) altMY = rmy + 30;
+      else if (rmy >= 1980 + 30 && rmy <= vLimit) altMY = rmy - 30;
+      if (altMY !== null && altMY !== rmy) {
+        const cnt1 = schemasOfWmiInYear(wmi, rmy);
+        const cnt2 = schemasOfWmiInYear(wmi, altMY);
+        if (cnt1 === 0 && cnt2 > 0) rmy = altMY;
+      }
+    }
+  }
+  const candidateYears: (number | null)[] =
+    dmy !== null && dmy >= 1980 && dmy <= vLimit
+      ? [dmy]
+      : [rmy, ...(omy !== null ? [omy] : []), ...(year !== null && year >= 1980 && year <= vLimit ? [year] : [])];
+
+  const schemaIds = (wmi?.schemas ?? [])
+    .filter(([, from, to]) => candidateYears.some((y) => y === null || (y >= from && y <= (to ?? 2999))))
+    .map(([id]) => id);
+  const schemas: ReadonlyMap<number, SchemaRecord> = wmi ? await store.getSchemas(schemaIds) : new Map();
+
   const ctx = {
     core,
     wmi,
@@ -161,33 +192,13 @@ export async function decodeVin(store: VpicStore, rawVin: string, options: Decod
     return result.returnCode;
   };
 
-  // The source computes the descriptor before `vin` is assigned, i.e. from ''.
-  const dmy = core.vinDescriptors[vinDescriptor("")] ?? null;
+  // The source computes the descriptor before `vin` is assigned, i.e. from '',
+  // so this pass only runs if vpic.VinDescriptor ever lists '***********'.
   let modelYearSource = "***X*|Y";
 
   if (dmy !== null && dmy >= 1980 && dmy <= vLimit) {
     await run({ pass: 1, modelYear: dmy, vin, modelYearSource: vinDescriptor(""), conclusive: true, error12: year !== null && year !== dmy });
   } else {
-    let rmy = vinModelYear2(vin, wmi && wmi.wmi === varWmi ? wmi : null, now);
-    let omy: number | null = null;
-    let conclusive = true;
-    if (rmy !== null && rmy < 0) {
-      omy = -rmy - 30;
-      rmy = -rmy;
-      conclusive = false;
-    }
-
-    if (conclusive && rmy !== null) {
-      let altMY: number | null = null;
-      if (rmy >= 1980 && rmy <= vLimit - 30) altMY = rmy + 30;
-      else if (rmy >= 1980 + 30 && rmy <= vLimit) altMY = rmy - 30;
-      if (altMY !== null && altMY !== rmy) {
-        const cnt1 = schemasOfWmiInYear(wmi, rmy);
-        const cnt2 = schemasOfWmiInYear(wmi, altMY);
-        if (cnt1 === 0 && cnt2 > 0) rmy = altMY;
-      }
-    }
-
     let do3and4 = true;
     if (year !== null && year >= 1980 && year <= vLimit) {
       if (year === rmy || year === omy) {

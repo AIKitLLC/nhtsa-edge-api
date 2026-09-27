@@ -4,11 +4,12 @@
  * use a filesystem reader over the same build output.
  */
 
+import { BoundedCache } from "./bounded-cache";
 import type { CoreAsset, SchemaBucket, SchemaRecord, SpecBucket, SpecSchema, WmiBucket, WmiRecord } from "./types";
 
 export interface AssetReader {
-  /** Returns the parsed JSON at `path` (e.g. "vpic/core.json"), or null when absent. */
-  readJson<T>(path: string): Promise<T | null>;
+  /** Returns the text of the asset at `path` (e.g. "vpic/core.json"), or null when absent. */
+  readText(path: string): Promise<string | null>;
 }
 
 /** Stable string hash (FNV-1a 32-bit) used to spread WMIs over bucket files. */
@@ -38,29 +39,69 @@ export class AssetNotFoundError extends Error {
   }
 }
 
+/**
+ * Parsed asset files kept per isolate. The whole dataset (~135 MB of JSON) does not
+ * fit in a Worker's 128 MB, so the least recently used files are evicted once their
+ * JSON text exceeds this budget (parsed objects take a few times the text size).
+ */
+export const DEFAULT_CACHE_BUDGET_BYTES = 4 * 1024 * 1024; // ~42 MB heap measured over 3,000 varied VINs
+const MAX_CACHED_FILES = 2000;
+
 export class VpicStore {
   private core: Promise<CoreAsset> | null = null;
-  private readonly files = new Map<string, Promise<unknown>>();
+  private readonly files: BoundedCache<string, Promise<unknown>>;
 
-  constructor(private readonly reader: AssetReader) {}
+  constructor(
+    private readonly reader: AssetReader,
+    cacheBudgetBytes: number = DEFAULT_CACHE_BUDGET_BYTES
+  ) {
+    this.files = new BoundedCache(MAX_CACHED_FILES, cacheBudgetBytes);
+  }
+
+  /** Number of asset files currently cached (excluding core.json). */
+  get cachedFiles(): number {
+    return this.files.size;
+  }
+
+  /** JSON text size of the cached files. */
+  get cachedBytes(): number {
+    return this.files.weight;
+  }
+
+  private async readJson<T>(path: string): Promise<{ value: T; bytes: number } | null> {
+    const text = await this.reader.readText(path);
+    return text === null ? null : { value: JSON.parse(text) as T, bytes: text.length };
+  }
 
   private load<T>(path: string, required: boolean): Promise<T | null> {
-    let pending = this.files.get(path) as Promise<T | null> | undefined;
-    if (!pending) {
-      pending = this.reader.readJson<T>(path).then((value) => {
-        if (value === null && required) throw new AssetNotFoundError(path);
-        return value;
-      });
-      // Failed loads are not cached, so a transient error does not stick
-      pending.catch(() => this.files.delete(path));
-      this.files.set(path, pending);
-    }
+    const cached = this.files.get(path) as Promise<T | null> | undefined;
+    if (cached) return cached;
+
+    const pending = this.readJson<T>(path).then((result) => {
+      if (result === null) {
+        if (required) throw new AssetNotFoundError(path);
+        return null;
+      }
+      // Weigh the entry once its size is known (only if it was not evicted meanwhile)
+      if (this.files.has(path)) this.files.set(path, pending, result.bytes);
+      return result.value;
+    });
+    // Failed loads are not cached, so a transient error does not stick
+    pending.catch(() => this.files.delete(path));
+    this.files.set(path, pending, 0);
     return pending;
   }
 
+  /** core.json is needed by every decode; it is held outside the LRU. */
   getCore(): Promise<CoreAsset> {
-    this.core ??= this.load<CoreAsset>("vpic/core.json", true).then((c) => c as CoreAsset);
-    this.core.catch(() => (this.core = null));
+    if (!this.core) {
+      const pending = this.readJson<CoreAsset>("vpic/core.json").then((c) => {
+        if (c === null) throw new AssetNotFoundError("vpic/core.json");
+        return c.value;
+      });
+      pending.catch(() => (this.core = null));
+      this.core = pending;
+    }
     return this.core;
   }
 

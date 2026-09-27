@@ -6,7 +6,11 @@
  *   - vpic.fValidCharsInKey / vpic.fValidCharsInRegEx
  */
 
+import { BoundedCache } from "./bounded-cache";
+
 const VALID_CHARS = "ABCDEFGHJKLMNPRSTUVWXYZ0123456789";
+/** Compiled pattern keys kept per isolate (a decode touches a few hundred). */
+const MAX_COMPILED_KEYS = 4096;
 
 /**
  * var_keys = VIN positions 4-8, then '|' and positions 10-17 (check digit skipped).
@@ -24,7 +28,7 @@ function escapeRegExpChar(ch: string): string {
   return /[\\^$.*+?()[\]{}|/-]/.test(ch) ? `\\${ch}` : ch;
 }
 
-const likeCache = new Map<string, RegExp>();
+const likeCache = new BoundedCache<string, RegExp>(MAX_COMPILED_KEYS);
 
 /**
  * PostgreSQL `value LIKE pattern` (default escape '\'), anchored on both ends.
@@ -67,7 +71,7 @@ export function sqlwildToRegex(pattern: string): string {
   return `^${out}.*`;
 }
 
-const regexCache = new Map<string, RegExp | null>();
+const regexCache = new BoundedCache<string, RegExp | null>(MAX_COMPILED_KEYS);
 
 function keysRegex(keys: string): RegExp | null {
   if (regexCache.has(keys)) return regexCache.get(keys) ?? null;

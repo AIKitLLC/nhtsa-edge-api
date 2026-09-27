@@ -12,12 +12,12 @@ let currentAssets: Fetcher | null = null;
 let store: VpicStore | null = null;
 
 const reader: AssetReader = {
-  async readJson<T>(path: string): Promise<T | null> {
+  async readText(path: string): Promise<string | null> {
     if (!currentAssets) throw new Error("ASSETS binding not configured");
     const res = await currentAssets.fetch(new Request(`${ASSET_ORIGIN}${path}`));
     if (res.status === 404) return null;
     if (!res.ok) throw new Error(`Asset ${path}: HTTP ${res.status}`);
-    return (await res.json()) as T;
+    return res.text();
   },
 };
 

@@ -8,10 +8,10 @@ import type { AssetReader } from "../../../src/vpic/store";
 
 export function fsAssetReader(root: string): AssetReader {
   return {
-    async readJson<T>(path: string): Promise<T | null> {
+    async readText(path: string): Promise<string | null> {
       const full = join(root, path);
       if (!existsSync(full)) return null;
-      return JSON.parse(readFileSync(full, "utf-8")) as T;
+      return readFileSync(full, "utf-8");
     },
   };
 }
