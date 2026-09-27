@@ -6,68 +6,64 @@ on:
     paths: [.github/workflows/zz-probe-vpic.yml]
 
 jobs:
-  probe:
+  functions:
     runs-on: ubuntu-latest
     steps:
-      - name: Secrets present?
-        env:
-          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: |
-          [ -n "$CF_TOKEN" ] && echo "CLOUDFLARE_API_TOKEN: set" || echo "CLOUDFLARE_API_TOKEN: MISSING"
-          [ -n "$CF_ACCOUNT" ] && echo "CLOUDFLARE_ACCOUNT_ID: set" || echo "CLOUDFLARE_ACCOUNT_ID: MISSING"
-
-      - name: Downloads index
-        run: |
-          curl -sSL -A "Mozilla/5.0" https://vpic.nhtsa.dot.gov/downloads/ -o index.html || true
-          grep -oiE 'href="[^"]+"' index.html | sort -u | head -80
-
       - name: Download dump
         run: |
-          set -e
-          for m in 2026_09 2026_08 2026_07; do
-            if curl -sSfL -A "Mozilla/5.0" -o dump.zip "https://vpic.nhtsa.dot.gov/downloads/vPICList_lite_${m}.plain.zip"; then echo "GOT $m"; break; fi
-          done
-          ls -la dump.zip
-          unzip -o dump.zip -d dump
-          ls -laR dump | head -20
+          curl -sSfL -A "Mozilla/5.0" -o dump.zip "https://vpic.nhtsa.dot.gov/downloads/vPICList_lite_2026_09.plain.zip"
+          unzip -q dump.zip -d dump
+      - name: Function sources part 1 (lines 1-1000)
+        run: sed -n '1,1000p' dump/*.sql
+      - name: Function sources part 2 (lines 1001-1905)
+        run: sed -n '1001,1905p' dump/*.sql
+      - name: Function sources part 3 (lines 1905-2200)
+        run: sed -n '1905,2200p' dump/*.sql
 
-      - name: Tables, row counts
+  samples:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download dump
         run: |
-          F=$(ls dump/*.sql dump/**/*.sql 2>/dev/null | head -1)
-          echo "FILE=$F"; wc -c "$F"
-          echo "== CREATE TABLE =="
-          grep -nE '^CREATE TABLE' "$F" | head -200
-          echo "== COPY row counts =="
-          awk '/^COPY /{t=$2; n=0; inb=1; next} inb && /^\\\.$/{print n, t; inb=0; next} inb{n++}' "$F" | sort -rn | head -120
-
-      - name: Key table definitions
+          curl -sSfL -A "Mozilla/5.0" -o dump.zip "https://vpic.nhtsa.dot.gov/downloads/vPICList_lite_2026_09.plain.zip"
+          unzip -q dump.zip -d dump
+      - name: Table definitions (misc)
         run: |
-          F=$(ls dump/*.sql | head -1)
-          for t in pattern vinschema wmi_vinschema wmi element wmi_make make model make_model vehiclespecschema vehiclespecpattern vspecschemapattern defaultvalue errorcode; do
+          F=$(ls dump/*.sql)
+          for t in vinexception vindescriptor conversion enginemodel enginemodelpattern wmiyearvalidchars vehiclespecschema_model vehiclespecschema_year country manufacturer vehicletype bodystyle defs_make defs_model defs_body decodingoutput; do
             echo "===== $t"
-            awk -v t="$t" 'BEGIN{IGNORECASE=1} $0 ~ "^CREATE TABLE [a-z_]*\\.?\"?"t"\"? \\(" {p=1} p{print} p && /^\);/{p=0}' "$F"
+            awk -v t="$t" '$0 ~ "^CREATE TABLE vpic\\."t" \\(" {p=1} p{print} p && /^\);/{p=0}' "$F"
           done
-
-      - name: Sample rows
+      - name: Samples (misc)
         run: |
-          F=$(ls dump/*.sql | head -1)
-          for t in pattern vinschema wmi_vinschema wmi element wmi_make make model make_model vehiclespecschema vehiclespecpattern vspecschemapattern; do
+          F=$(ls dump/*.sql)
+          for t in vinexception vindescriptor conversion enginemodel enginemodelpattern wmiyearvalidchars vehiclespecschema_model vehiclespecschema_year country manufacturer vehicletype bodystyle errorcode defaultvalue drivetype fueltype transmission grossvehicleweightrating defs_make; do
             echo "===== $t"
-            awk -v t="$t" 'BEGIN{IGNORECASE=1} $0 ~ "^COPY [a-z_]*\\.?\"?"t"\"? " {p=1; n=0; print; next} p && /^\\\.$/{p=0} p && n<8 {print; n++}' "$F"
+            awk -v t="$t" '$0 ~ "^COPY vpic\\."t" " {p=1; n=0; print; next} p && /^\\\.$/{p=0} p && n<25 {print; n++}' "$F" | cut -c1-300
           done
-
-      - name: Element table (all rows)
+      - name: Full errorcode + defaultvalue + conversion
         run: |
-          F=$(ls dump/*.sql | head -1)
-          awk 'BEGIN{IGNORECASE=1} /^COPY [a-z_]*\.?"?element"? /{p=1; print; next} p && /^\\\.$/{p=0} p{print}' "$F" | cut -c1-220
-
-      - name: Functions list
+          F=$(ls dump/*.sql)
+          for t in errorcode defaultvalue conversion vehicletype; do
+            echo "===== $t"
+            awk -v t="$t" '$0 ~ "^COPY vpic\\."t" " {p=1; print; next} p && /^\\\.$/{p=0} p {print}' "$F" | cut -c1-300
+          done
+      - name: Pattern stats
         run: |
-          F=$(ls dump/*.sql | head -1)
-          grep -nE '^CREATE (OR REPLACE )?(FUNCTION|PROCEDURE)' "$F" | head -100
-
-      - name: spVinDecode source
+          F=$(ls dump/*.sql)
+          awk '/^COPY vpic\.pattern /{p=1; next} p && /^\\\.$/{p=0} p' "$F" > pattern.tsv
+          echo "distinct elementid counts:"; cut -f4 pattern.tsv | sort | uniq -c | sort -rn | head -80
+          echo "key length distribution:"; cut -f3 pattern.tsv | awk '{print length($0)}' | sort -n | uniq -c
+          echo "keys with special chars:"; cut -f3 pattern.tsv | grep -E '[\[\]\^\-#_%]' | head -40
+          echo "distinct char classes:"; cut -f3 pattern.tsv | grep -oE '\[[^]]*\]' | sort | uniq -c | sort -rn | head -40
+          echo "attributeid samples for element 28 (Model):"; awk -F'\t' '$4==28' pattern.tsv | head -5
+          echo "attributeid samples for element 38 (Trim):"; awk -F'\t' '$4==38' pattern.tsv | head -5
+          echo "attributeid samples for element 26 (Make):"; awk -F'\t' '$4==26' pattern.tsv | head -5
+          du -h pattern.tsv
+      - name: Size estimate
         run: |
-          F=$(ls dump/*.sql | head -1)
-          awk 'BEGIN{IGNORECASE=1} /^CREATE (OR REPLACE )?(FUNCTION|PROCEDURE) [a-z_]*\.?"?spvindecode"?\(/{p=1} p{print} p && /^\$(_\$|\$|[a-z_]*\$);?$/{c++; if(c>=1){p=0; c=0}}' "$F" | head -900
+          F=$(ls dump/*.sql)
+          for t in pattern wmi_vinschema vinschema wmi vinexception vehiclespecpattern vspecschemapattern vehiclespecschema vehiclespecschema_model vehiclespecschema_year wmiyearvalidchars; do
+            awk -v t="$t" '$0 ~ "^COPY vpic\\."t" " {p=1; next} p && /^\\\.$/{p=0} p' "$F" | wc -c | xargs echo "$t bytes:"
+          done
+          awk '/^COPY vpic\.pattern /{p=1; next} p && /^\\\.$/{p=0} p' "$F" | cut -f2-5 | gzip -9 | wc -c | xargs echo "pattern (vinschemaid,keys,elementid,attributeid) gz bytes:"
