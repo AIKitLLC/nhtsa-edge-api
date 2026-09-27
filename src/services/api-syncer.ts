@@ -76,35 +76,37 @@ export async function syncMakesFromApi(env?: Env): Promise<SyncResult> {
   let updated = 0;
 
   if (env?.DB && results.length > 0) {
+    const db = env.DB;
     try {
-      // Chunk into batch statements of 100 to respect D1 statement limits
+      // D1 batches are chunked to stay well within per-batch statement limits
       const chunkSize = 100;
-      for (let i = 0; i < Math.min(results.length, 1000); i += chunkSize) {
+      for (let i = 0; i < results.length; i += chunkSize) {
         const chunk = results.slice(i, i + chunkSize);
         const stmts = chunk.map((m) =>
-          env.DB!.prepare(
-            `INSERT OR IGNORE INTO makes_models (make, model) VALUES (?, ?)`
-          ).bind(m.Make_Name.toUpperCase().trim(), "BASE_MODEL")
+          db
+            .prepare(
+              `INSERT INTO makes (make, make_id) VALUES (?, ?)
+               ON CONFLICT(make) DO UPDATE SET make_id = excluded.make_id, updated_at = CURRENT_TIMESTAMP`
+            )
+            .bind(m.Make_Name.toUpperCase().trim(), m.Make_ID)
         );
-        await env.DB.batch(stmts);
+        await db.batch(stmts);
         updated += chunk.length;
       }
 
-      await env.DB.prepare(
-        `INSERT INTO sync_history (sync_channel, sync_type, records_processed, records_updated, status, details)
-         VALUES (?, ?, ?, ?, ?, ?)`
-      )
-        .bind(
-          "LIVE_API",
-          "MAKES",
-          results.length,
-          updated,
-          "SUCCESS",
-          `Synced ${updated} makes from API`
-        )
-        .run();
-    } catch {
-      // D1 persistence error
+      await recordSyncHistory(db, "MAKES", results.length, updated, "SUCCESS", `Synced ${updated} makes from API`);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      await recordSyncHistory(db, "MAKES", results.length, updated, "FAILED", message);
+      return {
+        channel: "LIVE_API",
+        type: "MAKES",
+        recordsProcessed: results.length,
+        recordsUpdated: updated,
+        success: false,
+        message: `D1 write failed after ${updated} makes: ${message}`,
+        timestamp: new Date().toISOString(),
+      };
     }
   }
 
@@ -117,6 +119,30 @@ export async function syncMakesFromApi(env?: Env): Promise<SyncResult> {
     message: `Successfully processed ${results.length} makes from NHTSA API.`,
     timestamp: new Date().toISOString(),
   };
+}
+
+/**
+ * Appends a row to sync_history; failures here must never break a sync.
+ */
+async function recordSyncHistory(
+  db: D1Database,
+  syncType: SyncResult["type"],
+  processed: number,
+  updated: number,
+  status: "SUCCESS" | "FAILED",
+  details: string
+): Promise<void> {
+  try {
+    await db
+      .prepare(
+        `INSERT INTO sync_history (sync_channel, sync_type, records_processed, records_updated, status, details)
+         VALUES (?, ?, ?, ?, ?, ?)`
+      )
+      .bind("LIVE_API", syncType, processed, updated, status, details)
+      .run();
+  } catch {
+    // History is best-effort
+  }
 }
 
 /**
@@ -143,36 +169,38 @@ export async function syncModelsForMakeFromApi(
   }
 
   const results = data.Results ?? [];
-  const modelNames: string[] = [];
-
+  const uniqueNames = new Set<string>();
   for (const item of results) {
-    if (item.Model_Name && typeof item.Model_Name === "string") {
-      const trimmed = item.Model_Name.trim();
-      if (!modelNames.includes(trimmed)) {
-        modelNames.push(trimmed);
-      }
+    if (typeof item.Model_Name === "string" && item.Model_Name.trim() !== "") {
+      uniqueNames.add(item.Model_Name.trim());
     }
   }
+  const modelNames = [...uniqueNames];
 
   let updatedCount = 0;
   if (env?.DB && modelNames.length > 0) {
+    const db = env.DB;
+    const cleanMake = make.toUpperCase().trim();
     try {
-      const cleanMake = make.toUpperCase().trim();
       const stmts = modelNames.map((model) =>
-        env.DB!.prepare(
-          `INSERT INTO makes_models (make, model) VALUES (?, ?)
-           ON CONFLICT(make, model) DO NOTHING`
-        ).bind(cleanMake, model)
+        db
+          .prepare(
+            `INSERT INTO makes_models (make, model) VALUES (?, ?)
+             ON CONFLICT(make, model) DO NOTHING`
+          )
+          .bind(cleanMake, model)
       );
 
-      // Execute in chunks
       const chunkSize = 100;
       for (let i = 0; i < stmts.length; i += chunkSize) {
-        await env.DB.batch(stmts.slice(i, i + chunkSize));
+        await db.batch(stmts.slice(i, i + chunkSize));
       }
       updatedCount = modelNames.length;
-    } catch {
-      // D1 write error
+      await recordSyncHistory(db, "MODELS", modelNames.length, updatedCount, "SUCCESS", `Synced models for ${cleanMake}`);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      await recordSyncHistory(db, "MODELS", modelNames.length, updatedCount, "FAILED", `${cleanMake}: ${message}`);
+      return { success: false, make: cleanMake, models: modelNames, updatedCount };
     }
   }
 

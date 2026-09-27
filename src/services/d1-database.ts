@@ -99,7 +99,7 @@ export async function getModelsFromD1(db: D1Database, make: string): Promise<str
   try {
     const { results } = await db
       .prepare(
-        "SELECT model FROM makes_models WHERE make = ? AND model != 'BASE_MODEL' ORDER BY model"
+        "SELECT model FROM makes_models WHERE make = ? ORDER BY model"
       )
       .bind(make.toUpperCase())
       .all<{ model: string }>();

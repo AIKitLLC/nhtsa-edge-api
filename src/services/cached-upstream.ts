@@ -2,7 +2,7 @@ import type { Context } from "hono";
 import { CONFIG } from "../config";
 import type { Env } from "../types/env";
 import { getFromCache, getSafeExecutionContext, saveToCache } from "./cache";
-import { fetchUpstream, type UpstreamFetchResult } from "./upstream";
+import { fetchUpstream, upstreamTimeoutMs, type UpstreamFetchResult } from "./upstream";
 
 const JSON_CONTENT_TYPE = "application/json; charset=utf-8";
 
@@ -50,7 +50,7 @@ export async function serveCachedUpstream(
     });
   }
 
-  const upstream = await fetchUpstream(upstreamUrl);
+  const upstream = await fetchUpstream(upstreamUrl, { timeoutMs: upstreamTimeoutMs(c.env) });
   const result: TransformedBody = transform
     ? transform(upstream)
     : { status: upstream.status, body: upstream.bodyText };

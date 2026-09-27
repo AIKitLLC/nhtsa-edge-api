@@ -1,4 +1,5 @@
 import { CONFIG } from "../config";
+import type { Env } from "../types/env";
 
 export interface UpstreamFetchResult {
   readonly status: number;
@@ -7,7 +8,19 @@ export interface UpstreamFetchResult {
   readonly latencyMs: number;
 }
 
-// In-flight map for request coalescing across concurrent requests
+// Only gateway-style failures are worth retrying; a plain 500 or a 429 would
+// just be repeated, adding load on NHTSA without improving the outcome.
+const RETRYABLE_STATUSES: ReadonlySet<number> = new Set([502, 503, 504]);
+
+/**
+ * Reads the UPSTREAM_TIMEOUT_MS var, falling back to the default for missing/invalid values.
+ */
+export function upstreamTimeoutMs(env?: Env): number {
+  const parsed = Number.parseInt(env?.UPSTREAM_TIMEOUT_MS ?? "", 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : CONFIG.UPSTREAM.DEFAULT_TIMEOUT_MS;
+}
+
+// In-flight map for request coalescing across concurrent requests (per isolate)
 const inFlightRequests = new Map<string, Promise<UpstreamFetchResult>>();
 
 /**
@@ -68,8 +81,7 @@ async function executeFetchWithRetry(
       clearTimeout(timeoutId);
       const latencyMs = Math.round(performance.now() - startTime);
 
-      // Check if upstream server returned 502/503/504
-      if (response.status >= 500 && attempt < maxRetries) {
+      if (RETRYABLE_STATUSES.has(response.status) && attempt < maxRetries) {
         attempt++;
         const backoff = CONFIG.UPSTREAM.RETRY_BASE_DELAY_MS * Math.pow(2, attempt - 1);
         await new Promise((resolve) => setTimeout(resolve, backoff));

@@ -4,7 +4,7 @@ import type { CompactVehicleSpec } from "../../types/nhtsa";
 import { CONFIG } from "../../config";
 import { buildCacheKey, getSafeExecutionContext } from "../../services/cache";
 import { serveCachedUpstream } from "../../services/cached-upstream";
-import { fetchUpstream } from "../../services/upstream";
+import { fetchUpstream, upstreamTimeoutMs } from "../../services/upstream";
 import { specFromUpstream, vinDecodeUrl } from "../../services/vin-upstream";
 import { decodeWithEnrichment } from "../../services/local-enrichment";
 import { compareWithUpstream } from "../../services/comparator";
@@ -122,7 +122,7 @@ vinRouter.get("/vin/:vin/compare", async (c) => {
   const localResult = await decodeWithEnrichment(vin, c.env, { useStoredVin: false });
   const localLatencyMs = roundMs(performance.now() - localStart);
 
-  const upstream = await fetchUpstream(vinDecodeUrl(vin));
+  const upstream = await fetchUpstream(vinDecodeUrl(vin), { timeoutMs: upstreamTimeoutMs(c.env) });
   const result = specFromUpstream(upstream, vin);
   if (!result.ok) {
     return jsonError(c, result.status, result.code, result.message, { localResult });
