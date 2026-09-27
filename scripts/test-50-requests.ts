@@ -114,6 +114,8 @@ const testCases: TestCase[] = [
 ];
 
 const BASE_URL = process.env.TEST_HOST || "http://127.0.0.1:8787";
+// Sync endpoints require the bearer token (same value as in .dev.vars / the ADMIN_TOKEN secret)
+const ADMIN_TOKEN = process.env.ADMIN_TOKEN || "dev-token";
 
 async function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -142,6 +144,7 @@ async function runTestSuite() {
         headers: {
           Accept: "application/json",
           "User-Agent": "NHTSA-50-Request-Test-Runner/1.0",
+          ...(tc.method === "POST" ? { Authorization: `Bearer ${ADMIN_TOKEN}` } : {}),
         },
       });
 

@@ -21,14 +21,17 @@ healthRouter.get("/", (c) => {
     documentation: {
       v1Endpoints: {
         vinDecode: "GET /api/v1/vin/:vin",
+        vinLocalDecode: "GET /api/v1/vin/:vin/local",
+        vinParityAudit: "GET /api/v1/vin/:vin/compare",
         makes: "GET /api/v1/makes",
         models: "GET /api/v1/models?make=:make",
         recalls: "GET /api/v1/recalls/:vin",
+        syncStatus: "GET /api/v1/sync/status",
       },
       dropInVPICProxy: {
         description: "100% drop-in replacement for vpic.nhtsa.dot.gov/api/vehicles",
         sample: "GET /vehicles/DecodeVinValues/:vin?format=json",
-        compactMode: "Add &clean=true to strip ~100 empty fields and save 80% bandwidth",
+        compactMode: "Add &clean=true to strip empty fields",
       },
       dropInRecallsProxy: {
         description: "Drop-in proxy for api.nhtsa.gov/recalls",

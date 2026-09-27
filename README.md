@@ -1,105 +1,67 @@
-# NHTSA Edge API & High-Performance Caching Gateway ⚡🚗
+# NHTSA Edge API
 
-> High-performance **Cloudflare Workers** edge gateway providing vehicle data APIs (NHTSA VPIC & Safety Recalls) with ultra-low latency (~2ms - 15ms), ~70% - 90% payload bandwidth reduction, local in-memory decoding (49 CFR Part 565), and resilient multi-tier caching.
+A **Cloudflare Workers** gateway in front of the NHTSA vehicle APIs
+([vPIC](https://vpic.nhtsa.dot.gov/api/) and [Recalls](https://api.nhtsa.gov/)). It adds:
 
----
+- **Edge caching**: VIN decodes are cached for 30 days, catalogs for 7 days, recalls for 6 hours.
+- **A clean v1 JSON API**: typed numbers and booleans, empty VPIC fields removed.
+- **A drop-in VPIC proxy**: same paths as `vpic.nhtsa.dot.gov/api/vehicles/*`, plus optional `clean=true`.
+- **An in-memory VIN engine** (49 CFR Part 565): check digit, model year and WMI lookup against a bundled
+  NHTSA catalog of 13,001 WMIs and 32,009 models. No network call.
+- **A parity audit endpoint** that compares the local engine with live NHTSA output.
 
-## 🎯 The Problems with Direct NHTSA API & The Cloudflare Solution
-
-| Criteria | Direct NHTSA API (`vpic.nhtsa.dot.gov`) | Cloudflare Edge API (`nhtsa-edge-api`) |
-| :--- | :--- | :--- |
-| **Average Latency** | **300ms - 2,500ms+** (single origin in US, high cross-continent ping) | **2ms - 15ms** (served locally from 330+ Cloudflare Edge PoPs worldwide) |
-| **Local RAM Decode** | Not available (must call remote servers) | **0.01ms - 0.05ms** (in-memory 49 CFR Part 565 engine) |
-| **Payload Size** | **~4 KB - 18 KB** (bloated with 100+ empty `""` and `null` attributes) | **~800 B - 1.2 KB** (Clean V1 / `?clean=true` cuts 70% - 90% bandwidth) |
-| **Availability / Downtime** | Vulnerable to maintenance outages and network spikes | **99.99% Resilient**: Local engine works offline even if NHTSA is down |
-| **Spike Protection** | Prone to `504 Gateway Timeout` or rate-limiting / IP bans | **Request Coalescing (Single-Flight)**: protects upstream servers |
-| **Backwards Compatibility**| Requires custom parsing for legacy applications | **100% Drop-in Replacement**: identical paths and format options |
-| **Data Ingestion** | Manual gigabyte SQL Server/CSV downloads | **Dual-Channel Sync**: Git-embedded master data + Automated Nightly Sync |
+> **Scope of the local engine.** It returns the WMI make and manufacturer, model year, country, vehicle
+> type and check-digit validity. It does **not** return model, trim, engine or body. For those, use
+> `/api/v1/vin/:vin`, which calls NHTSA and caches the result.
 
 ---
 
-## 🏗️ Technical Architecture (Safe High-Performance Engineering)
+## Quickstart
 
-1. **Ultra-lightweight Hono v4 Framework**: Optimized specifically for Web Standards and Cloudflare Workers V8 isolates runtime, achieving sub-millisecond routing overhead (~0.01ms).
-2. **Model 2 Hybrid Architecture & Multi-Tier Edge Caching**:
-   - **Embedded Master Datasets (Version-Controlled in Git)**: Bundles **13,001 global WMIs** (`data/wmi-master.json`) and **32,009 vehicle models** (`data/makes-models.json`) extracted directly from the official `vPICList_lite_2026_09` release.
-   - **Sub-millisecond In-Memory Decoder**: Decodes VINs in **0.01ms - 0.05ms** using pure TypeScript implementation of federal standard **49 CFR Part 565** (Modulo 11 Check Digit validation, low-volume WMI pos 3='9' handling, 30-year model year cycle).
-   - **L1 Edge Cache API (`caches.default`)**: Anycast Edge PoP cache with `stale-while-revalidate` background refresh.
-   - **Cloudflare D1 (SQLite Edge Database)**: Distributed SQLite edge database supporting automated migrations and incremental catalog sync.
-3. **Request Coalescing (Thundering Herd Protection)**: Concurrent cache-miss requests for the same VIN share a single upstream Promise, eliminating redundant upstream requests.
-4. **Resilient Network Client**: Equipped with `AbortController` timeout (default 5s) and automatic retry with exponential backoff on upstream 502/503/504 errors.
-5. **Strict Type Safety Doctrine**: TypeScript `strict: true`, `noUncheckedIndexedAccess: true`, zero `any`, strict runtime boundary validations with `zod`.
-6. **Shadow Parity Audit (`/api/v1/vin/:vin/compare`)**: Real-time cross-verification between the local decoding engine and live NHTSA VPIC output.
+Requires Node.js >= 18 and pnpm (`corepack enable`).
 
----
-
-## 🚀 Installation & Quickstart
-
-### 1. Prerequisites
-- Node.js >= 18 (fully verified on Node v24)
-- `pnpm`, `bun`, or `npm`
-
-### 2. Clone and Install Dependencies
 ```bash
-git clone https://github.com/your-username/nhtsa-edge-api.git
+git clone https://github.com/AIKitLLC/nhtsa-edge-api.git
 cd nhtsa-edge-api
 pnpm install
+
+pnpm db:migrate:local           # create the local D1 database
+echo "ADMIN_TOKEN=dev-token" > .dev.vars
+pnpm dev                        # http://localhost:8787
 ```
 
-### 3. Run Locally (Miniflare Edge Simulator)
 ```bash
-pnpm dev
-# Local development server listens at http://localhost:8787
-```
-
-### 4. Run Typecheck and Automated Tests
-```bash
-# Verify strict TypeScript type safety (Zero errors)
-pnpm typecheck
-
-# Run test suite (30/30 unit & integration tests)
-pnpm test
-
-# Run 50-request rate-limit protected benchmark suite
-pnpm run test:50
-```
-
-### 5. Live Speed Benchmark
-While `pnpm dev` is running, open another terminal window and run:
-```bash
-./scripts/benchmark.sh 8787
-```
-
-**Measured Benchmark Results:**
-```text
-==========================================================
-⚡ NHTSA API vs Cloudflare Edge API Benchmark
-==========================================================
-Test VIN: 5UXWX7C5*BA
-
-Direct NHTSA VPIC : 0.286s | 3994 bytes
-Edge Proxy (HIT)  : 0.0035s | 3994 bytes  (80x faster)
-Edge Compact (HIT): 0.0034s | 1251 bytes  (70% payload bandwidth reduction)
-==========================================================
+pnpm typecheck   # worker + scripts, strict TypeScript
+pnpm test        # vitest unit & integration tests
+pnpm build       # dry-run bundle (checks the worker size)
 ```
 
 ---
 
-## 📡 API Reference & Usage Guide
+## API
 
-### Option 1: Modern RESTful V1 Clean API (Recommended)
-Standardized clean JSON format, strongly typed numbers/booleans, omitting 100+ blank fields:
+### v1 REST API
 
-| Method | Endpoint | Description | Cache TTL |
-| :--- | :--- | :--- | :--- |
-| `GET` | `/api/v1/vin/:vin` | Detailed VIN decode (Make, Model, Year, Cylinders, Body, etc.) | 30 days |
-| `GET` | `/api/v1/vin/:vin/local` | In-memory 49 CFR Part 565 fast decode (0.01ms - 5ms, 100% offline) | Permanent |
-| `GET` | `/api/v1/vin/:vin/compare` | Parity audit comparing local engine vs official NHTSA output | Realtime |
-| `GET` | `/api/v1/makes` | Comprehensive list of all registered vehicle makes | 7 days |
-| `GET` | `/api/v1/models?make=toyota` | List of models for a specific manufacturer | 7 days |
-| `GET` | `/api/v1/recalls/:vin` | Safety recall campaigns by VIN | 6 hours |
+| Method | Endpoint | Description | Upstream | Cache |
+| :-- | :-- | :-- | :-- | :-- |
+| `GET` | `/api/v1/vin/:vin` | Compact VIN decode (full or wildcard VIN, 3–17 chars) | VPIC | 30 days |
+| `GET` | `/api/v1/vin/:vin/local` | In-memory decode, enriched from D1 when bound | none | – |
+| `GET` | `/api/v1/vin/:vin/compare` | Local engine vs. live VPIC parity report | VPIC | never |
+| `GET` | `/api/v1/makes[?remote=true]` | All makes (bundled catalog; `remote=true` → VPIC) | optional | 7 days |
+| `GET` | `/api/v1/models?make=:make[&remote=true]` | Models for a make: bundled catalog → D1 → VPIC | fallback | 7 days |
+| `GET` | `/api/v1/recalls/:vin` | Recall campaigns for a full 17-char VIN | Recalls API | 6 hours |
+| `GET` | `/api/v1/sync/status` | D1 statistics and the last 20 sync runs | none | – |
 
-**Sample Response `GET /api/v1/vin/5UXWX7C5*BA`:**
+Every response carries `X-Cache-Status` (`HIT`/`MISS`), `X-Cache-Tier`, `X-Response-Time-Ms` and
+`Server-Timing`. Errors use one envelope:
+
+```json
+{ "success": false, "error": { "code": "INVALID_VIN_FORMAT", "message": "..." }, "timestamp": "..." }
+```
+
+<details>
+<summary>Sample <code>GET /api/v1/vin/5UXWX7C5*BA</code></summary>
+
 ```json
 {
   "success": true,
@@ -118,117 +80,196 @@ Standardized clean JSON format, strongly typed numbers/booleans, omitting 100+ b
     "engineHp": 300,
     "fuelType": "Gasoline",
     "plantCountry": "GERMANY",
-    "plantCity": "MUNICH",
     "manufacturer": "BMW NORTH AMERICA",
     "isValidVin": true,
     "errorCode": "0",
-    "errorText": "0 - VIN decoded clean",
-    "extraAttributes": {
-      "AirBagLocFront": "1st Row (Driver and Passenger)",
-      "TPMS": "Direct",
-      "DisplacementCC": "2979.168"
-    }
+    "extraAttributes": { "TPMS": "Direct" }
   },
-  "source": "EDGE_CACHE",
-  "cached": true,
+  "source": "UPSTREAM",
+  "cached": false,
   "timestamp": "2026-09-27T03:40:18.535Z"
 }
 ```
+</details>
 
----
+### Drop-in VPIC proxy
 
-### Option 2: 100% Drop-in Transparent VPIC Proxy
-Designed for existing applications already integrated with `vpic.nhtsa.dot.gov/api/vehicles/*`. No path or parsing modifications required — simply point your base URL to the Cloudflare Worker:
+Point an existing VPIC integration at the worker. Both `/vehicles/*` and `/api/vehicles/*` work:
 
-- `GET /vehicles/DecodeVinValues/:vin?format=json`
-- `GET /vehicles/DecodeVin/:vin?format=json`
-- `GET /vehicles/GetModelsForMake/:make?format=json`
-- `GET /vehicles/GetAllMakes?format=json`
-
-> **Pro-Tip**: Append `&clean=true` to any VPIC proxy endpoint to automatically strip empty `""` keys while maintaining the original schema:
-> ```
-> GET /vehicles/DecodeVinValues/5UXWX7C5*BA?format=json&clean=true
-> ```
-
----
-
-## 🌐 Deploying to Cloudflare (Production)
-
-### Method 1: 1-Click Automated Script (Recommended)
-The repository includes an automated setup script that verifies authentication, creates your D1 Database, applies migrations, and deploys globally:
-
-```bash
-pnpm run setup:cloudflare
-# Or via shell directly:
-bash scripts/setup-cloudflare.sh
+```
+GET /vehicles/DecodeVinValues/:vin?format=json
+GET /vehicles/GetModelsForMake/:make?format=json
+GET /vehicles/GetAllMakes?format=json&clean=true   # strip empty fields
 ```
 
-**What the script does automatically:**
-1. Checks Cloudflare authentication status (`wrangler whoami`).
-2. Creates the distributed **Cloudflare D1 (`nhtsa-db`)** database.
-3. Automatically updates `wrangler.jsonc` with your production `database_id`.
-4. Applies all schema migrations (`wmi_catalog`, `makes_models`, `sync_history`).
-5. Deploys the worker across 330+ edge locations and outputs live testing URLs.
+`format=json` is added when missing. Only these query parameters are forwarded and cached:
+`format, modelyear, year, make, model, units, page, vehicleType, manufacturer`. Other parameters
+are dropped, so they cannot be used to bypass the cache. The proxy accepts GET (and HEAD) only.
+
+### Recalls proxy
+
+`GET /recalls/*` is proxied to `https://api.nhtsa.gov/recalls/*` and cached for 6 hours
+(forwarded parameters: `make, model, modelYear, campaignNumber, vin`).
+
+> The `/api/v1/recalls/:vin` endpoint calls `recalls/recallsByVin`. Check that this endpoint is
+> available on the public NHTSA API before relying on it. The documented public endpoints are
+> `recallsByVehicle` and `campaignNumber`.
+
+### Admin endpoints (require `Authorization: Bearer <ADMIN_TOKEN>`)
+
+| Method | Endpoint | Description |
+| :-- | :-- | :-- |
+| `POST` | `/api/v1/sync/makes` | Refresh all makes into D1 |
+| `POST` | `/api/v1/sync/models?make=:make` | Refresh models of one make into D1 |
+| `POST` | `/api/v1/sync/wmi?wmi=:wmi` | Fetch one WMI from VPIC into D1 |
+| `POST` | `/api/v1/sync/incremental` | Refresh models of the top makes (also runs daily by cron) |
+| `POST` | `/api/v1/admin/seed` | Seed the built-in top-manufacturer WMIs |
+
+If `ADMIN_TOKEN` is not configured, these endpoints return `503 ADMIN_DISABLED`.
 
 ---
 
-### Method 2: Manual Step-by-Step Deployment
+## Caching: read this before deploying
 
-1. **Log in to Cloudflare:**
-   ```bash
-   npx wrangler login
-   ```
+| Tier | Where | Notes |
+| :-- | :-- | :-- |
+| L1 `caches.default` | per Cloudflare data center | **Has no effect on `*.workers.dev`.** Needs a custom domain or route on a zone you own. |
+| L2 KV (optional) | global | Set `ENABLE_KV_CACHE=true` and bind `NHTSA_CACHE_KV`. |
+| In-flight coalescing | per isolate | Concurrent identical upstream requests share one fetch. |
 
-2. **Create D1 Database:**
-   ```bash
-   npx wrangler d1 create nhtsa-db
-   ```
-   *Copy the generated `database_id` and paste it into `wrangler.jsonc`.*
+On a bare `*.workers.dev` deployment with KV disabled, **every request goes to NHTSA**. For caching
+to work in production, attach a custom domain (Workers → your worker → Settings → Domains & Routes),
+enable KV, or do both.
 
-3. **Apply Remote Database Migrations:**
-   ```bash
-   npx wrangler d1 migrations apply nhtsa-db --remote
-   ```
+Cache keys are built from normalized input (uppercase VIN, allow-listed parameters in sorted order),
+so `?x=1` or a lowercase VIN does not create a new cache entry.
 
-4. **(Optional) Enable Global Persistent KV Cache:**
-   ```bash
-   npx wrangler kv:namespace create NHTSA_CACHE_KV
-   ```
-   *Uncomment `kv_namespaces` in `wrangler.jsonc` and set `"ENABLE_KV_CACHE": "true"`.*
-
-5. **Deploy Worker:**
-   ```bash
-   pnpm deploy
-   ```
+Upstream calls time out after `UPSTREAM_TIMEOUT_MS` (default 5000 ms). Only 502, 503 and 504
+responses are retried, up to 2 times with exponential backoff.
 
 ---
 
-## 🔄 Automated Data Updates via GitHub Actions
+## Deploying to Cloudflare
 
-This repository includes an automated DataOps workflow at [`.github/workflows/nhtsa-sql-sync.yml`](.github/workflows/nhtsa-sql-sync.yml):
+### Automated
 
-* **Schedule**: Runs automatically at **03:00 UTC every Sunday night and Monday night** (`cron: '0 3 * * 0,1'`).
-* **Manual Trigger**: Can also be executed anytime via the `Run workflow` button under the **Actions** tab on GitHub.
+```bash
+pnpm setup:cloudflare
+```
 
-### Automated Workflow Pipeline:
-1. Probes the official NHTSA downloads repository (`https://vpic.nhtsa.dot.gov/downloads/`) for newly released monthly SQL dumps (`vPICList_lite_YYYY_MM`).
-2. Downloads and ingests new records into Git-tracked files (`data/wmi-master.json`, `data/makes-models.json`).
-3. If no new monthly dump is published yet, performs an incremental live API catalog sync for newly registered makes/models.
-4. Executes safety unit tests (`bun test`).
-5. If changes are detected: Commits and pushes the updated dataset back to Git, then automatically redeploys the worker to Cloudflare!
+The script logs you in, creates or reuses the `nhtsa-db` D1 database, writes its id into
+`wrangler.jsonc`, applies migrations, deploys the worker, and creates an `ADMIN_TOKEN` secret.
+The token is printed once, so save it.
 
-> **Setup Secret**: Add `CLOUDFLARE_API_TOKEN` to **Repository Settings -> Secrets and variables -> Actions** to allow GitHub Actions to redeploy automatically after dataset updates.
+**Commit the updated `wrangler.jsonc` afterwards.** The database id is not a secret, and CI deploys
+fail until the placeholder `local-nhtsa-db` is replaced.
+
+### Manual
+
+```bash
+npx wrangler login
+npx wrangler d1 create nhtsa-db          # copy database_id into wrangler.jsonc, then commit it
+pnpm db:migrate:remote
+npx wrangler secret put ADMIN_TOKEN      # e.g. output of: openssl rand -hex 32
+pnpm deploy
+```
+
+Optional KV cache:
+
+```bash
+npx wrangler kv namespace create NHTSA_CACHE_KV
+# uncomment kv_namespaces in wrangler.jsonc, paste the id, set "ENABLE_KV_CACHE": "true"
+```
+
+### Configuration
+
+| Name | Kind | Default | Purpose |
+| :-- | :-- | :-- | :-- |
+| `ADMIN_TOKEN` | secret | unset (admin disabled) | Bearer token for sync/admin endpoints |
+| `UPSTREAM_TIMEOUT_MS` | var | `5000` | Timeout per upstream attempt |
+| `ENABLE_KV_CACHE` | var | `false` | Enable the L2 KV cache |
+| `ENVIRONMENT` | var | `production` | Informational |
+| `DB` | D1 binding | – | VIN store, WMI catalog, sync history, parity audits |
+| `NHTSA_CACHE_KV` | KV binding | – | Optional L2 cache |
 
 ---
 
-## ⚖️ Legal Attribution & Disclaimer
+## Data & automation
 
-* **Public Domain**: The VPIC database and vehicle specifications are official works of the United States Federal Government and are in the public domain under **17 U.S.C. § 105** (No copyright protection).
-* **Privacy & DPPA Compliance**: The data consists exclusively of vehicle engineering specifications (Make, Model, Year, Engine, GVWR, Plant). It **does not contain any Personally Identifiable Information (PII)** or vehicle registration/owner data, fully complying with the *Driver's Privacy Protection Act (18 U.S.C. § 2721)*.
-* **Attribution**: Vehicle data is provided by the **National Highway Traffic Safety Administration (NHTSA)**, U.S. Department of Transportation (DOT). This project is an independent high-performance edge gateway and is not officially affiliated with or endorsed by NHTSA or the United States Government.
+| Source | Content | How it is refreshed |
+| :-- | :-- | :-- |
+| `data/wmi-master.json` | 13,001 WMIs (bundled in the worker) | Manual ingestion of a monthly vPIC dump. See [docs/DATA.md](docs/DATA.md). |
+| `data/makes-models.json` | 32,009 models (bundled) | GitHub Action (new models for the top makes, merge only) |
+| `migrations/0002_seed_official_wmi.sql` | Same WMIs, seeded into D1 | `bun scripts/generate-d1-seed.ts` after changing `wmi-master.json` |
+| D1 `makes_models`, `makes`, `wmi_catalog` | Live API additions | Worker cron (daily 03:00 UTC) and admin sync endpoints |
+
+**Workflows**
+
+- `ci.yml` runs on every push and PR: typecheck, tests, and a dry-run bundle.
+- `nhtsa-sql-sync.yml` runs Sunday and Monday at 03:00 UTC, or on demand:
+  1. It checks whether NHTSA has published a monthly dump newer than the bundled one. If so, it flags
+     this in the job summary (ingesting a dump is a manual, reviewed step).
+  2. It adds newly registered models for the top makes. Models are never removed.
+  3. When data changed and `CLOUDFLARE_API_TOKEN` is set, it commits the data, applies D1 migrations,
+     and deploys. When nothing changed, it does not commit or deploy.
+
+Add the `CLOUDFLARE_API_TOKEN` repository secret (Settings → Secrets and variables → Actions) to
+enable automatic deploys. The token needs Workers Scripts:Edit and D1:Edit permissions.
 
 ---
 
-## 📄 License
+## Project structure
 
-MIT License. See [LICENSE](LICENSE) for details.
+```
+src/
+  index.ts                  app wiring, admin guard, cron handler
+  config.ts                 upstream URLs, TTLs, header names
+  middleware/               cors, timing, error boundary, admin-auth
+  routes/
+    health.ts               GET /
+    v1/                     vin.ts, catalog.ts, recalls.ts, admin.ts
+    sync.ts                 /api/v1/sync/*
+    vpic-proxy.ts           /vehicles/*, /api/vehicles/*
+    recalls-proxy.ts        /recalls/*
+  services/
+    cached-upstream.ts      the one read-through cache flow used by every cached route
+    cache.ts                L1/L2 cache + canonical cache keys
+    upstream.ts             fetch with timeout, retry, coalescing
+    local-decoder.ts        49 CFR 565 check digit / model year / WMI
+    local-enrichment.ts     local decode + D1 enrichment
+    vin-upstream.ts         VPIC DecodeVinValues → compact spec
+    comparator.ts           parity audit
+    d1-database.ts          D1 queries
+    api-syncer.ts           live API → D1 sync
+  validation/vin.ts         zod VIN schemas
+scripts/                    setup, data sync, benchmarks (typechecked with scripts/tsconfig.json)
+migrations/                 D1 schema and seed
+test/                       vitest suites
+```
+
+---
+
+## Known limitations
+
+- The local engine decodes the WMI (positions 1–3, or 1–3 + 12–14 for low-volume makers), the model
+  year and the check digit. The VDS (model, engine, body) needs NHTSA's pattern tables and is not
+  implemented.
+- The model-year rule based on position 7 applies to light vehicles for the North American market.
+  For other VINs, the engine picks the most recent cycle that is not in the future.
+- The check digit is mandatory only for VINs from the North American market. European VINs often fail
+  it legitimately.
+- The bundled catalog adds about 525 KiB (gzip) to the worker. This is within the 3 MB free-plan limit
+  but should be watched as the dataset grows.
+
+---
+
+## Legal
+
+- vPIC data is a work of the U.S. Government and is in the public domain (17 U.S.C. § 105).
+- The data contains vehicle specifications only, with no personal or registration data.
+- Data source: National Highway Traffic Safety Administration (NHTSA), U.S. DOT. This project is
+  independent and not affiliated with or endorsed by NHTSA.
+
+## License
+
+[MIT](LICENSE)
