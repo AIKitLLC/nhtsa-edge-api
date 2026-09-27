@@ -93,6 +93,23 @@ export async function getWmiFromD1(
 }
 
 /**
+ * Retrieves model names for a make from Cloudflare D1 (filled by the live API sync)
+ */
+export async function getModelsFromD1(db: D1Database, make: string): Promise<string[]> {
+  try {
+    const { results } = await db
+      .prepare(
+        "SELECT model FROM makes_models WHERE make = ? AND model != 'BASE_MODEL' ORDER BY model"
+      )
+      .bind(make.toUpperCase())
+      .all<{ model: string }>();
+    return results.map((row) => row.model);
+  } catch {
+    return [];
+  }
+}
+
+/**
  * Logs a parity audit comparison report into Cloudflare D1
  */
 export async function logParityAudit(

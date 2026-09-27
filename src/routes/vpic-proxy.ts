@@ -1,109 +1,93 @@
 import { Hono } from "hono";
 import type { Env } from "../types/env";
 import { CONFIG } from "../config";
-import { getFromCache, getSafeExecutionContext, normalizeCacheKey, saveToCache } from "../services/cache";
-import { fetchUpstream } from "../services/upstream";
+import { buildCacheKey, canonicalQuery } from "../services/cache";
+import { serveCachedUpstream } from "../services/cached-upstream";
 import { cleanEmptyFields } from "../services/transformer";
 import type { VpicRawResponse } from "../types/nhtsa";
 
 export const vpicProxyRouter = new Hono<{ Bindings: Env }>();
 
 /**
- * Fallback / Wildcard handler for VPIC vehicles API
- * Matches both /vehicles/* and /api/vehicles/*
+ * Query parameters accepted by the public VPIC GET endpoints.
+ * Anything else is dropped from both the cache key and the upstream call.
  */
-vpicProxyRouter.all("/vehicles/*", async (c) => {
-  const url = new URL(c.req.url);
-  const normalizedKey = normalizeCacheKey(url.toString());
+const VPIC_QUERY_PARAMS = [
+  "format",
+  "modelyear",
+  "year",
+  "make",
+  "model",
+  "units",
+  "page",
+  "vehicleType",
+  "manufacturer",
+] as const;
 
-  // Determine TTL based on endpoint type
-  const path = url.pathname.toLowerCase();
-  let ttlSeconds = CONFIG.CACHE.DEFAULT_TTL_SECONDS;
-
-  if (path.includes("decodevin")) {
-    ttlSeconds = CONFIG.CACHE.VIN_TTL_SECONDS;
-  } else if (
-    path.includes("getallmakes") ||
-    path.includes("getmodelsformake") ||
-    path.includes("getvehiclevariablelist")
+function ttlForPath(lowerPath: string): number {
+  if (lowerPath.includes("decodevin")) {
+    return CONFIG.CACHE.VIN_TTL_SECONDS;
+  }
+  if (
+    lowerPath.includes("getallmakes") ||
+    lowerPath.includes("getmodelsformake") ||
+    lowerPath.includes("getvehiclevariablelist")
   ) {
-    ttlSeconds = CONFIG.CACHE.CATALOG_TTL_SECONDS;
+    return CONFIG.CACHE.CATALOG_TTL_SECONDS;
   }
+  return CONFIG.CACHE.DEFAULT_TTL_SECONDS;
+}
 
-  // 1. Check Cache
-  const cached = await getFromCache(normalizedKey, c.env);
-  if (cached) {
-    return new Response(cached.bodyText, {
-      status: cached.status,
-      headers: {
-        ...Object.fromEntries(cached.headers.entries()),
-        [CONFIG.HEADERS.CACHE_STATUS]: "HIT",
-        [CONFIG.HEADERS.CACHE_TIER]: cached.tier,
-      },
+function cleanVpicBody(bodyText: string): string {
+  try {
+    const parsed = JSON.parse(bodyText) as VpicRawResponse<Record<string, unknown>>;
+    if (!Array.isArray(parsed.Results)) return bodyText;
+    return JSON.stringify({
+      ...parsed,
+      Results: parsed.Results.map((item) => cleanEmptyFields(item)),
     });
+  } catch {
+    // Non-JSON payload (e.g. format=xml) - serve untouched
+    return bodyText;
   }
+}
 
-  // 2. Build Upstream URL
-  // Strip optional '/api' prefix from incoming worker path
+/**
+ * Drop-in VPIC proxy. Matches both /vehicles/* and /api/vehicles/*
+ * (the router is mounted at "/" and "/api").
+ */
+vpicProxyRouter.get("/vehicles/*", async (c) => {
+  const url = new URL(c.req.url);
+  // Strip optional '/api' prefix; VPIC paths are case-insensitive
   const subPath = url.pathname.replace(/^\/api\//, "/");
-  const upstreamUrl = new URL(`${CONFIG.UPSTREAM.VPIC_BASE_URL}${subPath}`);
+  const lowerPath = subPath.toLowerCase();
 
-  // Guarantee format=json if not explicitly specified
-  if (!url.searchParams.has("format")) {
-    upstreamUrl.searchParams.set("format", "json");
-  }
-  for (const [key, val] of url.searchParams.entries()) {
-    if (key !== "clean" && key !== "compact") {
-      upstreamUrl.searchParams.set(key, val);
-    }
+  const query = canonicalQuery(url.searchParams, VPIC_QUERY_PARAMS);
+  if (!query.has("format")) {
+    query.set("format", "json");
+    query.sort();
   }
 
-  // 3. Fetch from Upstream NHTSA VPIC
-  const upstreamRes = await fetchUpstream(upstreamUrl.toString());
-
-  let responseBody = upstreamRes.bodyText;
-
-  // Optional: Clean empty fields if ?clean=true or ?compact=true
   const isCleanRequested =
-    url.searchParams.get("clean") === "true" ||
-    url.searchParams.get("compact") === "true";
+    url.searchParams.get("clean") === "true" || url.searchParams.get("compact") === "true";
 
-  if (isCleanRequested && upstreamRes.status === 200) {
-    try {
-      const parsed = JSON.parse(upstreamRes.bodyText) as VpicRawResponse<Record<string, unknown>>;
-      if (Array.isArray(parsed.Results)) {
-        const cleanedResults = parsed.Results.map((item) => cleanEmptyFields(item));
-        responseBody = JSON.stringify({
-          ...parsed,
-          Results: cleanedResults,
-        });
-      }
-    } catch {
-      // If parsing fails, fall back to raw body
-    }
-  }
+  const upstreamUrl = `${CONFIG.UPSTREAM.VPIC_BASE_URL}${subPath}?${query.toString()}`;
+  const cacheKey = buildCacheKey(
+    c.req.url,
+    ["vpic", lowerPath, isCleanRequested ? "clean" : "raw"],
+    query
+  );
 
-  // 4. Save to Cache if status is 200
-  if (upstreamRes.status === 200) {
-    await saveToCache(
-      normalizedKey,
-      responseBody,
-      ttlSeconds,
-      "application/json; charset=utf-8",
-      c.env,
-      getSafeExecutionContext(c)
-    );
-  }
-
-  // 5. Return Response
-  return new Response(responseBody, {
-    status: upstreamRes.status,
-    headers: {
-      "Content-Type": "application/json; charset=utf-8",
-      "Cache-Control": `public, max-age=${ttlSeconds}, s-maxage=${ttlSeconds}, stale-while-revalidate=${CONFIG.CACHE.SWR_TTL_SECONDS}`,
-      [CONFIG.HEADERS.CACHE_STATUS]: "MISS",
-      [CONFIG.HEADERS.CACHE_TIER]: "UPSTREAM",
-      [CONFIG.HEADERS.UPSTREAM_TIME]: `${upstreamRes.latencyMs}`,
-    },
+  return serveCachedUpstream(c, {
+    cacheKey,
+    upstreamUrl,
+    ttlSeconds: ttlForPath(lowerPath),
+    transform: (upstream) => ({
+      status: upstream.status,
+      body:
+        isCleanRequested && upstream.status === 200
+          ? cleanVpicBody(upstream.bodyText)
+          : upstream.bodyText,
+    }),
   });
 });

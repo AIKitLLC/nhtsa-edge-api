@@ -5,7 +5,7 @@ import { corsMiddleware } from "./middleware/cors";
 import { errorHandler } from "./middleware/error";
 import { adminAuthMiddleware } from "./middleware/admin-auth";
 import { healthRouter } from "./routes/health";
-import { v1Router } from "./routes/v1-optimized";
+import { v1Router } from "./routes/v1";
 import { vpicProxyRouter } from "./routes/vpic-proxy";
 import { recallsProxyRouter } from "./routes/recalls-proxy";
 import { syncRouter } from "./routes/sync";

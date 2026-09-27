@@ -11,15 +11,42 @@ export interface CachedLookupResult {
 }
 
 /**
- * Normalizes a URL to serve as a reliable cache key across different clients.
+ * Keeps only allow-listed query parameters (matched case-insensitively),
+ * renamed to their canonical spelling and sorted.
+ * Unknown parameters are dropped so they cannot be used to bust the cache.
  */
-export function normalizeCacheKey(urlStr: string): string {
-  const url = new URL(urlStr);
-  // Sort query parameters to ensure deterministic cache hits
-  const searchParams = new URLSearchParams(url.searchParams);
-  searchParams.sort();
-  url.search = searchParams.toString();
-  return url.toString();
+export function canonicalQuery(
+  params: URLSearchParams,
+  allowed: readonly string[]
+): URLSearchParams {
+  const canonicalByLower = new Map(allowed.map((name) => [name.toLowerCase(), name]));
+  const result = new URLSearchParams();
+
+  for (const [key, value] of params.entries()) {
+    const canonical = canonicalByLower.get(key.toLowerCase());
+    const trimmed = value.trim();
+    if (canonical && trimmed !== "" && !result.has(canonical)) {
+      result.set(canonical, trimmed);
+    }
+  }
+
+  result.sort();
+  return result;
+}
+
+/**
+ * Builds a deterministic cache key from already-normalized parts,
+ * independent of how the client spelled the request URL.
+ */
+export function buildCacheKey(
+  requestUrl: string,
+  parts: readonly string[],
+  query?: URLSearchParams
+): string {
+  const origin = new URL(requestUrl).origin;
+  const path = parts.map((p) => encodeURIComponent(p)).join("/");
+  const search = query && query.toString() !== "" ? `?${query.toString()}` : "";
+  return `${origin}/__cache/${path}${search}`;
 }
 
 /**
