@@ -146,20 +146,75 @@ Dành cho các ứng dụng đã viết sẵn logic gọi `vpic.nhtsa.dot.gov/ap
 
 ## 🌐 Triển Khai Lên Cloudflare Toàn Cầu (Production)
 
-### 1. Đăng nhập tài khoản Cloudflare
+### Cách 1: Tự động 1-Click bằng Script (Khuyên dùng)
+Hệ thống cung cấp sẵn script tự động kiểm tra đăng nhập, tạo D1 Database, migrate schema và deploy toàn bộ lên mạng lưới Cloudflare:
+
 ```bash
-npx wrangler login
+pnpm run setup:cloudflare
+# Hoặc chạy trực tiếp qua Bash:
+bash scripts/setup-cloudflare.sh
 ```
 
-### 2. (Tuỳ chọn) Bật Persistent KV Cache
-Tạo namespace KV để lưu cache vĩnh viễn trên Cloudflare:
-```bash
-npx wrangler kv:namespace create NHTSA_CACHE_KV
-```
-Sau đó mở file [wrangler.jsonc](file:///Users/tuannguyen/.gemini/antigravity/scratch/nhtsa-edge-api/wrangler.jsonc), uncomment phần `kv_namespaces` và dán `id` vừa nhận được, đồng thời đổi biến `"ENABLE_KV_CACHE": "true"`.
+**Script sẽ tự động thực hiện:**
+1. Kiểm tra session đăng nhập Cloudflare (`wrangler whoami`).
+2. Khởi tạo cơ sở dữ liệu phân tán **Cloudflare D1 (`nhtsa-db`)**.
+3. Cập nhật `database_id` chính thức vào `wrangler.jsonc`.
+4. Migrate bảng dữ liệu `wmi_catalog`, `makes_models`, `sync_history`.
+5. Đẩy code lên 330+ Edge PoP và in ra URL endpoint sẵn sàng sử dụng.
 
-### 3. Deploy lên Cloudflare
-```bash
-pnpm deploy
-```
-Sau khi hoàn tất, bạn sẽ nhận được URL toàn cầu (ví dụ: `https://nhtsa-edge-api.<your-subdomain>.workers.dev`).
+---
+
+### Cách 2: Triển khai thủ công từng bước
+
+1. **Đăng nhập Cloudflare:**
+   ```bash
+   npx wrangler login
+   ```
+
+2. **Tạo D1 SQLite Database trên Cloudflare:**
+   ```bash
+   npx wrangler d1 create nhtsa-db
+   ```
+   *Sao chép `database_id` vừa tạo và cập nhật vào `wrangler.jsonc`.*
+
+3. **Áp dụng Migration lên Production:**
+   ```bash
+   npx wrangler d1 migrations apply nhtsa-db --remote
+   ```
+
+4. **(Tuỳ chọn) Bật Persistent KV Cache:**
+   ```bash
+   npx wrangler kv:namespace create NHTSA_CACHE_KV
+   ```
+   *Uncomment phần `kv_namespaces` trong `wrangler.jsonc` và đặt `"ENABLE_KV_CACHE": "true"`.*
+
+5. **Deploy lên Cloudflare:**
+   ```bash
+   pnpm deploy
+   ```
+
+---
+
+## 🔄 Tự Động Cập Nhật Dữ Liệu Bằng GitHub Actions
+
+Dự án đã được trang bị sẵn GitHub Actions Workflow [`.github/workflows/nhtsa-sql-sync.yml`](.github/workflows/nhtsa-sql-sync.yml) thực hiện quy trình **DataOps tự động**:
+
+* **Lịch trình**: Tự động chạy lúc **03:00 UTC mỗi đêm Chủ Nhật và đêm Thứ Hai hàng tuần** (`cron: '0 3 * * 0,1'`).
+* **Hỗ trợ chạy thủ công**: Nút `Run workflow` trong tab **Actions** trên GitHub.
+
+### Quy trình tự động diễn ra:
+1. Quét trang phát hành chính thức của NHTSA (`https://vpic.nhtsa.dot.gov/downloads/`) để tìm kiếm bản dump mới (`vPICList_lite_YYYY_MM`).
+2. Tự động tải, convert và cập nhật bộ dữ liệu chuẩn trong Git (`data/wmi-master.json`, `data/makes-models.json`).
+3. Nếu chưa có bản dump tháng mới, tự động chạy **Live API incremental sync** để bổ sung các hãng/mẫu xe mới đăng ký trong tuần.
+4. Chạy kiểm thử an toàn (`bun test`).
+5. Nếu có dữ liệu mới: Tự động `git commit` & `push` vào repo, sau đó deploy Worker bản mới nhất lên Cloudflare!
+
+> **Thiết lập bí mật (Secret)**: Thêm Secret `CLOUDFLARE_API_TOKEN` trong **Repository Settings -> Secrets and variables -> Actions** để GitHub Action tự động deploy lên Cloudflare sau mỗi lần cập nhật dữ liệu.
+
+---
+
+## ⚖️ Tuyên Bố Pháp Lý & Bản Quyền (Legal Attribution & Disclaimer)
+
+* **Phạm vi công cộng (Public Domain)**: Cơ sở dữ liệu VPIC và thông số kỹ thuật VIN tuân theo **17 U.S.C. § 105** (Các tác phẩm của Chính phủ Liên bang Hoa Kỳ tự động thuộc phạm vi công cộng, không có bản quyền).
+* **Tuân thủ DPPA & Quyền riêng tư**: Dữ liệu chỉ bao gồm thông số kỹ thuật xe của nhà sản xuất, **hoàn toàn không chứa thông tin cá nhân (PII)** của chủ xe, tuân thủ nghiêm ngặt *Driver's Privacy Protection Act (18 U.S.C. § 2721)*.
+* **Ghi nhận nguồn**: Dữ liệu thông số phương tiện được cung cấp bởi **Cục Quản lý An toàn Giao thông Đường cao tốc Quốc gia Mỹ (NHTSA)** thuộc Bộ Giao thông Vận tải Hoa Kỳ (U.S. DOT). Dự án này là cổng gateway độc lập, không phải là cơ quan trực thuộc hay được bảo trợ chính thức bởi chính phủ Mỹ.

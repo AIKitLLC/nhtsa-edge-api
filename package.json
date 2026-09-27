@@ -7,6 +7,9 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
+    "setup:cloudflare": "bash scripts/setup-cloudflare.sh",
+    "sync:dump": "bun scripts/sync-sql-dump.ts",
+    "test:50": "bun scripts/test-50-requests.ts",
     "build": "tsc --noEmit",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",

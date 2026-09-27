@@ -1,0 +1,67 @@
+name: NHTSA SQL Dump & Dataset Sync 🔄
+
+on:
+  schedule:
+    # Chạy tự động lúc 03:00 UTC mỗi đêm Chủ Nhật (0) và đêm Thứ Hai (1)
+    - cron: '0 3 * * 0,1'
+  workflow_dispatch: # Cho phép kích hoạt thủ công từ GitHub Actions UI
+
+concurrency:
+  group: nhtsa-sync
+  cancel-in-progress: true
+
+jobs:
+  sync-and-deploy:
+    name: Sync NHTSA SQL Dump & Deploy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Quyền commit dữ liệu mới vào Git
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: ⚡ Setup Bun Runtime
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: 📦 Install Project Dependencies
+        run: bun install --frozen-lockfile || bun install
+
+      - name: 🔄 Run NHTSA SQL Dump & Dataset Synchronizer
+        run: |
+          chmod +x scripts/sync-sql-dump.ts
+          bun scripts/sync-sql-dump.ts
+
+      - name: 🧪 Run Safety Test Suite
+        run: |
+          bun test
+
+      - name: 📝 Commit & Push Updated Master Data (If Changed)
+        id: commit_step
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          
+          if [[ -n $(git status -s data/) ]]; then
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            git add data/
+            git commit -m "chore(data): automated NHTSA SQL dump & catalog sync [skip ci]"
+            git push
+            echo "✔ Pushed updated datasets to git repository."
+          else
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "✔ No new dataset changes to commit."
+          fi
+
+      - name: 🚀 Deploy Updated Worker to Cloudflare Global Edge
+        if: env.CLOUDFLARE_API_TOKEN != ''
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          command: deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
