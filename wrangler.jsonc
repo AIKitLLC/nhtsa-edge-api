@@ -19,7 +19,10 @@
       "database_id": "local-nhtsa-db",
       "migrations_dir": "migrations"
     }
-  ]
+  ],
+  "triggers": {
+    "crons": ["0 3 * * *"]
+  }
   /**
    * Optional: Uncomment to enable persistent global KV caching across all edge PoPs
    * Run: npx wrangler kv:namespace create NHTSA_CACHE_KV

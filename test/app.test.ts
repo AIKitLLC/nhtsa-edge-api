@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import app from "../src/index";
+import { app } from "../src/index";
 
 describe("NHTSA Edge API Integration Tests", () => {
   beforeEach(() => {

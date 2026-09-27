@@ -58,7 +58,19 @@ CREATE TABLE IF NOT EXISTS parity_audit_logs (
   audited_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS sync_history (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  sync_channel TEXT NOT NULL,
+  sync_type TEXT NOT NULL,
+  records_processed INTEGER NOT NULL,
+  records_updated INTEGER NOT NULL,
+  status TEXT NOT NULL,
+  details TEXT,
+  synced_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Indexes for lightning fast edge lookups (<0.5ms)
 CREATE INDEX IF NOT EXISTS idx_wmi_make ON wmi_catalog(make);
 CREATE INDEX IF NOT EXISTS idx_models_make ON makes_models(make);
 CREATE INDEX IF NOT EXISTS idx_vds_lookup ON vds_patterns(wmi, vds_pattern);
+CREATE INDEX IF NOT EXISTS idx_sync_time ON sync_history(synced_at DESC);

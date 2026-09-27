@@ -7,6 +7,8 @@ import { healthRouter } from "./routes/health";
 import { v1Router } from "./routes/v1-optimized";
 import { vpicProxyRouter } from "./routes/vpic-proxy";
 import { recallsProxyRouter } from "./routes/recalls-proxy";
+import { syncRouter } from "./routes/sync";
+import { runIncrementalSync } from "./services/api-syncer";
 
 const app = new Hono<{ Bindings: Env; Variables: AppVariables }>();
 
@@ -23,6 +25,9 @@ app.route("/", healthRouter);
 
 // High-performance clean v1 API (/api/v1/vin/:vin, /api/v1/makes, etc.)
 app.route("/api/v1", v1Router);
+
+// Dual-Channel Sync Management (/api/v1/sync/*)
+app.route("/api/v1/sync", syncRouter);
 
 // 100% transparent drop-in VPIC proxy (matching both /api/vehicles/* and /vehicles/*)
 app.route("/api", vpicProxyRouter);
@@ -46,4 +51,20 @@ app.notFound((c) => {
   );
 });
 
-export default app;
+export { app };
+
+export default {
+  fetch: app.fetch,
+  /**
+   * Automated Cloudflare Worker Cron Trigger (Nightly Incremental API Sync)
+   */
+  async scheduled(_event: ScheduledEvent, env: Env, ctx: ExecutionContext): Promise<void> {
+    ctx.waitUntil(
+      runIncrementalSync(env).then((res) => {
+        console.log(`[Cron Sync] Successfully synced ${res.totalModelsSynced} models across ${res.totalMakesProcessed} makes at ${res.timestamp}`);
+      }).catch((err) => {
+        console.error("[Cron Sync] Error during nightly sync:", err);
+      })
+    );
+  },
+};
