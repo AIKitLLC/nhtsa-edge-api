@@ -1,67 +1,82 @@
-name: NHTSA SQL Dump & Dataset Sync 🔄
+name: NHTSA Dataset Sync
 
 on:
   schedule:
-    # Runs at 03:00 UTC every Sunday night (0) and Monday night (1)
+    # 03:00 UTC every Sunday and Monday
     - cron: '0 3 * * 0,1'
-  workflow_dispatch: # Allows manual trigger from GitHub Actions UI
+  workflow_dispatch:
 
 concurrency:
   group: nhtsa-sync
-  cancel-in-progress: true
+  # Never cancel a run that may be pushing or deploying
+  cancel-in-progress: false
 
 jobs:
   sync-and-deploy:
-    name: Sync NHTSA SQL Dump & Deploy
+    name: Sync dataset & deploy
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Permission to commit updated datasets into Git
+      contents: write # commit refreshed datasets
+    env:
+      # Job-level so the deploy step's `if:` can see it (step-level env is not available there)
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
 
     steps:
-      - name: 📥 Checkout Repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
         with:
-          fetch-depth: 1
+          node-version: 22
+          cache: pnpm
 
-      - name: ⚡ Setup Bun Runtime
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
+      - uses: oven-sh/setup-bun@v2
 
-      - name: 📦 Install Project Dependencies
-        run: bun install --frozen-lockfile || bun install
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
-      - name: 🔄 Run NHTSA SQL Dump & Dataset Synchronizer
+      - name: Refresh dataset from NHTSA
+        run: bun scripts/sync-sql-dump.ts
+
+      - name: Verify (typecheck + tests)
         run: |
-          chmod +x scripts/sync-sql-dump.ts
-          bun scripts/sync-sql-dump.ts
+          pnpm typecheck
+          pnpm test
 
-      - name: 🧪 Run Safety Test Suite
-        run: |
-          bun test
-
-      - name: 📝 Commit & Push Updated Master Data (If Changed)
+      - name: Commit refreshed data (only when it changed)
         id: commit_step
         run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          
-          if [[ -n $(git status -s data/) ]]; then
-            echo "has_changes=true" >> $GITHUB_OUTPUT
+          if [[ -n "$(git status --porcelain data/)" ]]; then
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git config user.name "github-actions[bot]"
             git add data/
-            git commit -m "chore(data): automated NHTSA SQL dump & catalog sync [skip ci]"
+            git commit -m "chore(data): automated NHTSA catalog refresh"
             git push
-            echo "✔ Pushed updated datasets to git repository."
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
           else
-            echo "has_changes=false" >> $GITHUB_OUTPUT
-            echo "✔ No new dataset changes to commit."
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+            echo "No dataset changes."
           fi
 
-      - name: 🚀 Deploy Updated Worker to Cloudflare Global Edge
-        if: env.CLOUDFLARE_API_TOKEN != ''
+      - name: Check wrangler.jsonc has a real D1 database_id
+        if: steps.commit_step.outputs.has_changes == 'true' && env.CLOUDFLARE_API_TOKEN != ''
+        run: |
+          if grep -q '"database_id": "local-nhtsa-db"' wrangler.jsonc; then
+            echo "::error::wrangler.jsonc still has the placeholder database_id. Commit your real D1 id (see README > Deploy)."
+            exit 1
+          fi
+
+      - name: Apply D1 migrations
+        if: steps.commit_step.outputs.has_changes == 'true' && env.CLOUDFLARE_API_TOKEN != ''
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          command: d1 migrations apply nhtsa-db --remote
+
+      - name: Deploy worker
+        if: steps.commit_step.outputs.has_changes == 'true' && env.CLOUDFLARE_API_TOKEN != ''
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           command: deploy
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}

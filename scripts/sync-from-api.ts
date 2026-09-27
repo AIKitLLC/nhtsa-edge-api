@@ -1,108 +1,36 @@
 #!/usr/bin/env bun
 /**
- * CLI Script: Sync fresh vehicle makes & models from NHTSA live API directly into Git data files
+ * Adds newly registered models from the NHTSA live API into data/makes-models.json.
+ * Existing models are never removed.
+ *
  * Usage:
- *   bun scripts/sync-from-api.ts
- *   bun scripts/sync-from-api.ts --make=Tesla
+ *   bun scripts/sync-from-api.ts              # top makes
+ *   bun scripts/sync-from-api.ts --make=Tesla # a single make
  */
 
-import fs from "node:fs";
-import path from "node:path";
+import { resolve } from "node:path";
+import { TOP_MAKES, countModels, readJson, refreshMakes, writeJsonIfChanged, type ModelCatalog } from "./lib/catalog";
 
-const BASE_URL = "https://vpic.nhtsa.dot.gov/api";
-const catalogPath = path.resolve("./data/makes-models.json");
+const CATALOG_PATH = resolve(import.meta.dirname ?? ".", "../data/makes-models.json");
 
-interface ModelResult {
-  Model_ID: number;
-  Model_Name: string;
+async function main(): Promise<void> {
+  const makeArg = process.argv.slice(2).find((a) => a.startsWith("--make="))?.slice("--make=".length);
+  const targetMakes = makeArg ? [makeArg.trim().toUpperCase()] : TOP_MAKES;
+
+  const catalog = readJson<ModelCatalog>(CATALOG_PATH, {});
+  console.log(`Refreshing ${targetMakes.length} make(s) from the NHTSA live API...`);
+
+  const { added, failed } = await refreshMakes(catalog, targetMakes);
+  const written = writeJsonIfChanged(CATALOG_PATH, catalog);
+
+  console.log(`Done: ${added} new models, ${countModels(catalog)} total, file ${written ? "updated" : "unchanged"}.`);
+  if (failed.length > 0) {
+    console.warn(`Failed makes: ${failed.join(", ")}`);
+    process.exitCode = 1;
+  }
 }
 
-async function fetchModelsForMake(make: string): Promise<string[]> {
-  const url = `${BASE_URL}/vehicles/GetModelsForMake/${encodeURIComponent(make)}?format=json`;
-  const res = await fetch(url, { headers: { "User-Agent": "NHTSA-Sync-Tool/1.0" } });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  const data = await res.json() as { Results?: ModelResult[] };
-  const models: string[] = [];
-  for (const item of data.Results ?? []) {
-    if (item.Model_Name && typeof item.Model_Name === "string") {
-      const trimmed = item.Model_Name.trim();
-      if (!models.includes(trimmed)) {
-        models.push(trimmed);
-      }
-    }
-  }
-  return models;
-}
-
-async function main() {
-  console.log("==========================================================");
-  console.log("🔄 NHTSA Live API Synchronizer (Channel 2: Direct Sync)");
-  console.log("==========================================================");
-
-  let catalog: Record<string, string[]> = {};
-  if (fs.existsSync(catalogPath)) {
-    catalog = JSON.parse(fs.readFileSync(catalogPath, "utf-8")) as Record<string, string[]>;
-  }
-
-  const args = process.argv.slice(2);
-  const makeArg = args.find((a) => a.startsWith("--make="))?.replace("--make=", "");
-
-  const targetMakes = makeArg
-    ? [makeArg.toUpperCase()]
-    : [
-        "TOYOTA",
-        "HONDA",
-        "FORD",
-        "CHEVROLET",
-        "TESLA",
-        "BMW",
-        "MERCEDES-BENZ",
-        "HYUNDAI",
-        "KIA",
-        "NISSAN",
-        "AUDI",
-        "VOLKSWAGEN",
-        "PORSCHE",
-        "MAZDA",
-        "SUBARU",
-        "LEXUS",
-        "JEEP",
-        "RIVIAN",
-        "LUCID",
-        "VINFAST",
-      ];
-
-  console.log(`Syncing models for ${targetMakes.length} makes directly from NHTSA API...`);
-
-  let newModelsTotal = 0;
-
-  for (const make of targetMakes) {
-    process.stdout.write(`   Fetching ${make}... `);
-    try {
-      const models = await fetchModelsForMake(make);
-      const existing = catalog[make] ?? [];
-      const newModels = models.filter((m) => !existing.includes(m));
-
-      catalog[make] = models;
-      newModelsTotal += newModels.length;
-
-      if (newModels.length > 0) {
-        console.log(`✅ ${models.length} models (${newModels.length} new: ${newModels.slice(0, 3).join(", ")}${newModels.length > 3 ? "..." : ""})`);
-      } else {
-        console.log(`✅ ${models.length} models (up to date)`);
-      }
-    } catch (err: unknown) {
-      console.log(`❌ Failed: ${err instanceof Error ? err.message : String(err)}`);
-    }
-  }
-
-  fs.writeFileSync(catalogPath, JSON.stringify(catalog, null, 2));
-  const stats = fs.statSync(catalogPath);
-
-  console.log("----------------------------------------------------------");
-  console.log(`✅ Sync Complete! ${newModelsTotal} new models discovered.`);
-  console.log(`📁 Updated ${catalogPath} (${(stats.size / 1024).toFixed(1)} KB)`);
-  console.log("==========================================================");
-}
-
-main().catch(console.error);
+main().catch((err: unknown) => {
+  console.error(err);
+  process.exit(1);
+});

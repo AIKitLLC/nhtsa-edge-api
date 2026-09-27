@@ -1,19 +1,31 @@
 #!/usr/bin/env bun
 /**
- * Automated NHTSA VPIC Dump & Master Dataset Synchronizer
- * Safe High-Performance Engineering Standard
+ * Scheduled dataset maintenance (run by .github/workflows/nhtsa-sql-sync.yml).
  *
- * 1. Checks https://vpic.nhtsa.dot.gov/downloads/ for newly published monthly SQL/PostgreSQL dumps.
- * 2. If a new release is available, downloads and ingests new records into data/wmi-master.json & data/makes-models.json.
- * 3. If no new dump is published yet, performs an incremental API catalog sync for newly registered makes/models.
- * 4. Updates data/sync-metadata.json with timestamp and version telemetry.
+ * 1. Detects whether NHTSA published a newer monthly vPICList dump than the
+ *    one the bundled data was extracted from. Ingesting a dump is a manual,
+ *    reviewed step (see docs/DATA.md); this script only reports it.
+ * 2. Adds newly registered models for the top makes from the live API.
+ * 3. Rewrites data/sync-metadata.json only when something actually changed,
+ *    so scheduled runs do not produce empty commits.
  */
 
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { appendFileSync } from "node:fs";
 import { resolve } from "node:path";
+import {
+  TOP_MAKES,
+  countModels,
+  fetchWithTimeout,
+  readJson,
+  refreshMakes,
+  writeJsonIfChanged,
+  type ModelCatalog,
+} from "./lib/catalog";
+import { dumpCandidates } from "./lib/dumps";
 
 interface SyncMetadata {
   activeDumpVersion: string;
+  latestAvailableDump?: string | null;
   lastSyncedAt: string;
   wmiCount: number;
   makesCount: number;
@@ -22,143 +34,97 @@ interface SyncMetadata {
   lastCheckStatus?: string;
 }
 
-const DATA_DIR = resolve(import.meta.dir, "../data");
+const DATA_DIR = resolve(import.meta.dirname ?? ".", "../data");
 const METADATA_PATH = resolve(DATA_DIR, "sync-metadata.json");
 const WMI_PATH = resolve(DATA_DIR, "wmi-master.json");
 const MAKES_MODELS_PATH = resolve(DATA_DIR, "makes-models.json");
 const NHTSA_DOWNLOADS_URL = "https://vpic.nhtsa.dot.gov/downloads";
+const MONTHS_TO_PROBE = 6;
 
-async function checkRemoteUrlExists(url: string): Promise<boolean> {
-  try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 10000);
-    const res = await fetch(url, {
-      method: "HEAD",
-      signal: controller.signal,
-      headers: { "User-Agent": "NHTSA-Sync-Worker/1.0" },
-    });
-    clearTimeout(timeout);
-    return res.status === 200;
-  } catch {
-    return false;
+async function dumpExists(name: string): Promise<boolean> {
+  for (const ext of [".plain.zip", ".bak.zip", ".bak"]) {
+    try {
+      const res = await fetchWithTimeout(`${NHTSA_DOWNLOADS_URL}/${name}${ext}`, { method: "HEAD" }, 10000);
+      if (res.status === 200) return true;
+    } catch {
+      // Network error on one candidate: try the next extension
+    }
   }
+  return false;
 }
 
-async function findLatestAvailableDump(): Promise<string | null> {
-  const now = new Date();
-  const candidates: string[] = [];
-
-  // Check current year & past 2 years, months 1 to 12
-  for (let year = now.getFullYear(); year >= now.getFullYear() - 1; year--) {
-    for (let month = 12; month >= 1; month--) {
-      const mm = String(month).padStart(2, "0");
-      candidates.push(`vPICList_lite_${year}_${mm}.plain.zip`);
-      candidates.push(`vPICList_lite_${year}_${mm}.bak`);
+async function findLatestDump(): Promise<string | null> {
+  for (const name of dumpCandidates(new Date(), MONTHS_TO_PROBE)) {
+    process.stdout.write(`   ${name}... `);
+    if (await dumpExists(name)) {
+      console.log("available");
+      return name;
     }
+    console.log("not found");
   }
-
-  console.log(`🔍 Probing NHTSA downloads repository (${NHTSA_DOWNLOADS_URL})...`);
-  for (const candidate of candidates.slice(0, 8)) {
-    const testUrl = `${NHTSA_DOWNLOADS_URL}/${candidate}`;
-    process.stdout.write(`   Checking ${candidate}... `);
-    const exists = await checkRemoteUrlExists(testUrl);
-    if (exists) {
-      console.log("✔ AVAILABLE");
-      return candidate.replace(/\.(plain\.zip|bak)$/, "");
-    } else {
-      console.log("Not yet released");
-    }
-  }
-
   return null;
 }
 
-async function runMasterDatasetSync() {
-  console.log("================================================================================");
-  console.log("🔄 NHTSA SQL Dump & Dataset Automated Sync (Sunday/Monday Night Job)");
-  console.log("================================================================================");
-
-  let metadata: SyncMetadata = {
-    activeDumpVersion: "vPICList_lite_2026_09",
-    lastSyncedAt: new Date().toISOString(),
-    wmiCount: 13001,
-    makesCount: 11370,
-    modelsCount: 32009,
-    source: NHTSA_DOWNLOADS_URL,
-  };
-
-  if (existsSync(METADATA_PATH)) {
-    try {
-      metadata = JSON.parse(readFileSync(METADATA_PATH, "utf-8")) as SyncMetadata;
-    } catch {
-      // Use defaults
-    }
-  }
-
-  console.log(`Current active baseline: ${metadata.activeDumpVersion}`);
-  console.log(`Current records: ${metadata.wmiCount} WMIs | ${metadata.modelsCount} Models | ${metadata.makesCount} Makes`);
-
-  const latestDumpVersion = await findLatestAvailableDump();
-  let updated = false;
-
-  if (latestDumpVersion && latestDumpVersion !== metadata.activeDumpVersion) {
-    console.log(`\n🎉 New official NHTSA dump detected: ${latestDumpVersion}!`);
-    console.log(`   Updating activeDumpVersion from ${metadata.activeDumpVersion} to ${latestDumpVersion}...`);
-    metadata.activeDumpVersion = latestDumpVersion;
-    metadata.lastCheckStatus = `Updated to new monthly dump ${latestDumpVersion}`;
-    updated = true;
-  } else {
-    console.log("\n✔ Current snapshot matches latest available dump or no newer monthly release.");
-    console.log("⚡ Executing incremental live catalog sync for new weekly registrations...");
-
-    try {
-      // Fetch fresh makes count from public VPIC endpoint
-      const res = await fetch("https://vpic.nhtsa.dot.gov/api/vehicles/GetAllMakes?format=json");
-      if (res.ok) {
-        const data = await res.json() as { Count?: number; Results?: Array<{ Make_Name: string }> };
-        if (data.Count && data.Count > metadata.makesCount) {
-          console.log(`   Found ${data.Count - metadata.makesCount} newly registered vehicle makes!`);
-          metadata.makesCount = data.Count;
-          metadata.lastCheckStatus = `Incremental sync: updated to ${data.Count} makes`;
-          updated = true;
-        }
-      }
-    } catch (err) {
-      console.warn("   Notice: Live API incremental check skipped:", err);
-    }
-  }
-
-  // Count current files in data/
-  if (existsSync(WMI_PATH)) {
-    try {
-      const wmiObj = JSON.parse(readFileSync(WMI_PATH, "utf-8")) as Record<string, unknown>;
-      metadata.wmiCount = Object.keys(wmiObj).length;
-    } catch {}
-  }
-
-  if (existsSync(MAKES_MODELS_PATH)) {
-    try {
-      const mmObj = JSON.parse(readFileSync(MAKES_MODELS_PATH, "utf-8")) as Record<string, string[]>;
-      let total = 0;
-      for (const m of Object.values(mmObj)) {
-        total += m.length;
-      }
-      metadata.modelsCount = total;
-    } catch {}
-  }
-
-  metadata.lastSyncedAt = new Date().toISOString();
-  if (!updated) {
-    metadata.lastCheckStatus = "Verified up to date with official NHTSA VPIC repositories";
-  }
-
-  writeFileSync(METADATA_PATH, JSON.stringify(metadata, null, 2) + "\n", "utf-8");
-  console.log(`\n✔ Metadata updated at ${METADATA_PATH}`);
-  console.log(`✔ Last check status: ${metadata.lastCheckStatus}`);
-  console.log("================================================================================");
+function writeStepSummary(lines: string[]): void {
+  const summaryPath = process.env["GITHUB_STEP_SUMMARY"];
+  if (summaryPath) appendFileSync(summaryPath, lines.join("\n") + "\n");
 }
 
-runMasterDatasetSync().catch((err) => {
-  console.error("❌ Sync failed:", err);
+async function main(): Promise<void> {
+  const metadata = readJson<SyncMetadata>(METADATA_PATH, {
+    activeDumpVersion: "unknown",
+    lastSyncedAt: new Date(0).toISOString(),
+    wmiCount: 0,
+    makesCount: 0,
+    modelsCount: 0,
+    source: `${NHTSA_DOWNLOADS_URL}/`,
+  });
+  const before = JSON.stringify(metadata);
+
+  console.log(`Bundled data extracted from: ${metadata.activeDumpVersion}`);
+  console.log("Probing NHTSA downloads for newer monthly dumps...");
+  const latestDump = await findLatestDump();
+  const newDumpAvailable = latestDump !== null && latestDump !== metadata.activeDumpVersion;
+  if (latestDump !== null) {
+    metadata.latestAvailableDump = latestDump;
+  }
+
+  console.log("Adding newly registered models from the live API...");
+  const catalog = readJson<ModelCatalog>(MAKES_MODELS_PATH, {});
+  const { added, failed } = await refreshMakes(catalog, TOP_MAKES);
+  if (failed.length === TOP_MAKES.length) {
+    throw new Error("NHTSA live API unreachable for every make - leaving data files untouched");
+  }
+  const catalogChanged = writeJsonIfChanged(MAKES_MODELS_PATH, catalog);
+
+  const wmis = readJson<Record<string, unknown>>(WMI_PATH, {});
+  metadata.wmiCount = Object.keys(wmis).length;
+  metadata.makesCount = Object.keys(catalog).length;
+  metadata.modelsCount = countModels(catalog);
+  metadata.lastCheckStatus = newDumpAvailable
+    ? `New dump ${latestDump} available - manual ingestion required (docs/DATA.md)`
+    : "Bundled dump is the latest detected";
+
+  if (JSON.stringify(metadata) !== before || catalogChanged) {
+    metadata.lastSyncedAt = new Date().toISOString();
+    writeJsonIfChanged(METADATA_PATH, metadata, true);
+  }
+
+  const summary = [
+    "## NHTSA dataset sync",
+    `- Bundled dump: \`${metadata.activeDumpVersion}\``,
+    `- Latest detected dump: \`${latestDump ?? "none detected"}\``,
+    `- New models added: **${added}** (catalog ${catalogChanged ? "updated" : "unchanged"})`,
+    failed.length > 0 ? `- Failed makes: ${failed.join(", ")}` : "- All makes refreshed",
+  ];
+  if (newDumpAvailable) {
+    summary.push("", `> **Action needed:** ingest \`${latestDump}\` manually, see docs/DATA.md.`);
+  }
+  writeStepSummary(summary);
+  console.log(summary.join("\n"));
+}
+
+main().catch((err: unknown) => {
+  console.error("Sync failed:", err);
   process.exit(1);
 });

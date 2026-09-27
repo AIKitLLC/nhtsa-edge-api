@@ -10,11 +10,14 @@
     "setup:cloudflare": "bash scripts/setup-cloudflare.sh",
     "sync:dump": "bun scripts/sync-sql-dump.ts",
     "test:50": "bun scripts/test-50-requests.ts",
-    "build": "tsc --noEmit",
-    "typecheck": "tsc --noEmit",
+    "build": "wrangler deploy --dry-run --outdir dist",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p scripts",
     "test": "vitest run",
     "test:watch": "vitest",
-    "cf-typegen": "wrangler types"
+    "cf-typegen": "wrangler types",
+    "sync:api": "bun scripts/sync-from-api.ts",
+    "db:migrate:local": "wrangler d1 migrations apply nhtsa-db --local",
+    "db:migrate:remote": "wrangler d1 migrations apply nhtsa-db --remote"
   },
   "keywords": [
     "cloudflare-workers",
@@ -25,7 +28,7 @@
     "edge-computing",
     "hono"
   ],
-  "author": "",
+  "author": "AIKitLLC",
   "license": "MIT",
   "dependencies": {
     "hono": "^4.7.2",
@@ -33,8 +36,17 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250224.0",
+    "@types/node": "^22.20.4",
     "typescript": "^5.7.3",
     "vitest": "^3.0.7",
     "wrangler": "^3.111.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AIKitLLC/nhtsa-edge-api.git"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "packageManager": "pnpm@10.33.0"
 }
