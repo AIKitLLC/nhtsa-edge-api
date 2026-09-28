@@ -37,6 +37,10 @@ vinRouter.get("/vin/:vin", async (c) => {
     source: "LOCAL_VPIC",
     dataVersion: result.dumpVersion,
     decodeMs,
+    _meta: {
+      poweredBy: "AI Kit LLC",
+      repository: "https://github.com/AIKitLLC/nhtsa-edge-api",
+    },
     timestamp: new Date().toISOString(),
   });
 });

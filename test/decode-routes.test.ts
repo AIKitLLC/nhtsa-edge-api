@@ -28,6 +28,14 @@ describe("Offline decode endpoints (real vPIC data, no upstream calls)", () => {
     expect(fetchSpy).not.toHaveBeenCalled();
   });
 
+  it("GET /vehicles/DecodeVinValues/:vin?clean=true drops empty and 'Not Applicable' values", async () => {
+    const res = await request("/vehicles/DecodeVinValues/1HGCM82633A004352?format=json&clean=true");
+    const row = ((await res.json()) as { Results: Record<string, string>[] }).Results[0] ?? {};
+    expect(row["Make"]).toBe("HONDA");
+    expect(Object.values(row).some((v) => v === "" || v === "Not Applicable")).toBe(false);
+    expect(row["BusType"]).toBeUndefined();
+  });
+
   it("GET /vehicles/DecodeVinValues/:vin returns the vPIC envelope", async () => {
     const res = await request("/vehicles/DecodeVinValues/1HGCM82633A004352?format=json");
     expect(res.headers.get("X-Decode-Source")).toBe("LOCAL_VPIC");

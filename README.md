@@ -22,14 +22,15 @@ An **offline VIN decoder** for the NHTSA vPIC database, running on **Cloudflare 
 | Method | Endpoint | Response |
 | :-- | :-- | :-- |
 | `GET` | `/api/v1/vin/:vin[?modelyear=YYYY]` | Clean JSON: typed headline fields + every decoded attribute |
-| `GET` | `/vehicles/DecodeVinValues/:vin?format=json[&modelyear=YYYY]` | vPIC `DecodeVinValues` (flat) |
-| `GET` | `/vehicles/DecodeVin/:vin?format=json` | vPIC `DecodeVin` (one row per variable) |
+| `GET` | `/vehicles/DecodeVinValues/:vin?format=json[&modelyear=YYYY][&clean=true]` | vPIC `DecodeVinValues` (flat) |
+| `GET` | `/vehicles/DecodeVin/:vin?format=json[&clean=true]` | vPIC `DecodeVin` (one row per variable) |
 | `POST` | `/vehicles/DecodeVINValuesBatch/` (form: `format=json`, `data=VIN[,year];…`, max 50) | vPIC batch |
 | `GET` | `/api/v1/makes` | All makes (`vpic.Make`) |
 | `GET` | `/api/v1/models?make=:make` | Models of a make (`vpic.Make_Model`) |
 
 `/api/vehicles/...` works as well as `/vehicles/...`, and paths are case-insensitive like
 vPIC's. VINs may be partial (3–17 characters) and may contain `*` wildcards.
+`clean=true` (or `compact=true`) drops empty and `Not Applicable` values.
 
 Offline responses carry `X-Decode-Source: LOCAL_VPIC` and `X-Vpic-Data-Version`
 (e.g. `vPICList_lite_2026_09`) and are cacheable (`Cache-Control: public, max-age=86400`).
@@ -81,7 +82,8 @@ Offline responses carry `X-Decode-Source: LOCAL_VPIC` and `X-Vpic-Data-Version`
 
 | Method | Endpoint | Notes |
 | :-- | :-- | :-- |
-| `GET` | `/` | Health: `status`, `dataVersion` (503 if the data assets are unreadable) |
+| `GET` | `/` | Health JSON: `status`, `dataVersion` (503 if the data assets are unreadable); browsers get a landing page |
+| `GET` | `/api/v1/vin/:vin/unified[?epa=false&eu=false]` | Offline decode + US EPA FuelEconomy.gov (EV range, MPGe, motor) + EU RDW (type approval, masses). Enrichments are model-level, not VIN-specific; a failed enrichment leaves its section `null` and the response uncached |
 | `GET` | `/api/v1/vin/:vin/compare` | Offline decode vs live vPIC, field by field (not cached) |
 | `GET` | `/api/v1/recalls/:vin` | Recalls for a 17-character VIN (proxied to `api.nhtsa.gov`, cached 6 h) |
 | `GET` | `/vehicles/*` | Any other vPIC endpoint, including `*Extended` decodes (proxied, cached) |
@@ -148,7 +150,8 @@ src/
     store.ts            asset access (+ worker-store.ts for the ASSETS binding)
     format.ts           vPIC response shapes; v1-format.ts: clean v1 shape
   routes/               v1 API, vPIC drop-in (vpic-decode.ts offline, vpic-proxy.ts), recalls
-  services/             upstream fetch, cache, shared response helpers
+  services/             upstream fetch, cache, multi-source resolver, response helpers
+  enrichment/           US EPA FuelEconomy.gov and EU RDW lookups for /unified
 scripts/vpic/           ingest-dump.ts, build-assets.ts, parity.ts (+ lib/)
 data/vpic/              the vPIC tables used by the decoder (git-tracked)
 docs/vpic-reference/    NHTSA's decode functions, verbatim, as the porting reference
@@ -177,6 +180,12 @@ or decoder change and smoke-tests it. Add these repository secrets
 | `CLOUDFLARE_ACCOUNT_ID` | your Cloudflare account id |
 
 Without them the deploy job is skipped with a warning; everything else still runs.
+
+### Production
+
+Production runs at `https://nhtsa-edge-api.tuannx87.workers.dev`. It is deployed
+manually (`pnpm deploy`) after the dev worker has been checked, so a data update never
+reaches production without a person looking at it.
 
 ### Manual
 

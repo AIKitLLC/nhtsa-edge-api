@@ -4,6 +4,7 @@ import { CONFIG } from "../config";
 import { decodeVin } from "../vpic/decode";
 import { toDecodeVinValues, toDecodeVinVariables, vpicEnvelope } from "../vpic/format";
 import { getVpicStore } from "../vpic/worker-store";
+import { cleanEmptyFields } from "../services/transformer";
 
 /** vPIC's DecodeVINValuesBatch accepts at most 50 VINs per request. */
 const MAX_BATCH = 50;
@@ -25,6 +26,11 @@ export function matchOfflineDecode(path: string): { kind: DecodeKind; vin: strin
 
 function parseModelYear(raw: string | null): number | null {
   return raw !== null && /^\d{4}$/.test(raw.trim()) ? Number(raw.trim()) : null;
+}
+
+/** `clean=true` (or `compact=true`), as on the proxied endpoints: drop empty and "Not Applicable" values. */
+function isCleanRequested(params: URLSearchParams): boolean {
+  return params.get("clean") === "true" || params.get("compact") === "true";
 }
 
 function offlineHeaders(dataVersion: string): Record<string, string> {
@@ -52,10 +58,18 @@ export async function serveOfflineDecode(
   const modelYear = parseModelYear(params.get("modelyear"));
   const result = await decodeVin(getVpicStore(c.env.ASSETS), vin, { modelYear });
   const criteria = `VIN(s): ${target.vin}`;
-  const body =
-    target.kind === "values"
-      ? vpicEnvelope(criteria, [toDecodeVinValues(result, target.vin)])
-      : vpicEnvelope(criteria, toDecodeVinVariables(result));
+  const clean = isCleanRequested(params);
+  let body;
+  if (target.kind === "values") {
+    const values = toDecodeVinValues(result, target.vin);
+    body = vpicEnvelope(criteria, [clean ? cleanEmptyFields(values) : values]);
+  } else {
+    const rows = toDecodeVinVariables(result);
+    body = vpicEnvelope(
+      criteria,
+      clean ? rows.filter((r) => r.Value !== null && !["", "not applicable"].includes(r.Value.trim().toLowerCase())) : rows
+    );
+  }
 
   return new Response(JSON.stringify(body), { status: 200, headers: offlineHeaders(result.dumpVersion) });
 }
