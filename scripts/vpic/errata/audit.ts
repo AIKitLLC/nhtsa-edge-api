@@ -27,7 +27,7 @@ const sql = new SQL(dbUrl, { max: 4 });
 interface Finding {
   readonly id: string;
   readonly title: string;
-  readonly kind: "code" | "data";
+  readonly kind: "code" | "data" | "compliance";
   readonly count: number;
   readonly examples: readonly unknown[];
   live?: readonly unknown[];
@@ -81,16 +81,18 @@ const findings: Finding[] = [];
   findings.push(f);
 }
 
-// E2. WMIs containing I, O or Q, which 49 CFR 565.15 excludes from every VIN position
+// E2. WMIs containing I, O or Q, which 49 CFR 565.15 excludes from every VIN position.
+//     Registered as submitted: they describe non-compliant VINs, not a dump defect.
 {
   const rows = (await sql`
     SELECT w.wmi, m.name AS manufacturer, w.publicavailabilitydate::date::text AS public_from
     FROM vpic.wmi w JOIN vpic.manufacturer m ON m.id = w.manufacturerid
     WHERE w.wmi ~ '[IOQ]' ORDER BY w.wmi`) as unknown[];
-  findings.push({ id: "E2", kind: "data", title: "WMIs containing I, O or Q (never valid on a VIN)", count: rows.length, examples: rows });
+  findings.push({ id: "E2", kind: "compliance", title: "WMIs containing I, O or Q (non-compliant with 49 CFR 565.15)", count: rows.length, examples: rows });
 }
 
-// E3. Pattern keys with a literal I, O or Q outside brackets: no valid VIN can match them
+// E3. Pattern keys with a literal I, O or Q outside brackets: they only match VINs that
+//     violate 49 CFR 565.15, as manufacturers submitted them (not a dump defect).
 {
   const rows = (await sql`
     SELECT e.name AS element, count(*)::int AS patterns, count(DISTINCT p.vinschemaid)::int AS schemas,
@@ -100,8 +102,8 @@ const findings: Finding[] = [];
     GROUP BY e.name ORDER BY 2 DESC`) as Array<{ patterns: number }>;
   findings.push({
     id: "E3",
-    kind: "data",
-    title: "Pattern keys with a literal I, O or Q (unreachable by any valid VIN)",
+    kind: "compliance",
+    title: "Pattern keys with a literal I, O or Q (match only non-compliant VINs)",
     count: rows.reduce((n, r) => n + r.patterns, 0),
     examples: rows,
   });
