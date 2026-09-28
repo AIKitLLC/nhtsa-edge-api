@@ -1,0 +1,72 @@
+#id	name
+1	Convertible/Cabriolet
+2	Minivan
+3	Coupe
+4	Low Speed Vehicle [LSV]/Neighborhood Electric Vehicle [NEV]
+5	Hatchback/Liftback/Notchback
+6	Motorcycle - Standard
+7	Sport Utility Vehicle [SUV]/Multipurpose Vehicle [MPV]
+8	Crossover Utility Vehicle [CUV]
+9	Van
+10	Roadster
+11	Truck
+12	Motorcycle - Scooter
+13	Sedan/Saloon
+15	Wagon
+16	Bus
+60	Pickup
+61	Trailer
+62	Incomplete - Cutaway
+63	Incomplete - Chassis Cab (Single Cab)
+64	Incomplete - Glider
+65	Incomplete
+66	Truck-Tractor
+67	Incomplete - Stripped Chassis
+68	Streetcar/Trolley
+69	Off-Road Vehicle - All-Terrain Vehicle [ATV] (Motorcycle-Style)
+70	Incomplete - Chassis Cab (Double Cab)
+71	Incomplete - School Bus Chassis
+72	Incomplete - Commercial Bus Chassis
+73	Bus - School Bus
+74	Incomplete - Chassis Cab (Number of Cab Unknown)
+75	Incomplete - Transit Bus Chassis
+76	Incomplete - Motor Coach Chassis
+77	Incomplete - Shuttle Bus Chassis
+78	Incomplete - Motor Home Chassis
+80	Motorcycle - Sport
+81	Motorcycle - Touring/Sport Touring
+82	Motorcycle - Cruiser
+83	Motorcycle - Three-Wheeled Motorcycle [2 Rear Wheels]
+84	Off-Road Vehicle - Dirt Bike/Off-Road
+85	Motorcycle - Dual-Sport/Adventure/Supermoto/On-Off Road
+86	Off-road Vehicle - Enduro (Off-road long distance racing)
+87	Motorcycle - Small/Minibike
+88	Off-Road Vehicle - Go-Kart
+90	Motorcycle - Side Car
+94	Motorcycle - Custom
+95	Cargo Van
+97	Off-road Vehicle - Snowmobile
+98	Motorcycle - Street
+100	Motorcycle - Enclosed Three Wheeled or Enclosed Autocycle [1 Rear Wheel]
+103	Motorcycle - Unenclosed Three Wheeled or Open Autocycle [1 Rear Wheel]
+104	Motorcycle - Moped
+105	Off-road Vehicle - Multipurpose Off-Highway Utility Vehicle [MOHUV] or Recreational Off-Highway Vehicle [ROV]
+107	Incomplete - Bus Chassis
+108	Motorhome
+109	Motorcycle - Cross Country
+110	Motorcycle - Underbone
+111	Step Van/Walk-in Van
+112	Incomplete - Commercial Chassis
+113	Off-road Vehicle - Motocross (Off-road short distance, closed track racing)
+114	Motorcycle - Competition
+116	Incomplete - Trailer Chassis
+117	Limousine
+119	Sport Utility Truck [SUT]
+124	Off-road Vehicle - Golf Cart
+125	Motorcycle - Unknown Body Class
+126	Off-road Vehicle - Farm Equipment
+127	Off-road Vehicle - Construction Equipment
+128	Ambulance
+129	Street Sweeper
+130	Fire Apparatus
+131	Motorcycle - Three Wheeled, Unknown Enclosure or Autocycle, Unknown Enclosure

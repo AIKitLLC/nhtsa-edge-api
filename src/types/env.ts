@@ -24,9 +24,9 @@ export interface Env {
   readonly NHTSA_CACHE_KV?: KVNamespace;
 
   /**
-   * Cloudflare D1 Serverless Database for NHTSA local data & parity audit
+   * Static assets built from data/vpic (scripts/vpic/build-assets.ts): the offline decoder's data.
    */
-  readonly DB?: D1Database;
+  readonly ASSETS: Fetcher;
 }
 
 export type AppVariables = {

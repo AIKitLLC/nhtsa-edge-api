@@ -1,159 +1,142 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, afterEach } from "vitest";
 import { app } from "../src/index";
-import {
-  resolveUnifiedVehicle,
-  fetchEpaEnergySpecs,
-  fetchRdwEuropeanSpecs,
-} from "../src/services/multi-source-resolver";
+import { fetchEpaEnergySpecs } from "../src/enrichment/epa";
+import { fetchRdwEuropeanSpecs } from "../src/enrichment/rdw";
+import { testEnv } from "./helpers/assets";
 
-describe("Multi-Source Vehicle Resolver & Intelligent Fallback", () => {
-  beforeEach(() => {
-    vi.restoreAllMocks();
+const request = (path: string) => app.request(path, undefined, testEnv());
+const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status });
+
+/** Stand-in for fueleconomy.gov and opendata.rdw.nl; anything else fails the test. */
+function mockThirdParties(opts: { epaDown?: boolean } = {}) {
+  return vi.spyOn(globalThis, "fetch").mockImplementation(async (input) => {
+    const url = String(input instanceof Request ? input.url : input);
+    if (url.includes("fueleconomy.gov")) {
+      if (opts.epaDown) return new Response("Service Unavailable", { status: 503 });
+      if (url.includes("menu/model")) {
+        return json({ menuItem: [{ text: "Model 3 Long Range AWD", value: "Model 3 Long Range AWD" }, { text: "Model 3", value: "Model 3" }] });
+      }
+      if (url.includes("menu/options")) return json({ menuItem: { text: "Auto (A1)", value: "44583" } });
+      if (url.includes("vehicle/44583")) {
+        return json({ atvType: "EV", fuelType: "Electricity", range: "272", comb08: "132", evMotor: "211 kW AC PMSM", charge240: "10", co2: "0" });
+      }
+    }
+    if (url.includes("opendata.rdw.nl")) {
+      return json([
+        {
+          merk: "TESLA",
+          handelsbenaming: "MODEL 3",
+          massa_ledig_voertuig: "1745",
+          toegestane_maximum_massa_voertuig: "2232",
+          typegoedkeuringsnummer: "e4*2007/46*1293*28",
+          europese_voertuigcategorie: "M1",
+          wielbasis: "288",
+          openstaande_terugroepactie_indicator: "Ja",
+        },
+      ]);
+    }
+    throw new Error(`unexpected fetch ${url}`);
   });
+}
 
-  describe("Fallback to Local Engine when Upstream NHTSA Fails", () => {
-    it("should gracefully fall back to local 49 CFR Part 565 engine if NHTSA returns 503", async () => {
-      // Mock fetch to simulate NHTSA 503 Service Unavailable
-      vi.spyOn(globalThis, "fetch").mockImplementation(async (input) => {
-        const url = String(input);
-        if (url.includes("vpic.nhtsa.dot.gov")) {
-          return new Response("Service Unavailable", { status: 503 });
-        }
-        return new Response("Not Found", { status: 404 });
-      });
+afterEach(() => vi.restoreAllMocks());
 
-      // Ford VIN: 1FM5K8D84HGA00001
-      const result = await resolveUnifiedVehicle("1FM5K8D84HGA00001", undefined, {
-        enrichWithEpa: false,
-        enrichWithEu: false,
-      });
-
-      expect(result.provenance.primarySource).toBe("LOCAL_FALLBACK");
-      expect(result.provenance.fallbackTriggered).toBe(true);
-      expect(result.make).toBe("FORD");
-      expect(result.plantCountry).toBe("UNITED STATES (USA)");
-      expect(result.year).toBe(2017);
-      expect(result.isValidVin).toBe(true);
-    });
-
-    it("should return graceful fallback on /api/v1/vin/:vin when upstream returns 500", async () => {
-      vi.spyOn(globalThis, "fetch").mockImplementation(async (input) => {
-        const url = String(input);
-        if (url.includes("vpic.nhtsa.dot.gov")) {
-          return new Response("Internal Server Error", { status: 500 });
-        }
-        return new Response("{}", { status: 200 });
-      });
-
-      const res = await app.request("/api/v1/vin/5YJ3E1EB8NF000001");
-      expect(res.status).toBe(200);
-
-      const json = await res.json() as Record<string, unknown>;
-      expect(json["success"]).toBe(true);
-      expect(json["source"]).toBe("LOCAL_FALLBACK");
-
-      const data = json["data"] as Record<string, unknown>;
-      expect(data["make"]).toBe("TESLA");
-      expect(data["year"]).toBe(2022);
-    });
-  });
-
-  describe("EPA FuelEconomy & EV Range Enrichment", () => {
-    it("should parse EV range and MPGe from mocked EPA responses", async () => {
-      vi.spyOn(globalThis, "fetch").mockImplementation(async (input) => {
-        const url = String(input);
-        if (url.includes("menu/model")) {
-          return new Response(JSON.stringify({ menuItem: [{ text: "Model 3 Long Range", value: "Model 3 Long Range" }] }), { status: 200 });
-        }
-        if (url.includes("menu/options")) {
-          return new Response(JSON.stringify({ menuItem: [{ text: "Auto", value: "47908" }] }), { status: 200 });
-        }
-        if (url.includes("vehicle/47908")) {
-          return new Response(JSON.stringify({
-            atvType: "EV",
-            fuelType: "Electricity",
-            range: "342",
-            comb08: "130",
-            evMotor: "84 and 191 kW ACPM",
-            charge240: "9.4",
-            co2: "0",
-          }), { status: 200 });
-        }
-        return new Response("{}", { status: 200 });
-      });
-
-      const specs = await fetchEpaEnergySpecs("Tesla", "Model 3", 2024);
-      expect(specs.isElectricVehicle).toBe(true);
-      expect(specs.electricRangeMiles).toBe(342);
-      expect(specs.electricRangeKm).toBe(550);
-      expect(specs.combinedMpgOrMpge).toBe(130);
-      expect(specs.energySource).toBe("EPA_FUELECONOMY");
+describe("EPA FuelEconomy.gov enrichment", () => {
+  it("prefers the exact model name and parses EV figures", async () => {
+    mockThirdParties();
+    const epa = await fetchEpaEnergySpecs("TESLA", "Model 3", 2022);
+    expect(epa.outcome).toBe("matched");
+    expect(epa.data).toMatchObject({
+      epaModel: "Model 3",
+      epaVehicleId: "44583",
+      isElectricVehicle: true,
+      electricRangeMiles: 272,
+      electricRangeKm: 438,
+      combinedMpgOrMpge: 132,
+      chargeTimeHours240V: 10,
+      co2GramsPerMile: 0,
+      matchLevel: "model-year",
     });
   });
 
-  describe("RDW European Technical Specs Enrichment", () => {
-    it("should parse EU type approval and weights from mocked RDW Open Data", async () => {
-      vi.spyOn(globalThis, "fetch").mockImplementation(async (input) => {
-        const url = String(input);
-        if (url.includes("opendata.rdw.nl")) {
-          return new Response(JSON.stringify([{
-            merk: "PEUGEOT",
-            handelsbenaming: "PARTNER",
-            massa_ledig_voertuig: "1292",
-            toegestane_maximum_massa_voertuig: "1970",
-            typegoedkeuringsnummer: "e2*2007/46*0001*30",
-            europese_voertuigcategorie: "N1",
-            wielbasis: "273",
-            openstaande_terugroepactie_indicator: "Nee",
-          }]), { status: 200 });
-        }
-        return new Response("{}", { status: 200 });
-      });
-
-      const euSpecs = await fetchRdwEuropeanSpecs("PEUGEOT", "PARTNER");
-      expect(euSpecs.euSource).toBe("EU_RDW");
-      expect(euSpecs.euTypeApprovalNumber).toBe("e2*2007/46*0001*30");
-      expect(euSpecs.curbWeightKg).toBe(1292);
-      expect(euSpecs.grossVehicleWeightKg).toBe(1970);
-      expect(euSpecs.wheelbaseCm).toBe(273);
-      expect(euSpecs.openRecallIndicatorEu).toBe(false);
-    });
+  it("reports a failure as 'error', not as 'no-match'", async () => {
+    mockThirdParties({ epaDown: true });
+    expect(await fetchEpaEnergySpecs("TESLA", "Model 3", 2022)).toEqual({ outcome: "error", data: null });
   });
 
-  describe("GET /api/v1/vin/:vin/unified Route Integration", () => {
-    it("should return unified profile with provenance metadata", async () => {
-      vi.spyOn(globalThis, "fetch").mockImplementation(async (input) => {
-        const url = String(input);
-        if (url.includes("vpic.nhtsa.dot.gov")) {
-          return new Response(JSON.stringify({
-            Count: 1,
-            Results: [{
-              Make: "TOYOTA",
-              Model: "Camry",
-              ModelYear: "2018",
-              VehicleType: "PASSENGER CAR",
-              PlantCountry: "UNITED STATES (USA)",
-              ErrorCode: "0",
-            }],
-          }), { status: 200 });
-        }
-        return new Response("{}", { status: 200 });
-      });
+  it("reports an unknown model as 'no-match'", async () => {
+    mockThirdParties();
+    expect(await fetchEpaEnergySpecs("TESLA", "Cybertruck", 2022)).toEqual({ outcome: "no-match", data: null });
+  });
+});
 
-      const res = await app.request("/api/v1/vin/4T1B11HK5JU000001/unified?epa=false&eu=false");
-      expect(res.status).toBe(200);
-
-      const json = await res.json() as Record<string, unknown>;
-      expect(json["success"]).toBe(true);
-
-      const data = json["data"] as Record<string, unknown>;
-      expect(data["make"]).toBe("TOYOTA");
-      expect(data["model"]).toBe("Camry");
-      expect(data["year"]).toBe(2018);
-
-      const provenance = data["provenance"] as Record<string, unknown>;
-      expect(provenance["primarySource"]).toBe("NHTSA_VPIC");
-      expect(provenance["fallbackTriggered"]).toBe(false);
+describe("EU RDW enrichment", () => {
+  it("returns model-level data only (no per-registration recall flag)", async () => {
+    mockThirdParties();
+    const eu = await fetchRdwEuropeanSpecs("TESLA", "Model 3");
+    expect(eu.outcome).toBe("matched");
+    expect(eu.data).toEqual({
+      euTypeApprovalNumber: "e4*2007/46*1293*28",
+      europeanVehicleCategory: "M1",
+      curbWeightKg: 1745,
+      grossVehicleWeightKg: 2232,
+      maxTowingWeightUnbrakedKg: undefined,
+      wheelbaseCm: 288,
+      matchLevel: "make-model",
     });
+  });
+});
+
+describe("GET /api/v1/vin/:vin/unified", () => {
+  it("combines the offline decode with EPA and RDW, without calling NHTSA", async () => {
+    const spy = mockThirdParties();
+    const res = await request("/api/v1/vin/5YJ3E1EB8NF000001/unified");
+    expect(res.status).toBe(200);
+    expect(res.headers.get("Cache-Control")).toMatch(/max-age=/);
+
+    const body = (await res.json()) as { data: Record<string, unknown> };
+    expect(body.data).toMatchObject({ vin: "5YJ3E1EB8NF000001", make: "TESLA", model: "Model 3", year: 2022 });
+    expect(body.data["provenance"]).toMatchObject({
+      primarySource: "LOCAL_VPIC",
+      enrichment: { epa: "matched", eu: "matched" },
+      enrichedSources: ["US_EPA_FUELECONOMY", "EU_RDW_OPENDATA"],
+    });
+    expect(spy.mock.calls.map(([u]) => String(u)).some((u) => u.includes("nhtsa"))).toBe(false);
+  });
+
+  it("is not cacheable when an enrichment failed transiently", async () => {
+    mockThirdParties({ epaDown: true });
+    const res = await request("/api/v1/vin/5YJ3E1EB8NF000001/unified?eu=false");
+    expect(res.status).toBe(200);
+    expect(res.headers.get("Cache-Control")).toBe("no-store");
+    const body = (await res.json()) as { data: { energy: unknown; provenance: Record<string, unknown> } };
+    expect(body.data.energy).toBeNull();
+    expect(body.data.provenance["enrichment"]).toEqual({ epa: "error", eu: "skipped" });
+  });
+
+  it("skips both enrichments on request and makes no network call", async () => {
+    const spy = vi.spyOn(globalThis, "fetch");
+    const res = await request("/api/v1/vin/5YJ3E1EB8NF000001/unified?epa=false&eu=false");
+    expect(res.status).toBe(200);
+    expect(spy).not.toHaveBeenCalled();
+  });
+
+  it("rejects an invalid VIN", async () => {
+    const res = await request("/api/v1/vin/!!/unified");
+    expect(res.status).toBe(400);
+  });
+});
+
+describe("Branding", () => {
+  it("serves the landing page to browsers and JSON to API clients", async () => {
+    const html = await app.request("/", { headers: { Accept: "text/html" } }, testEnv());
+    expect(html.headers.get("Content-Type")).toMatch(/text\/html/);
+    const page = await html.text();
+    expect(page).toContain("AI Kit LLC");
+    expect(page).toMatch(/vPICList_lite_/);
+
+    const api = await request("/");
+    expect(api.headers.get("X-Powered-By")).toMatch(/AI Kit LLC/);
+    expect(((await api.json()) as { project: { repository: string } }).project.repository).toContain("AIKitLLC");
   });
 });

@@ -1,20 +1,20 @@
 {
   "name": "nhtsa-edge-api",
   "version": "1.0.0",
-  "description": "High-performance Cloudflare Edge API and caching layer for NHTSA vehicle data",
+  "description": "Offline NHTSA vPIC VIN decoder and API gateway on Cloudflare Workers",
   "main": "src/index.ts",
   "type": "module",
   "scripts": {
-    "dev": "wrangler dev",
-    "deploy": "wrangler deploy",
-    "setup:cloudflare": "bash scripts/setup-cloudflare.sh",
-    "sync:dump": "bun scripts/sync-sql-dump.ts",
-    "test:50": "bun scripts/test-50-requests.ts",
-    "build": "tsc --noEmit",
-    "typecheck": "tsc --noEmit",
+    "build": "wrangler deploy --dry-run --outdir dist",
+    "build:data": "bun scripts/vpic/build-assets.ts",
+    "deploy": "bun scripts/vpic/build-assets.ts && wrangler deploy",
+    "deploy:dev": "bun scripts/vpic/build-assets.ts && wrangler deploy --env dev",
+    "dev": "bun scripts/vpic/build-assets.ts && wrangler dev",
+    "ingest": "bun scripts/vpic/ingest-dump.ts",
+    "parity": "bun scripts/vpic/parity.ts",
     "test": "vitest run",
     "test:watch": "vitest",
-    "cf-typegen": "wrangler types"
+    "typecheck": "tsc --noEmit && tsc --noEmit -p scripts"
   },
   "keywords": [
     "cloudflare-workers",
@@ -25,7 +25,7 @@
     "edge-computing",
     "hono"
   ],
-  "author": "",
+  "author": "AIKitLLC",
   "license": "MIT",
   "dependencies": {
     "hono": "^4.7.2",
@@ -33,8 +33,18 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250224.0",
+    "@types/bun": "^1.4.2",
+    "@types/node": "^22.20.4",
     "typescript": "^5.7.3",
     "vitest": "^3.0.7",
-    "wrangler": "^3.111.0"
-  }
+    "wrangler": "^4.142.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AIKitLLC/nhtsa-edge-api.git"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "packageManager": "pnpm@10.33.0"
 }

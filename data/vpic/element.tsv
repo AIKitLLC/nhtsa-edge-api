@@ -1,0 +1,161 @@
+#id	name	code	lookuptable	isprivate	groupname	datatype	decode	weight
+1	Other Battery Info	BatteryInfo	\N	f	Mechanical/Battery	string	Pattern	\N
+2	Battery Type	BatteryType	BatteryType	f	Mechanical/Battery	lookup	Pattern	\N
+3	Bed Type	BedType	BedType	f	Exterior/Truck	lookup	Pattern	\N
+4	Cab Type	BodyCabType	BodyCab	f	Exterior/Truck	lookup	Pattern	\N
+5	Body Class	BodyClass	BodyStyle	f	Exterior/Body	lookup	Pattern	99
+8	Country Name	Country	Country	f	\N	lookup	\N	\N
+9	Engine Number of Cylinders	EngineCylinders	\N	f	Engine	int	Pattern	88
+10	Destination Market	DestinationMarket	DestinationMarket	f	General	lookup	Pattern	\N
+11	Displacement (CC)	DisplacementCC	\N	f	Engine	decimal	Pattern	98
+12	Displacement (CI)	DisplacementCI	\N	f	Engine	decimal	Pattern	\N
+13	Displacement (L)	DisplacementL	\N	f	Engine	decimal	Pattern	\N
+14	Doors	Doors	\N	f	Exterior/Body	int	Pattern	\N
+15	Drive Type	DriveType	DriveType	f	Mechanical/Drivetrain	lookup	Pattern	\N
+16	Driver Assist	DriverAssist	DriverAssist	f	Active Safety System	lookup	\N	\N
+17	Engine Stroke Cycles	EngineCycles	\N	f	Engine	int	Pattern	\N
+18	Engine Model	EngineModel	\N	f	Engine	string	Pattern	55
+21	Engine Power (KW)	EngineKW	\N	f	Engine	decimal	Pattern	\N
+23	Entertainment System	EntertainmentSystem	EntertainmentSystem	f	Interior	lookup	Pattern	\N
+24	Fuel Type - Primary	FuelTypePrimary	FuelType	f	Engine	lookup	Pattern	91
+25	Gross Vehicle Weight Rating From	GVWR	GrossVehicleWeightRating	f	Exterior/Dimension	lookup	Pattern	70
+26	Make	Make	Make	f	General	lookup	WMI, Pattern	99
+27	Manufacturer Name	Manufacturer	Manufacturer	f	General	lookup	WMI	\N
+28	Model	Model	Model	f	General	lookup	Pattern	99
+29	Model Year	ModelYear	\N	f	General	int	WMI, Input	99
+31	Plant City	PlantCity	\N	f	General	string	Pattern	98
+33	Number of Seats	Seats	\N	f	Interior/Seat	int	Pattern	\N
+34	Series	Series	\N	f	General	string	Pattern	61
+36	Steering Location	SteeringLocation	Steering	f	Interior	lookup	Pattern	\N
+37	Transmission Style	TransmissionStyle	Transmission	f	Mechanical/Transmission	lookup	Pattern	\N
+38	Trim	Trim	\N	f	General	string	Pattern	61
+39	Vehicle Type	VehicleType	VehicleType	f	General	lookup	WMI	99
+40	Windows	Windows	\N	f	Exterior/Body	int	Pattern	\N
+41	Axles	Axles	\N	f	Mechanical/Drivetrain	int	Pattern	15
+42	Brake System Type	BrakeSystemType	BrakeSystem	f	Mechanical/Brake	lookup	Pattern	\N
+45	NCIC Code	NCICCode	NCICCode	f	\N	lookup	\N	\N
+48	Number of Battery Cells per Module	BatteryCells	\N	f	Mechanical/Battery	int	Pattern	\N
+49	Bed Length (inches)	BedLengthIN	\N	f	Exterior/Dimension	int	Pattern	\N
+52	Brake System Description	BrakeSystemDesc	\N	f	Mechanical/Brake	string	Pattern	\N
+54	Curb Weight (pounds)	CurbWeightLB	\N	f	Exterior/Dimension	int	Pattern	\N
+55	Curtain Air Bag Locations	AirBagLocCurtain	AirBagLocations	f	Passive Safety System/Air Bag Location	lookup	Pattern	\N
+56	Seat Cushion Air Bag Locations	AirBagLocSeatCushion	AirBagLocations	f	Passive Safety System/Air Bag Location	lookup	Pattern	\N
+57	Battery Current (Amps) From	BatteryA	\N	f	Mechanical/Battery	int	Pattern	\N
+58	Battery Voltage (Volts) From	BatteryV	\N	f	Mechanical/Battery	int	Pattern	\N
+59	Battery Energy (KWh) From	BatteryKWh	\N	f	Mechanical/Battery	decimal	Pattern	\N
+60	Wheelbase Type	WheelBaseType	WheelBaseType	f	Exterior/Body	lookup	Pattern	\N
+61	Number of Seat Rows	SeatRows	\N	f	Interior/Seat	int	Pattern	\N
+62	Valve Train Design	ValveTrainDesign	ValvetrainDesign	f	Engine	lookup	Pattern	\N
+63	Transmission Speeds	TransmissionSpeeds	\N	f	Mechanical/Transmission	int	Pattern	\N
+64	Engine Configuration	EngineConfiguration	EngineConfiguration	f	Engine	lookup	Pattern	\N
+65	Front Air Bag Locations	AirBagLocFront	AirBagLocFront	f	Passive Safety System/Air Bag Location	lookup	Pattern	64
+66	Fuel Type - Secondary	FuelTypeSecondary	FuelType	f	Engine	lookup	Pattern	\N
+67	Fuel Delivery/Fuel Injection Type	FuelInjectionType	FuelDeliveryType	f	Engine	lookup	Pattern	\N
+69	Knee Air Bag Locations	AirBagLocKnee	AirBagLocKnee	f	Passive Safety System/Air Bag Location	lookup	Pattern	\N
+71	Engine Brake (hp) From	EngineHP	\N	f	Engine	decimal	Pattern	\N
+72	EV Drive Unit	EVDriveUnit	EVDriveUnit	f	Mechanical/Battery	lookup	Pattern	\N
+75	Plant Country	PlantCountry	Country	f	General	lookup	Pattern	99
+76	Plant Company Name	PlantCompanyName	\N	f	General	string	Pattern	\N
+77	Plant State	PlantState	\N	f	General	string	Pattern	98
+78	Pretensioner	Pretensioner	Pretensioner	f	Passive Safety System	lookup	Pattern	\N
+79	Seat Belt Type	SeatBeltsAll	SeatBeltsAll	f	Passive Safety System	lookup	Pattern	65
+81	Adaptive Cruise Control (ACC)	AdaptiveCruiseControl	AdaptiveCruiseControl	f	Active Safety System/Maintaining Safe Distance	lookup	Pattern	\N
+82	Adaptive Headlights	AdaptiveHeadlights	AdaptiveHeadlights	f	Active Safety System	lookup	\N	\N
+86	Antilock Braking System (ABS)	ABS	ABS	f	Active Safety System	lookup	Pattern	\N
+87	Crash Imminent Braking (CIB)	CIB	AutoBrake	f	Active Safety System/Forward Collision Prevention	lookup	Pattern	\N
+88	Blind Spot Warning (BSW)	BlindSpotMon	BlindSpotMonitoring	f	Active Safety System/Lane and Side Assist	lookup	Pattern	\N
+89	CAFE Body Type	CAFEBodyType	CAFEBodyType	t	\N	lookup	\N	\N
+90	CAFE Make	CAFEMake	CAFEMake	t	\N	lookup	\N	\N
+91	CAFE Model	CAFEModel	CAFEModel	t	\N	lookup	\N	\N
+92	NCAP Body Type	NCAPBodyType	\N	t	\N	string	\N	\N
+93	NCAP Make	NCAPMake	\N	t	\N	string	\N	\N
+94	NCAP Model	NCAPModel	\N	t	\N	string	\N	\N
+96	NCSA Body Type	NCSABodyType	vNCSABodyType	t	Internal	lookup	Pattern	\N
+97	NCSA Make	NCSAMake	vNCSAMake	t	Internal	lookup	Pattern	\N
+98	NCSA Model	NCSAModel	vNCSAModel	t	Internal	lookup	Pattern	\N
+99	Electronic Stability Control (ESC)	ESC	ECS	f	Active Safety System	lookup	Pattern	\N
+100	Traction Control	TractionControl	TractionControl	f	Active Safety System	lookup	Pattern	\N
+101	Forward Collision Warning (FCW)	ForwardCollisionWarning	ForwardCollisionWarning	f	Active Safety System/Forward Collision Prevention	lookup	Pattern	\N
+102	Lane Departure Warning (LDW)	LaneDepartureWarning	LaneDepartureWarning	f	Active Safety System/Lane and Side Assist	lookup	Pattern	\N
+103	Lane Keeping Assistance (LKA)	LaneKeepSystem	LaneKeepSystem	f	Active Safety System/Lane and Side Assist	lookup	Pattern	\N
+104	Backup Camera	RearVisibilitySystem	RearVisibilityCamera	f	Active Safety System/Backing Up and Parking	lookup	Pattern	\N
+105	Parking Assist	ParkAssist	ParkAssist	f	Active Safety System/Backing Up and Parking	lookup	Pattern	\N
+107	Side Air Bag Locations	AirBagLocSide	AirBagLocations	f	Passive Safety System/Air Bag Location	lookup	Pattern	\N
+109	Trim2	Trim2	\N	f	General	string	Pattern	\N
+110	Series2	Series2	\N	f	General	string	Pattern	\N
+111	Wheelbase (inches) From	WheelBaseShort	\N	f	Exterior/Dimension	decimal	Pattern	\N
+112	Wheelbase (inches) To	WheelBaseLong	\N	f	Exterior/Dimension	decimal	Pattern	\N
+114	Note	Note	\N	f	General	string	Pattern	\N
+115	Number of Wheels	Wheels	\N	f	Exterior/Wheel Tire	int	Pattern	\N
+116	Trailer Type Connection	TrailerType	TrailerType	f	Exterior/Trailer	lookup	Pattern	\N
+117	Trailer Body Type	TrailerBodyType	TrailerBodyType	f	Exterior/Trailer	lookup	Pattern	\N
+118	Trailer Length (feet)	TrailerLength	\N	f	Exterior/Trailer	decimal	Pattern	\N
+119	Wheel Size Front (inches)	WheelSizeFront	\N	f	Exterior/Wheel Tire	int	Pattern	\N
+120	Wheel Size Rear (inches)	WheelSizeRear	\N	f	Exterior/Wheel Tire	int	Pattern	\N
+121	Other Restraint System Info	OtherRestraintSystemInfo	\N	f	Passive Safety System	string	Pattern	\N
+122	Cooling Type	CoolingType	CoolingType	f	Engine	lookup	Pattern	\N
+125	Engine Brake (hp) To	EngineHP_to	\N	f	Engine	decimal	Pattern	\N
+126	Electrification Level	ElectrificationLevel	ElectrificationLevel	f	Engine	lookup	Pattern	\N
+127	Charger Level	ChargerLevel	ChargerLevel	f	Mechanical/Battery/Charger	lookup	Pattern	\N
+128	Charger Power (KW)	ChargerPowerKW	\N	f	Mechanical/Battery/Charger	int	Pattern	\N
+129	Other Engine Info	OtherEngineInfo	\N	f	Engine	string	Pattern	\N
+132	Battery Current (Amps) To	BatteryA_to	\N	f	Mechanical/Battery	int	Pattern	\N
+133	Battery Voltage (Volts) To	BatteryV_to	\N	f	Mechanical/Battery	int	Pattern	\N
+134	Battery Energy (KWh) To	BatteryKWh_to	\N	f	Mechanical/Battery	decimal	Pattern	\N
+135	Turbo	Turbo	Turbo	f	Engine	lookup	Pattern	\N
+136	Base Price ($)	BasePrice	\N	f	General	decimal	Pattern	\N
+137	Number of Battery Modules per Pack	BatteryModules	\N	f	Mechanical/Battery	int	Pattern	\N
+138	Number of Battery Packs per Vehicle	BatteryPacks	\N	f	Mechanical/Battery	int	Pattern	\N
+139	Top Speed (MPH)	TopSpeedMPH	\N	f	Engine	int	Pattern	\N
+140	EquipmentType	EquipmentType	EquipmentType	f	\N	lookup	\N	\N
+141	Manufacturer Type	ManufacturerType	ManufacturerType	f	\N	lookup	\N	\N
+142	Suggested VIN	SuggestedVIN	\N	f	\N	string	Decoding	\N
+143	Error Code	ErrorCode	ErrorCode	f	\N	lookup	Decoding	\N
+144	Possible Values	PossibleValues	\N	f	\N	string	Decoding	\N
+145	Axle Configuration	AxleConfiguration	AxleConfiguration	f	Mechanical/Drivetrain	lookup	Pattern	\N
+146	Engine Manufacturer	EngineManufacturer	\N	f	Engine	string	Pattern	\N
+147	Bus Length (feet)	BusLength	\N	f	Exterior/Bus	int	Pattern	\N
+148	Bus Floor Configuration Type	BusFloorConfigType	BusFloorConfigType	f	Exterior/Bus	lookup	Pattern	\N
+149	Bus Type	BusType	BusType	f	Exterior/Bus	lookup	Pattern	\N
+150	Other Bus Info	OtherBusInfo	\N	f	Exterior/Bus	string	Pattern	\N
+151	Custom Motorcycle Type	CustomMotorcycleType	CustomMotorcycleType	f	Exterior/Motorcycle	lookup	Pattern	\N
+152	Motorcycle Suspension Type	MotorcycleSuspensionType	MotorcycleSuspensionType	f	Exterior/Motorcycle	lookup	Pattern	\N
+153	Motorcycle Chassis Type	MotorcycleChassisType	MotorcycleChassisType	f	Exterior/Motorcycle	lookup	Pattern	\N
+154	Other Motorcycle Info	OtherMotorcycleInfo	\N	f	Exterior/Motorcycle	string	Pattern	\N
+155	Other Trailer Info	OtherTrailerInfo	\N	f	Exterior/Trailer	string	Pattern	\N
+156	Additional Error Text	AdditionalErrorText	\N	f	\N	string	Decoding	\N
+158	Cash For Clunkers	CashForClunkers	\N	f	General	string	\N	\N
+159	Track Width (inches)	TrackWidth	\N	f	Exterior/Body	decimal	Pattern	\N
+168	Tire Pressure Monitoring System (TPMS) Type	TPMS	TPMS	\N	Active Safety System	lookup	Pattern	\N
+169	Active Safety System Note	ActiveSafetySysNote	\N	f	Active Safety System	string	Pattern	\N
+170	Dynamic Brake Support (DBS)	DynamicBrakeSupport	DynamicBrakeSupport	\N	Active Safety System/Forward Collision Prevention	lookup	Pattern	\N
+171	Pedestrian Automatic Emergency Braking (PAEB)	PedestrianAutomaticEmergencyBraking	PedestrianAutomaticEmergencyBraking	\N	Active Safety System/Forward Collision Prevention	lookup	Pattern	\N
+172	Auto-Reverse System for Windows and Sunroofs	AutoReverseSystem	AutoReverseSystem	\N	Active Safety System	lookup	Pattern	\N
+173	Automatic Pedestrian Alerting Sound (for Hybrid and EV only)	AutomaticPedestrianAlertingSound	AutomaticPedestrainAlertingSound	\N	Active Safety System	lookup	Pattern	\N
+174	Automatic Crash Notification (ACN)/Advanced Automatic Crash Notification (AACN)	CAN_AACN	CAN_AACN	\N	Active Safety System/911 Notification	lookup	Pattern	\N
+175	Event Data Recorder (EDR)	EDR	EDR	\N	Active Safety System	lookup	Pattern	\N
+176	Keyless Ignition	KeylessIgnition	KeylessIgnition	\N	Active Safety System	lookup	Pattern	\N
+177	Daytime Running Light (DRL)	DaytimeRunningLight	DaytimeRunningLight	\N	Active Safety System/Lighting Technologies	lookup	Pattern	\N
+178	Headlamp Light Source	LowerBeamHeadlampLightSource	LowerBeamHeadlampLightSource	\N	Active Safety System/Lighting Technologies	lookup	Pattern	\N
+179	Semiautomatic Headlamp Beam Switching	SemiautomaticHeadlampBeamSwitching	SemiautomaticHeadlampBeamSwitching	\N	Active Safety System/Lighting Technologies	lookup	Pattern	\N
+180	Adaptive Driving Beam (ADB)	AdaptiveDrivingBeam	AdaptiveDrivingBeam	\N	Active Safety System/Lighting Technologies	lookup	Pattern	\N
+181	SAE Automation Level From	SAEAutomationLevel	\N	f	Active Safety System	int	Pattern	\N
+182	SAE Automation Level To	SAEAutomationLevel_to	\N	f	Active Safety System	int	Pattern	\N
+183	Rear Cross Traffic Alert	RearCrossTrafficAlert	RearCrossTrafficAlert	\N	Active Safety System/Backing Up and Parking	lookup	Pattern	\N
+184	Gross Combination Weight Rating From	GCWR	GrossVehicleWeightRating	f	Exterior/Dimension	lookup	Pattern	\N
+185	Gross Combination Weight Rating To	GCWR_to	GrossVehicleWeightRating	f	Exterior/Dimension	lookup	Pattern	\N
+186	NCSA Note	NCSANote	\N	t	Internal	string	Pattern	\N
+187	NCSA Mapping Exception	NCSAMappingException	NCSAMappingException	t	Internal	lookup	\N	\N
+188	NCSA Mapping Exception Approved On	NCSAMapExcApprovedOn	\N	t	Internal	string	\N	\N
+189	NCSA Mapping Exception Approved By	NCSAMapExcApprovedBy	\N	t	Internal	string	\N	\N
+190	Gross Vehicle Weight Rating To	GVWR_to	GrossVehicleWeightRating	f	Exterior/Dimension	lookup	Pattern	\N
+191	Error Text	ErrorText	\N	f	\N	string	Decoding	\N
+192	Rear Automatic Emergency Braking	RearAutomaticEmergencyBraking	RearAutomaticEmergencyBraking	f	Active Safety System/Backing Up and Parking	lookup	Pattern	\N
+193	Blind Spot Intervention (BSI)	BlindSpotIntervention	BlindSpotIntervention	f	Active Safety System/Lane and Side Assist	lookup	Pattern	\N
+194	Lane Centering Assistance	LaneCenteringAssistance	LaneCenteringAssistance	f	Active Safety System/Lane and Side Assist	lookup	Pattern	\N
+195	Non-Land Use	NonLandUse	NonLandUse	f	General	lookup	Pattern	\N
+196	Vehicle Descriptor	VehicleDescriptor	\N	f	\N	string	Decoding	\N
+200	Fuel-Tank Type	FuelTankType	FuelTankType	\N	Exterior/Motorcycle	lookup	Pattern	\N
+201	Fuel-Tank Material	FuelTankMaterial	FuelTankMaterial	\N	Exterior/Motorcycle	lookup	Pattern	\N
+202	Combined Braking System (CBS)	CombinedBrakingSystem	CombinedBrakingSystem	\N	Exterior/Motorcycle	lookup	Pattern	\N
+203	Wheelie Mitigation	WheelieMitigation	WheelieMitigation	\N	Exterior/Motorcycle	lookup	Pattern	\N

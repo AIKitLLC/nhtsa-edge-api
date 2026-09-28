@@ -4,3 +4,8 @@ dist
 coverage
 .env
 .DS_Store
+.dev.vars
+build
+
+# NHTSA dumps downloaded by scripts/vpic/ingest-dump.ts
+vPICList_*.zip

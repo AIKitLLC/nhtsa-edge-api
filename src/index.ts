@@ -4,39 +4,34 @@ import { timingMiddleware } from "./middleware/timing";
 import { corsMiddleware } from "./middleware/cors";
 import { errorHandler } from "./middleware/error";
 import { healthRouter } from "./routes/health";
-import { v1Router } from "./routes/v1-optimized";
+import { v1Router } from "./routes/v1";
 import { vpicProxyRouter } from "./routes/vpic-proxy";
 import { recallsProxyRouter } from "./routes/recalls-proxy";
-import { syncRouter } from "./routes/sync";
-import { runIncrementalSync } from "./services/api-syncer";
 
 const app = new Hono<{ Bindings: Env; Variables: AppVariables }>();
 
-// 1. Global Middlewares
+// 1. Global middlewares
 app.use("*", timingMiddleware());
 app.use("*", corsMiddleware());
 
-// 2. Global Error Handler
+// 2. Global error handler
 app.onError(errorHandler);
 
-// 3. Mount Routes
-// Health & API Catalog at root
+// 3. Routes
+// Health, data version and endpoint catalog
 app.route("/", healthRouter);
 
-// High-performance clean v1 API (/api/v1/vin/:vin, /api/v1/makes, etc.)
+// Clean v1 API: offline VIN decode, catalog, recalls
 app.route("/api/v1", v1Router);
 
-// Dual-Channel Sync Management (/api/v1/sync/*)
-app.route("/api/v1/sync", syncRouter);
-
-// 100% transparent drop-in VPIC proxy (matching both /api/vehicles/* and /vehicles/*)
+// Drop-in vPIC API (/vehicles/* and /api/vehicles/*): decode endpoints offline, the rest proxied
 app.route("/api", vpicProxyRouter);
 app.route("/", vpicProxyRouter);
 
-// NHTSA Recalls drop-in proxy (/recalls/*)
+// NHTSA recalls drop-in proxy (/recalls/*)
 app.route("/", recallsProxyRouter);
 
-// 4. 404 Not Found Handler
+// 4. 404 handler
 app.notFound((c) => {
   return c.json(
     {
@@ -55,16 +50,4 @@ export { app };
 
 export default {
   fetch: app.fetch,
-  /**
-   * Automated Cloudflare Worker Cron Trigger (Nightly Incremental API Sync)
-   */
-  async scheduled(_event: ScheduledEvent, env: Env, ctx: ExecutionContext): Promise<void> {
-    ctx.waitUntil(
-      runIncrementalSync(env).then((res) => {
-        console.log(`[Cron Sync] Successfully synced ${res.totalModelsSynced} models across ${res.totalMakesProcessed} makes at ${res.timestamp}`);
-      }).catch((err) => {
-        console.error("[Cron Sync] Error during nightly sync:", err);
-      })
-    );
-  },
 };

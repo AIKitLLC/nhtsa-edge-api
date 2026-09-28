@@ -1,0 +1,16 @@
+#id	name	additionalerrortext	weight
+0	0 - VIN decoded clean. Check Digit (9th position) is correct	\N	0
+1	1 - Check Digit (9th position) does not calculate properly	\N	-5
+2	2 - VIN corrected, error in one position 	\N	-100
+3	3 - VIN corrected, error in one position (assuming Check Digit is correct)	\N	-100
+4	4 - VIN corrected, error in one position only (indicated by ! in Suggested VIN), multiple matches found	In the Possible values section, the Numeric value before the : indicates the position in error and the values after the : indicate the possible values that are allowed in this position.	-200
+5	5 - VIN has errors in few positions	The error positions are indicated by ! in Suggested VIN. In the Possible values section, each pair of parenthesis indicate information about each error position in VIN . The Numeric value before the : indicates the position in error and the values after the : indicate the possible values that are allowed in this position	-300
+6	6 - Incomplete VIN	\N	-10
+7	7 - Manufacturer is not registered with NHTSA for sale or importation in the U.S. for use on U.S roads; Please contact the manufacturer directly for more information	\N	-10000
+8	8 - No detailed data available currently	\N	-1000
+9	9 - Glider Warning - A "Glider" is not a "motor vehicle", as defined in 49 U.S.C. 30102(a)(6), and cannot be assigned a VIN that meets 49 CFR Part 565 requirements	\N	0
+10	10 - Off-Road Vehicle Warning – This is not a Vehicle Identification Number (VIN) for a motor vehicle. This indicates that the manufacturer did not certify this product as complying with the Federal Motor Vehicle Safety Standards that are applicable to motor vehicles as defined in 49 U.S.C. 30102. 	\N	0
+11	11 - Incorrect Model Year - Position 10 does not match valid model year codes (I, O, Q, U, Z, 0). Decoded data may not be accurate.	\N	-20
+12	12 - Model Year Warning - Model Year entered for decoding with VIN does not match the model year based on the 10th position in VIN.	\N	-20
+14	14 - Unable to provide information for some of the characters in the VIN, based on the manufacturer submission.	\N	-30
+400	400 - Invalid Characters Present	\N	-40

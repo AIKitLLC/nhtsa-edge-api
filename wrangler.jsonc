@@ -7,32 +7,41 @@
   "observability": {
     "enabled": true
   },
+  // Offline decoder data, built from data/vpic by `pnpm build:data`.
+  // run_worker_first keeps the raw files private: they are read only through env.ASSETS.
+  "assets": {
+    "directory": "./build/assets",
+    "binding": "ASSETS",
+    "run_worker_first": true
+  },
   "vars": {
     "ENVIRONMENT": "production",
     "UPSTREAM_TIMEOUT_MS": "5000",
     "ENABLE_KV_CACHE": "false"
   },
-  "d1_databases": [
-    {
-      "binding": "DB",
-      "database_name": "nhtsa-db",
-      "database_id": "b817a95e-cb55-43f3-8daa-82e6b97e74ae",
-      "migrations_dir": "migrations"
+  "env": {
+    // Deployed by .github/workflows/vpic-data.yml after each verified data/decoder change
+    "dev": {
+      "name": "nhtsa-edge-api-dev",
+      "workers_dev": true,
+      "assets": {
+        "directory": "./build/assets",
+        "binding": "ASSETS",
+        "run_worker_first": true
+      },
+      "vars": {
+        "ENVIRONMENT": "dev",
+        "UPSTREAM_TIMEOUT_MS": "5000",
+        "ENABLE_KV_CACHE": "false"
+      }
     }
-  ],
-  "triggers": {
-    "crons": ["0 3 * * *"]
   }
   /**
-   * Optional: Uncomment to enable persistent global KV caching across all edge PoPs
-   * Run: npx wrangler kv:namespace create NHTSA_CACHE_KV
-   * and paste the id below:
+   * Optional: persistent KV cache for the proxied (non-decode) endpoints.
+   * Run: npx wrangler kv namespace create NHTSA_CACHE_KV
+   * then add under the top level (and/or env.dev):
    *
-   * "kv_namespaces": [
-   *   {
-   *     "binding": "NHTSA_CACHE_KV",
-   *     "id": "<YOUR_KV_NAMESPACE_ID>"
-   *   }
-   * ]
+   * "kv_namespaces": [{ "binding": "NHTSA_CACHE_KV", "id": "<YOUR_KV_NAMESPACE_ID>" }]
+   * and set "ENABLE_KV_CACHE": "true".
    */
 }

@@ -1,0 +1,574 @@
+{
+  "dumpVersion": "vPICList_lite_2026_09",
+  "source": "https://vpic.nhtsa.dot.gov/downloads/vPICList_lite_2026_09.plain.zip",
+  "tables": {
+    "abs": {
+      "rows": 3,
+      "files": {
+        "abs.tsv": "8b72ca14c0833b296f42f42219242848a20922869428c9ca66f22762f7b05fc5"
+      }
+    },
+    "adaptivecruisecontrol": {
+      "rows": 3,
+      "files": {
+        "adaptivecruisecontrol.tsv": "8b72ca14c0833b296f42f42219242848a20922869428c9ca66f22762f7b05fc5"
+      }
+    },
+    "adaptivedrivingbeam": {
+      "rows": 3,
+      "files": {
+        "adaptivedrivingbeam.tsv": "8b72ca14c0833b296f42f42219242848a20922869428c9ca66f22762f7b05fc5"
+      }
+    },
+    "airbaglocations": {
+      "rows": 6,
+      "files": {
+        "airbaglocations.tsv": "aa8cb2597a58ba4519ac32ed3234814978c705ec7f50891b1643226f5b03da25"
+      }
+    },
+    "airbaglocfront": {
+      "rows": 2,
+      "files": {
+        "airbaglocfront.tsv": "8683735dbdb292dfe680a7dc65bc0c445eca0590ed2171666931ae7eb885cd2f"
+      }
+    },
+    "airbaglocknee": {
+      "rows": 3,
+      "files": {
+        "airbaglocknee.tsv": "8819af64701ca44fb9ac579a3ca408d201676faca64fb2f7b4ecbeaec04a2936"
+      }
+    },
+    "autobrake": {
+      "rows": 3,
+      "files": {
+        "autobrake.tsv": "8b72ca14c0833b296f42f42219242848a20922869428c9ca66f22762f7b05fc5"
+      }
+    },
+    "automaticpedestrainalertingsound": {
+      "rows": 3,
+      "files": {
+        "automaticpedestrainalertingsound.tsv": "8b72ca14c0833b296f42f42219242848a20922869428c9ca66f22762f7b05fc5"
+      }
+    },
+    "autoreversesystem": {
+      "rows": 3,
+      "files": {
+        "autoreversesystem.tsv": "8b72ca14c0833b296f42f42219242848a20922869428c9ca66f22762f7b05fc5"
+      }
+    },
+    "axleconfiguration": {
+      "rows": 5,
+      "files": {
+        "axleconfiguration.tsv": "cee368c9b74601ceb7b49b8d1451cb4b7711103946df8c6476472b08afa85721"
+      }
+    },
+    "batterytype": {
+      "rows": 9,
+      "files": {
+        "batterytype.tsv": "7addbeb956cc20273b1c9294e6a7ba5e8c613276efd9b0360456f8aa53d38268"
+      }
+    },
+    "bedtype": {
+      "rows": 4,
+      "files": {
+        "bedtype.tsv": "478146ea340bc5e57f7849e7085ef4d197f62a9f78eaa448faf89be12f24dbf8"
+      }
+    },
+    "blindspotintervention": {
+      "rows": 3,
+      "files": {
+        "blindspotintervention.tsv": "8b72ca14c0833b296f42f42219242848a20922869428c9ca66f22762f7b05fc5"
+      }
+    },
+    "blindspotmonitoring": {
+      "rows": 3,
+      "files": {
+        "blindspotmonitoring.tsv": "8b72ca14c0833b296f42f42219242848a20922869428c9ca66f22762f7b05fc5"
+      }
+    },
+    "bodycab": {
+      "rows": 12,
+      "files": {
+        "bodycab.tsv": "3c0684232fc8d61bc8bec207f5ea508fa910af4eb097ceb087034338843ddc4e"
+      }
+    },
+    "bodystyle": {
+      "rows": 71,
+      "files": {
+        "bodystyle.tsv": "3810d8b10bb64da7a3005509c55dabd5adfd4847d9a711cb092c12f0da061c9a"
+      }
+    },
+    "brakesystem": {
+      "rows": 5,
+      "files": {
+        "brakesystem.tsv": "46e3f8c3c6293ed6e8020c81d1893256b1affc6176527ca5b5efa18192fe30d6"
+      }
+    },
+    "busfloorconfigtype": {
+      "rows": 4,
+      "files": {
+        "busfloorconfigtype.tsv": "272c7f3ddb240c369b506f2e269b01869878179f69b405a3b62ac88fbb91bb02"
+      }
+    },
+    "bustype": {
+      "rows": 7,
+      "files": {
+        "bustype.tsv": "e445f9de4a27975cab2b957e364f2298997eb94b1bbc158697453bb43b357d24"
+      }
+    },
+    "can_aacn": {
+      "rows": 3,
+      "files": {
+        "can_aacn.tsv": "8b72ca14c0833b296f42f42219242848a20922869428c9ca66f22762f7b05fc5"
+      }
+    },
+    "chargerlevel": {
+      "rows": 3,
+      "files": {
+        "chargerlevel.tsv": "40cf98b039addae7dd3903937b4097bcf9516f4ebd13054c103d8c88b14e98ff"
+      }
+    },
+    "combinedbrakingsystem": {
+      "rows": 3,
+      "files": {
+        "combinedbrakingsystem.tsv": "8b72ca14c0833b296f42f42219242848a20922869428c9ca66f22762f7b05fc5"
+      }
+    },
+    "coolingtype": {
+      "rows": 2,
+      "files": {
+        "coolingtype.tsv": "4b6a990ac77aa09a07d0bd929b3334e1955b606168b689e0a11c49414e32a104"
+      }
+    },
+    "country": {
+      "rows": 199,
+      "files": {
+        "country.tsv": "70e216f86e8f990e6f4aa97d7867afb7c6d370784792402673d5480ad33c73bf"
+      }
+    },
+    "custommotorcycletype": {
+      "rows": 21,
+      "files": {
+        "custommotorcycletype.tsv": "f126461e422763c9ed80295a8b5132f9d598778ca1a9098c40eaf89bf63f760e"
+      }
+    },
+    "daytimerunninglight": {
+      "rows": 3,
+      "files": {
+        "daytimerunninglight.tsv": "8b72ca14c0833b296f42f42219242848a20922869428c9ca66f22762f7b05fc5"
+      }
+    },
+    "destinationmarket": {
+      "rows": 35,
+      "files": {
+        "destinationmarket.tsv": "b6c47ce1ccfd50055ea5e5b7e516d052dc9c6eacc1c8dbf5e6f000c88e01d45c"
+      }
+    },
+    "drivetype": {
+      "rows": 23,
+      "files": {
+        "drivetype.tsv": "a809053e4f0d05fc00e3f4227c8e968aa2f234f2237f1d3ab9e39d8185eb2322"
+      }
+    },
+    "dynamicbrakesupport": {
+      "rows": 3,
+      "files": {
+        "dynamicbrakesupport.tsv": "8b72ca14c0833b296f42f42219242848a20922869428c9ca66f22762f7b05fc5"
+      }
+    },
+    "ecs": {
+      "rows": 3,
+      "files": {
+        "ecs.tsv": "8b72ca14c0833b296f42f42219242848a20922869428c9ca66f22762f7b05fc5"
+      }
+    },
+    "edr": {
+      "rows": 3,
+      "files": {
+        "edr.tsv": "8b72ca14c0833b296f42f42219242848a20922869428c9ca66f22762f7b05fc5"
+      }
+    },
+    "electrificationlevel": {
+      "rows": 6,
+      "files": {
+        "electrificationlevel.tsv": "c06ea6dc0bf88b786e1f5fb061ae4f42419536c2169b36fc8d7af99d808d49ac"
+      }
+    },
+    "engineconfiguration": {
+      "rows": 5,
+      "files": {
+        "engineconfiguration.tsv": "9234299daf1fb579f760aae3a03cfefb85e4c477836d3ad921d1343385ac4511"
+      }
+    },
+    "entertainmentsystem": {
+      "rows": 2,
+      "files": {
+        "entertainmentsystem.tsv": "cf287773eadd08deaf2b74820599267c1e62bde0c04ad641a37ba59e2d720ae3"
+      }
+    },
+    "evdriveunit": {
+      "rows": 4,
+      "files": {
+        "evdriveunit.tsv": "09b4bd74f9f52ace1fae8d1b78cea04231bdecab86b7a4b2ab9ce5d2e0f53273"
+      }
+    },
+    "forwardcollisionwarning": {
+      "rows": 3,
+      "files": {
+        "forwardcollisionwarning.tsv": "8b72ca14c0833b296f42f42219242848a20922869428c9ca66f22762f7b05fc5"
+      }
+    },
+    "fueldeliverytype": {
+      "rows": 9,
+      "files": {
+        "fueldeliverytype.tsv": "fd5ac7bb22f4222a01c50f07052b8b89ed5ccf7a597bae51f1935f3c353ce99b"
+      }
+    },
+    "fueltankmaterial": {
+      "rows": 6,
+      "files": {
+        "fueltankmaterial.tsv": "c5ec567940fad8f99a7f1363c3abe68bd0a8db02c548db828f53cc074364f3cc"
+      }
+    },
+    "fueltanktype": {
+      "rows": 4,
+      "files": {
+        "fueltanktype.tsv": "a31e7998a8e0f31cc2dfee2679b19cbbcbe2c055d8e984ae764241e65435a925"
+      }
+    },
+    "fueltype": {
+      "rows": 14,
+      "files": {
+        "fueltype.tsv": "73cc8b282c8260bddb715883ea7ce86e5cd7d144828750deeaa3bbe023ae3f97"
+      }
+    },
+    "grossvehicleweightrating": {
+      "rows": 16,
+      "files": {
+        "grossvehicleweightrating.tsv": "d833153d4df8c15bc07c75b38def422e9aa7aebadcae334901d67a72de03d756"
+      }
+    },
+    "keylessignition": {
+      "rows": 3,
+      "files": {
+        "keylessignition.tsv": "8b72ca14c0833b296f42f42219242848a20922869428c9ca66f22762f7b05fc5"
+      }
+    },
+    "lanecenteringassistance": {
+      "rows": 3,
+      "files": {
+        "lanecenteringassistance.tsv": "8b72ca14c0833b296f42f42219242848a20922869428c9ca66f22762f7b05fc5"
+      }
+    },
+    "lanedeparturewarning": {
+      "rows": 3,
+      "files": {
+        "lanedeparturewarning.tsv": "8b72ca14c0833b296f42f42219242848a20922869428c9ca66f22762f7b05fc5"
+      }
+    },
+    "lanekeepsystem": {
+      "rows": 3,
+      "files": {
+        "lanekeepsystem.tsv": "801583737fa5aef16b0787ff5e7364070efba84a7cf737e6fe01856ab68abdd8"
+      }
+    },
+    "lowerbeamheadlamplightsource": {
+      "rows": 16,
+      "files": {
+        "lowerbeamheadlamplightsource.tsv": "f176448cac6bf69c469ed95a52169e28f80a86dee12646efd81a9bac486413db"
+      }
+    },
+    "motorcyclechassistype": {
+      "rows": 4,
+      "files": {
+        "motorcyclechassistype.tsv": "38e65d27cb5b4474d72394b0f2e07275869e2940a53f93b5ce9b47d0ce521239"
+      }
+    },
+    "motorcyclesuspensiontype": {
+      "rows": 4,
+      "files": {
+        "motorcyclesuspensiontype.tsv": "e86ea82c8d46c2667ab8ea55139f33031170cac90d62a3833f8d605b2adc88c3"
+      }
+    },
+    "nonlanduse": {
+      "rows": 3,
+      "files": {
+        "nonlanduse.tsv": "744c47f9c268460d9ea4d853bc8e7087f96c39e78f4eb44953a514e494e2c96c"
+      }
+    },
+    "parkassist": {
+      "rows": 3,
+      "files": {
+        "parkassist.tsv": "8b72ca14c0833b296f42f42219242848a20922869428c9ca66f22762f7b05fc5"
+      }
+    },
+    "pedestrianautomaticemergencybraking": {
+      "rows": 3,
+      "files": {
+        "pedestrianautomaticemergencybraking.tsv": "8b72ca14c0833b296f42f42219242848a20922869428c9ca66f22762f7b05fc5"
+      }
+    },
+    "pretensioner": {
+      "rows": 2,
+      "files": {
+        "pretensioner.tsv": "f2d28b62cbac2701fc66d54e60893c6e7fa576c13d49cd32fee25fcbb94b4b1c"
+      }
+    },
+    "rearautomaticemergencybraking": {
+      "rows": 3,
+      "files": {
+        "rearautomaticemergencybraking.tsv": "8b72ca14c0833b296f42f42219242848a20922869428c9ca66f22762f7b05fc5"
+      }
+    },
+    "rearcrosstrafficalert": {
+      "rows": 3,
+      "files": {
+        "rearcrosstrafficalert.tsv": "28094a998735d959c8c1feb983351caaff9e585756bf8cce57fabf016f21db9a"
+      }
+    },
+    "rearvisibilitycamera": {
+      "rows": 3,
+      "files": {
+        "rearvisibilitycamera.tsv": "8b72ca14c0833b296f42f42219242848a20922869428c9ca66f22762f7b05fc5"
+      }
+    },
+    "seatbeltsall": {
+      "rows": 3,
+      "files": {
+        "seatbeltsall.tsv": "57b9a4e7376c26ae586fd008d47e4dbc895fb573623847d63f0958625e7fde73"
+      }
+    },
+    "semiautomaticheadlampbeamswitching": {
+      "rows": 3,
+      "files": {
+        "semiautomaticheadlampbeamswitching.tsv": "8b72ca14c0833b296f42f42219242848a20922869428c9ca66f22762f7b05fc5"
+      }
+    },
+    "steering": {
+      "rows": 2,
+      "files": {
+        "steering.tsv": "0cb481068b8caa7f0a571e5671dd754a9e759206284f49ca3b62584b67c1f7b4"
+      }
+    },
+    "tpms": {
+      "rows": 2,
+      "files": {
+        "tpms.tsv": "dca4e0d3d7873a59ec051386242cfba8342e7515b164cd6e6bd0987cb49c50ad"
+      }
+    },
+    "tractioncontrol": {
+      "rows": 3,
+      "files": {
+        "tractioncontrol.tsv": "8b72ca14c0833b296f42f42219242848a20922869428c9ca66f22762f7b05fc5"
+      }
+    },
+    "trailerbodytype": {
+      "rows": 29,
+      "files": {
+        "trailerbodytype.tsv": "d27965ce007eda0830c3ddf155323f06499f4aefc73072b97125b5070aaa1430"
+      }
+    },
+    "trailertype": {
+      "rows": 9,
+      "files": {
+        "trailertype.tsv": "a7fc6e0f198629d10cc152717ffa65fc74cf965e0eb3eb07d9c32a1e92c64cd3"
+      }
+    },
+    "transmission": {
+      "rows": 12,
+      "files": {
+        "transmission.tsv": "51c9dd48d249365fa1211503db6982d671436a20f5e0b6fae94d4b55013a4e15"
+      }
+    },
+    "turbo": {
+      "rows": 2,
+      "files": {
+        "turbo.tsv": "f2d28b62cbac2701fc66d54e60893c6e7fa576c13d49cd32fee25fcbb94b4b1c"
+      }
+    },
+    "valvetraindesign": {
+      "rows": 4,
+      "files": {
+        "valvetraindesign.tsv": "ad8ce48cd340f462f9d2da4d3fbaff0fffeb7f1d35bdaa5b0b560422a4a5b369"
+      }
+    },
+    "vehicletype": {
+      "rows": 9,
+      "files": {
+        "vehicletype.tsv": "0a439c8ec299475aba4628d6ffaf1807bb4d744a78d44e3a4dd0f42ed85d4f29"
+      }
+    },
+    "wheelbasetype": {
+      "rows": 6,
+      "files": {
+        "wheelbasetype.tsv": "9a811bd4ec0d0f05694d60b33074ed80758f78cf637185d78bb80cfd17e78b88"
+      }
+    },
+    "wheeliemitigation": {
+      "rows": 3,
+      "files": {
+        "wheeliemitigation.tsv": "8b72ca14c0833b296f42f42219242848a20922869428c9ca66f22762f7b05fc5"
+      }
+    },
+    "make": {
+      "rows": 12361,
+      "files": {
+        "make.tsv": "439c47be90a5e74564c566825df5f0343ab67c95d11a3c90e2e9f4e6cc0f05da"
+      }
+    },
+    "model": {
+      "rows": 32009,
+      "files": {
+        "model.tsv": "17f7b37b6e8c23dd7c932556d11d3affb18b1f925ca8da02634b82e51f751b58"
+      }
+    },
+    "manufacturer": {
+      "rows": 23003,
+      "files": {
+        "manufacturer.tsv": "8ced6774f43ca3210a331d7a199cabd4acffe84b12ee6082184379f8f262be2a"
+      }
+    },
+    "wmi": {
+      "rows": 13001,
+      "files": {
+        "wmi.tsv": "c03aedbfcc6f5964eaaece5378e1df7e6ec0816f476aebeae631fa626f3c96c3"
+      }
+    },
+    "wmi_make": {
+      "rows": 14172,
+      "files": {
+        "wmi_make.tsv": "6544adcf77114f6954815cd499182c05de88caa2744be806ef1094a2c2a41293"
+      }
+    },
+    "wmi_vinschema": {
+      "rows": 41774,
+      "files": {
+        "wmi_vinschema.tsv": "f83be9289a364b82a95dc80a0c104c93f6975e378abbbcee0ec17f5f16968f97"
+      }
+    },
+    "vinschema": {
+      "rows": 25229,
+      "files": {
+        "vinschema.tsv": "0fd5034c37d7f3840adfa10dd0cfea8777e4d17fb953d336718ea4a10a5e73eb"
+      }
+    },
+    "pattern": {
+      "rows": 1678690,
+      "files": {
+        "pattern/00.tsv": "241c7890e659ebd464a7848facf1f95cb6c4c902db49235c1803dd157f5775a6",
+        "pattern/01.tsv": "3e911eda2b3b908ce430c5b2b34c3574f41a5b6428da35110d0c13d45e11177d",
+        "pattern/02.tsv": "a53c3352d64f5f62cc00b1ff6419d027de5fa754a3fbfe7ac7ffeea727b0e95e",
+        "pattern/03.tsv": "455df396bf459f4db3b06930a5f4f4c88b30b5bf83d1fa6dbe7280de437161c9",
+        "pattern/04.tsv": "616c11e8fd6769a156dbfdfc4694901d75821293a64e14b67df7d2522113d7b6",
+        "pattern/05.tsv": "55f4841579eab55093c102c15624e2979a4e69a81723d4e94f1bf54966577743",
+        "pattern/06.tsv": "4bfae29eaa831e469882fe13f283188b8d255fce35dffe7851ea0a0a39df114a",
+        "pattern/07.tsv": "ea2d8ff5e946ce2e798e9c6d3fbb5af6c9581c8598afd9fe122e7e8f2c16f35c",
+        "pattern/08.tsv": "0633483d6f64c97fdbc2fa8c0edf76e4ad9c7874f1cf73fc4b43e9332e2b148d",
+        "pattern/09.tsv": "9b9beec55c2fe429cf5a79e457dc8fb0299ba46e8efb4fbbb33befd9e9ba5cbd",
+        "pattern/10.tsv": "b1e8fbd6866016b97340171f8fb7dad38e6f84ea7200ca15a21b61eb0de57895",
+        "pattern/11.tsv": "0b53b5b68b9552f8f78ea5397dbccbeb0624e307110c9e7cb46c135e5f38dc29",
+        "pattern/12.tsv": "2d3011f03d44a7705b1ebcce6e7da9b97388d3264a1989c2f5e4b7653c95789c",
+        "pattern/13.tsv": "5cebd76ac8ee6c35b97f10c945bb114c7a773384dd08f64b8b793e787bb73a34",
+        "pattern/14.tsv": "d88bb8506898d17678168bd6367c3469580a337eacdfdf20d6f12bc2aa709be1",
+        "pattern/15.tsv": "5bc9de4a35f24229d63e2096d37945cfaf1fceffc24636eda9e1eaf936c5d036"
+      }
+    },
+    "element": {
+      "rows": 160,
+      "files": {
+        "element.tsv": "8f016c9d26ebfe3ccc824a5f4b99d6e5c4107d95d678d2c16d765808fbbcd5db"
+      }
+    },
+    "make_model": {
+      "rows": 32009,
+      "files": {
+        "make_model.tsv": "67d7cc3ebf91c608e0fb72c431d8eababe34f60d126e246479fb1646ac622170"
+      }
+    },
+    "enginemodel": {
+      "rows": 346,
+      "files": {
+        "enginemodel.tsv": "6229a7759459afb3b06bda42e9ab2bd9b9f2b559ed9d4bb5db630526fa2d6a2e"
+      }
+    },
+    "enginemodelpattern": {
+      "rows": 2510,
+      "files": {
+        "enginemodelpattern.tsv": "dae9307c3391f3481b7bcdab1474efe5441d1f86d5ab55a105616d01da118deb"
+      }
+    },
+    "conversion": {
+      "rows": 6,
+      "files": {
+        "conversion.tsv": "e5cbf6d7a8b9b86706f70013973e531ba6a9885be2ad6f310fee5fb4e02b0e20"
+      }
+    },
+    "defaultvalue": {
+      "rows": 186,
+      "files": {
+        "defaultvalue.tsv": "dd2d0cc28f78880711559dab72225173d0d4770b6f1fed7d5f4c2817ca1eaa87"
+      }
+    },
+    "errorcode": {
+      "rows": 15,
+      "files": {
+        "errorcode.tsv": "ddc19416b10e10c700e2f4e3f1a4e68ed882db576402c73d7539928070c9e807"
+      }
+    },
+    "vinexception": {
+      "rows": 18805,
+      "files": {
+        "vinexception.tsv": "85708beec33ede9b5a526163db8403c316a48cdcc51ddef42acebb91e9f7f4ff"
+      }
+    },
+    "vindescriptor": {
+      "rows": 69,
+      "files": {
+        "vindescriptor.tsv": "96848187b42fb97e49f89ddfc52a7bf0662cfc073e812a987f2186d6a22d7458"
+      }
+    },
+    "vehiclespecschema": {
+      "rows": 6656,
+      "files": {
+        "vehiclespecschema.tsv": "16582d11995d9abc77df7e4bf172cdbfc8ee0dc274ffcfa72a436f08f3a2b4f6"
+      }
+    },
+    "vspecschemapattern": {
+      "rows": 17149,
+      "files": {
+        "vspecschemapattern.tsv": "fc880040fcd72bd640416d31d6453a8ac088732897ab9a5b8e14670c132f9981"
+      }
+    },
+    "vehiclespecpattern": {
+      "rows": 226001,
+      "files": {
+        "vehiclespecpattern.tsv": "11ba1cd43f8c185eb6bc8e444faba5647353e531256a729721e814b829ce5837"
+      }
+    },
+    "vehiclespecschema_model": {
+      "rows": 7550,
+      "files": {
+        "vehiclespecschema_model.tsv": "f8437f884c2a1409292c494430a78eda66fb16cbb7b59c5c020867d1ed94b973"
+      }
+    },
+    "vehiclespecschema_year": {
+      "rows": 12882,
+      "files": {
+        "vehiclespecschema_year.tsv": "da21e2f43eb476461f1c3c591a94964f035164a99147323bcc4cc35a2652aa5d"
+      }
+    },
+    "wmiyearvalidchars": {
+      "rows": 241377,
+      "files": {
+        "wmiyearvalidchars/00.tsv": "d577fd688f970cbe674b0ce957808539b1d2b4579b4ae2b7ec54656dac247834",
+        "wmiyearvalidchars/01.tsv": "71fcbe74c587fafdb7b6f200c833da0ee28956aea8d4a1c4e02034c8c4290e40",
+        "wmiyearvalidchars/02.tsv": "4122e0286ac70d84c263a1cc6a445ad0a20b25de73b9a3d6aad7f733358a9887",
+        "wmiyearvalidchars/03.tsv": "e72ce567f2f09145a4325f45937e54871c3e776489302d8f420a18f0221845ed",
+        "wmiyearvalidchars/04.tsv": "b48ca1e0e21dc43a967c3c6469114c4148245e88e7321696659b8a85ab43aad9",
+        "wmiyearvalidchars/05.tsv": "c4a66cf8a13748e90a92b60f5a0111b4fcc197d9dc336849ec08cb3c8600ca2a",
+        "wmiyearvalidchars/06.tsv": "6a4cfa28d2cfdad57024fc923a369a7319a1efdc7b4f37d7a62a6336bbadf8ad",
+        "wmiyearvalidchars/07.tsv": "db9543b44c977710e74f267ac78381ec0de8fa3f0a28e72a173c302637cc1f4b"
+      }
+    }
+  }
+}

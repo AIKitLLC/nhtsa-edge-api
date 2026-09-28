@@ -1,0 +1,15 @@
+#id	name
+1	Diesel
+2	Electric
+4	Gasoline
+6	Compressed Natural Gas (CNG)
+7	Liquefied Natural Gas (LNG)
+8	Compressed Hydrogen/Hydrogen
+9	Liquefied Petroleum Gas (propane or LPG)
+10	Ethanol (E85)
+11	Neat Ethanol (E100)
+13	Methanol (M85)
+14	Neat Methanol (M100)
+15	Flexible Fuel Vehicle (FFV)
+17	Natural Gas
+18	Fuel Cell

@@ -1,0 +1,209 @@
+name: vPIC data refresh & dev deploy
+
+on:
+  schedule:
+    # Every Monday 06:17 UTC (NHTSA publishes a new dump around mid-month)
+    - cron: '17 6 * * 1'
+  workflow_dispatch:
+    inputs:
+      dump:
+        description: 'Dump name to ingest (default: newest on the NHTSA downloads page)'
+        required: false
+  push:
+    # Re-run when the ingestion, asset build or decoder changes
+    paths:
+      - 'scripts/vpic/**'
+      - 'src/**'
+      - 'wrangler.jsonc'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/vpic-data.yml'
+
+concurrency:
+  group: vpic-data-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    name: Ingest, verify against live vPIC, commit
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      committed: ${{ steps.commit.outputs.committed }}
+    services:
+      # The original dump is restored here to verify data/vpic and the port against it
+      postgres:
+        image: postgres:17 # the dump is written by pg_dump 17 (SET transaction_timeout)
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      PGHOST: localhost
+      PGPORT: '5432'
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: postgres
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Ingest vPIC dump into data/vpic
+        run: bun scripts/vpic/ingest-dump.ts ${{ inputs.dump && format('--dump={0}', inputs.dump) || '' }}
+
+      - name: Detect data change
+        id: change
+        run: |
+          if [[ -n "$(git status --porcelain data/vpic)" ]]; then echo "data=true" >> "$GITHUB_OUTPUT"; else echo "data=false" >> "$GITHUB_OUTPUT"; fi
+
+      - name: Build assets
+        run: bun scripts/vpic/build-assets.ts
+
+      - name: Restore the original dump in PostgreSQL
+        run: |
+          ZIP=$(ls vPICList_*.plain.zip | head -n 1)
+          bun scripts/vpic/sql-verify/load-db.ts --dump="$ZIP"
+
+      - name: data/vpic is an exact projection of the dump (gate)
+        run: bun scripts/vpic/sql-verify/projection.ts
+
+      - name: Port matches NHTSA's SQL functions on the dump (gate)
+        run: |
+          bun scripts/vpic/sql-verify/compare.ts --size=3000 --seed=1 --concurrency=8 --db="postgres://postgres:postgres@localhost:5432/postgres"
+          bun scripts/vpic/sql-verify/functions.ts --size=2000 --keys=20000 --db="postgres://postgres:postgres@localhost:5432/postgres"
+
+      - name: Parity with the live vPIC API (gate)
+        run: |
+          GOLDEN=""
+          # Refresh the recorded live expectations whenever data or decoder changed
+          if [[ "${{ steps.change.outputs.data }}" == "true" || "${{ github.event_name }}" == "push" ]]; then
+            GOLDEN="--golden=test/fixtures/vpic-golden.json --golden-size=300"
+          fi
+          bun scripts/vpic/parity.ts --size=1000 --seed=1 --min-exact=${{ vars.VPIC_PARITY_MIN || '0.85' }} $GOLDEN
+
+      - name: Audit the dump for NHTSA defects (informational)
+        continue-on-error: true
+        run: bun scripts/vpic/errata/audit.ts --live --db="postgres://postgres:postgres@localhost:5432/postgres"
+
+      - name: Typecheck and tests (against the new data)
+        run: |
+          pnpm typecheck
+          pnpm test
+
+      - name: Upload parity report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vpic-parity
+          path: |
+            build/parity/
+            build/sql-verify/
+            build/errata/
+
+      - name: Commit data/vpic and the golden fixture together
+        id: commit
+        run: |
+          if [[ -z "$(git status --porcelain data/vpic test/fixtures)" ]]; then
+            echo "committed=false" >> "$GITHUB_OUTPUT"
+            echo "Nothing to commit."
+            exit 0
+          fi
+          VERSION=$(node -p 'require("./data/vpic/manifest.json").dumpVersion')
+          RATE=$(node -p 'const r=require("./build/parity/report.json"); (r.exactRate*100).toFixed(2)')
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git add data/vpic test/fixtures
+          git commit -m "data(vpic): ${VERSION} (live parity ${RATE}%)"
+          # Another run may have pushed meanwhile: replay this commit on top of it
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+          echo "committed=true" >> "$GITHUB_OUTPUT"
+          {
+            echo "## Committed \`${VERSION}\` (live parity ${RATE}%)"
+            echo "Revert data and fixture together with: \`git revert $(git rev-parse HEAD)\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  deploy-dev:
+    name: Deploy dev worker
+    needs: refresh
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Check Cloudflare credentials
+        id: creds
+        run: |
+          if [[ -z "$CLOUDFLARE_API_TOKEN" || -z "$CLOUDFLARE_ACCOUNT_ID" ]]; then
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID secrets are not set; skipping the dev deploy."
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.creds.outputs.ready == 'true'
+        with:
+          ref: ${{ github.ref }} # includes the data commit pushed by the refresh job
+
+      - uses: pnpm/action-setup@v4
+        if: steps.creds.outputs.ready == 'true'
+
+      - uses: actions/setup-node@v4
+        if: steps.creds.outputs.ready == 'true'
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - uses: oven-sh/setup-bun@v2
+        if: steps.creds.outputs.ready == 'true'
+
+      - name: Install and build assets
+        if: steps.creds.outputs.ready == 'true'
+        run: |
+          pnpm install --frozen-lockfile
+          bun scripts/vpic/build-assets.ts
+
+      - name: Deploy nhtsa-edge-api-dev
+        id: deploy
+        if: steps.creds.outputs.ready == 'true'
+        run: |
+          pnpm exec wrangler deploy --env dev 2>&1 | tee deploy.log
+          URL=$(grep -oE 'https://[a-zA-Z0-9.-]+\.workers\.dev' deploy.log | head -n 1)
+          echo "url=${URL}" >> "$GITHUB_OUTPUT"
+
+      - name: Smoke test the deployed worker
+        if: steps.creds.outputs.ready == 'true' && steps.deploy.outputs.url != ''
+        run: |
+          URL="${{ steps.deploy.outputs.url }}"
+          VERSION=$(node -p 'require("./data/vpic/manifest.json").dumpVersion')
+          # A new workers.dev route or version can take a moment to propagate
+          for attempt in $(seq 1 24); do
+            if curl -fsS "$URL/" -o health.json; then break; fi
+            echo "attempt $attempt: not reachable yet"; sleep 5
+          done
+          cat health.json
+          node -e 'const h=require("./health.json"); if (h.status!=="healthy" || h.dataVersion!==process.argv[1]) { console.error("unexpected health", h); process.exit(1) }' "$VERSION"
+          curl -fsS "$URL/api/v1/vin/1HGCM82633A004352" | tee decode.json
+          node -e 'const d=require("./decode.json").data; if (d.make!=="HONDA" || d.modelYear!==2003) { console.error("unexpected decode", d); process.exit(1) }'
+          {
+            echo "## Dev worker deployed"
+            echo "- URL: $URL"
+            echo "- Data: \`$VERSION\`"
+          } >> "$GITHUB_STEP_SUMMARY"
