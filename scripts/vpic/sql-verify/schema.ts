@@ -86,13 +86,18 @@ ANALYZE;
  * sentinel row at position 0 (never checked): the table is no longer empty, the
  * fallback is skipped, and no position has constraints — the live behaviour.
  */
-export function cacheOnlySql(): string {
+export function cacheOnlySql(existingPairs = "SELECT wmi, year FROM vpic.wmiyearvalidchars_agg"): string {
   return `
+CREATE TEMP TABLE cached_pairs AS ${existingPairs};
+CREATE INDEX ON cached_pairs (wmi, year);
 INSERT INTO vpic.wmiyearvalidchars (wmi, year, position, "char")
 SELECT w.wmi, y.year, 0, '_'
 FROM (SELECT DISTINCT wmi FROM vpic.wmi) w
 CROSS JOIN generate_series(1980, 2045) AS y(year)
-WHERE NOT EXISTS (SELECT 1 FROM vpic.wmiyearvalidchars_agg a WHERE a.wmi = w.wmi AND a.year = y.year);
+WHERE NOT EXISTS (SELECT 1 FROM cached_pairs a WHERE a.wmi = w.wmi AND a.year = y.year);
 ANALYZE vpic.wmiyearvalidchars;
 `;
 }
+
+/** The same, on a database restored from the original dump. */
+export const cacheOnlyDumpSql = (): string => cacheOnlySql("SELECT DISTINCT wmi, year FROM vpic.wmiyearvalidchars");

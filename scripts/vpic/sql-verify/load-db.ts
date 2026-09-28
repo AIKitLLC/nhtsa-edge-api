@@ -4,6 +4,8 @@
  * so vpic.spvindecode can be run against the exact data the offline decoder uses.
  *
  * Usage: bun scripts/vpic/sql-verify/load-db.ts [--data=data/vpic] [--pg-fallback]
+ *        bun scripts/vpic/sql-verify/load-db.ts --dump=vPICList_lite_2026_09.plain.zip [--pg-fallback]
+ *   --dump         restore the original NHTSA dump (tables, functions, views) instead of data/vpic
  *   --pg-fallback  keep the PostgreSQL valid-characters fallback (see schema.ts cacheOnlySql)
  * Connection: the usual libpq variables (PGHOST, PGPORT, PGUSER, PGDATABASE); needs psql.
  */
@@ -11,11 +13,12 @@
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { TABLE_SPECS } from "../lib/tables";
-import { cacheOnlySql, postLoadSql, schemaDdl } from "./schema";
+import { cacheOnlyDumpSql, cacheOnlySql, postLoadSql, schemaDdl } from "./schema";
 
 const root = resolve(import.meta.dirname ?? ".", "../../..");
 const dataDir = resolve(root, process.argv.find((a) => a.startsWith("--data="))?.slice(7) ?? "data/vpic");
 const pgFallback = process.argv.includes("--pg-fallback");
+const dumpZip = process.argv.find((a) => a.startsWith("--dump="))?.slice(7);
 const functionsFile = join(root, "docs/vpic-reference/decode-functions.sql");
 
 async function psql(input: string, label: string): Promise<void> {
@@ -51,8 +54,26 @@ async function copyFile(table: string, file: string): Promise<number> {
   return body.split("\n").filter(Boolean).length;
 }
 
+/** Restores the dump as NHTSA ships it (plain SQL, no owners), streamed from the zip. */
+async function restoreDump(zip: string): Promise<void> {
+  await psql("DROP SCHEMA IF EXISTS vpic CASCADE;", "drop schema");
+  const proc = Bun.spawn(
+    ["bash", "-o", "pipefail", "-c", `unzip -p "$0" '*.sql' | psql -X -q -v ON_ERROR_STOP=1 >/dev/null`, zip],
+    { stdout: "inherit", stderr: "pipe" }
+  );
+  const [code, err] = await Promise.all([proc.exited, new Response(proc.stderr).text()]);
+  if (code !== 0) throw new Error(`Dump restore failed: ${err.trim()}`);
+  await psql("ANALYZE;", "analyze");
+}
+
 async function main(): Promise<void> {
   const started = Date.now();
+  if (dumpZip) {
+    await restoreDump(resolve(dumpZip));
+    if (!pgFallback) await psql(cacheOnlyDumpSql(), "cache-only valid characters");
+    console.log(`Restored ${dumpZip} in ${((Date.now() - started) / 1000).toFixed(1)} s`);
+    return;
+  }
   await psql(schemaDdl(), "schema");
 
   for (const spec of TABLE_SPECS) {

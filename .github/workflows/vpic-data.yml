@@ -31,6 +31,22 @@ jobs:
       contents: write
     outputs:
       committed: ${{ steps.commit.outputs.committed }}
+    services:
+      # The original dump is restored here to verify data/vpic and the port against it
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      PGHOST: localhost
+      PGPORT: '5432'
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: postgres
     steps:
       - uses: actions/checkout@v4
 
@@ -57,6 +73,19 @@ jobs:
       - name: Build assets
         run: bun scripts/vpic/build-assets.ts
 
+      - name: Restore the original dump in PostgreSQL
+        run: |
+          ZIP=$(ls vPICList_*.plain.zip | head -n 1)
+          bun scripts/vpic/sql-verify/load-db.ts --dump="$ZIP"
+
+      - name: data/vpic is an exact projection of the dump (gate)
+        run: bun scripts/vpic/sql-verify/projection.ts
+
+      - name: Port matches NHTSA's SQL functions on the dump (gate)
+        run: |
+          bun scripts/vpic/sql-verify/compare.ts --size=3000 --seed=1 --concurrency=8 --db="postgres://postgres:postgres@localhost:5432/postgres"
+          bun scripts/vpic/sql-verify/functions.ts --size=2000 --keys=20000 --db="postgres://postgres:postgres@localhost:5432/postgres"
+
       - name: Parity with the live vPIC API (gate)
         run: |
           GOLDEN=""
@@ -76,7 +105,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: vpic-parity
-          path: build/parity/
+          path: |
+            build/parity/
+            build/sql-verify/
 
       - name: Commit data/vpic and the golden fixture together
         id: commit
