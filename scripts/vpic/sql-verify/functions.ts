@@ -164,7 +164,15 @@ async function lookups(): Promise<void> {
     a: string;
     v: string | null;
   }>;
-  for (const r of rows) check("felementattributevalue", `${r.e}:${r.a}`, r.v, pairs.get(`${r.e}|${r.a}`)?.[2] ?? null);
+  // Private elements (NCSA 96-98) are never part of the public output, and data/vpic
+  // deliberately does not carry their vNCSA* lookup views
+  const privateIds = new Set(
+    ((await sql`SELECT id FROM vpic.element WHERE coalesce(isprivate, false)`) as Array<{ id: number }>).map((r) => r.id)
+  );
+  for (const r of rows) {
+    if (privateIds.has(r.e)) continue;
+    check("felementattributevalue", `${r.e}:${r.a}`, r.v, pairs.get(`${r.e}|${r.a}`)?.[2] ?? null);
+  }
 }
 
 const now = new Date();
