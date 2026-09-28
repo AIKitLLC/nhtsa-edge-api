@@ -89,7 +89,7 @@ also compared with the verbatim NHTSA functions running in PostgreSQL on **the s
 data**, where any difference comes from the code (`scripts/vpic/sql-verify/`):
 
 ```bash
-# PostgreSQL 16 and psql on PATH; libpq variables select the database
+# PostgreSQL (17+ for the original dump) and psql on PATH; libpq variables select the database
 export PGHOST=localhost PGPORT=5433 PGUSER=postgres PGDATABASE=postgres
 pnpm build:data
 bun scripts/vpic/sql-verify/load-db.ts                 # data/vpic + decode-functions.sql, ~40 s

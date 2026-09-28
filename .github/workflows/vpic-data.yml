@@ -34,13 +34,13 @@ jobs:
     services:
       # The original dump is restored here to verify data/vpic and the port against it
       postgres:
-        image: postgres:16
+        image: postgres:17 # the dump is written by pg_dump 17 (SET transaction_timeout)
         env:
           POSTGRES_PASSWORD: postgres
         ports:
           - 5432:5432
         options: >-
-          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 20
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 20
     env:
       PGHOST: localhost
       PGPORT: '5432'
@@ -188,7 +188,12 @@ jobs:
         run: |
           URL="${{ steps.deploy.outputs.url }}"
           VERSION=$(node -p 'require("./data/vpic/manifest.json").dumpVersion')
-          curl -fsS "$URL/" | tee health.json
+          # A new workers.dev route or version can take a moment to propagate
+          for attempt in $(seq 1 24); do
+            if curl -fsS "$URL/" -o health.json; then break; fi
+            echo "attempt $attempt: not reachable yet"; sleep 5
+          done
+          cat health.json
           node -e 'const h=require("./health.json"); if (h.status!=="healthy" || h.dataVersion!==process.argv[1]) { console.error("unexpected health", h); process.exit(1) }' "$VERSION"
           curl -fsS "$URL/api/v1/vin/1HGCM82633A004352" | tee decode.json
           node -e 'const d=require("./decode.json").data; if (d.make!=="HONDA" || d.modelYear!==2003) { console.error("unexpected decode", d); process.exit(1) }'
