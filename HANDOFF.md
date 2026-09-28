@@ -4,7 +4,8 @@
 > **Repository**: [https://github.com/AIKitLLC/nhtsa-edge-api](https://github.com/AIKitLLC/nhtsa-edge-api) (Private, AIKitLLC)  
 > **Branch**: `main`  
 > **Primary Directory**: `/Users/tuannguyen/.gemini/antigravity/scratch/nhtsa-edge-api`  
-> **Status**: Production Ready & Fully Verified (35/35 Tests Passing, Typecheck Clean)  
+> **Production URL**: [https://nhtsa-edge-api.tuannx87.workers.dev](https://nhtsa-edge-api.tuannx87.workers.dev)  
+> **Status**: Production Ready & Deployed Globally (35/35 Tests Passing, CI/CD Active)  
 > **Last Updated**: 2026-09-27 (Post Multi-Source Fallback & Enrichment)
 
 ---

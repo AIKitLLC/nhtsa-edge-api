@@ -202,6 +202,8 @@ bash scripts/setup-cloudflare.sh
    pnpm deploy
    ```
 
+**Official Production URL**: `https://nhtsa-edge-api.tuannx87.workers.dev`
+
 ---
 
 ## 🔄 Automated Data Updates via GitHub Actions
