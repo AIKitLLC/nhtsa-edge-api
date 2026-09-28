@@ -25,7 +25,12 @@ It implements **Model 2 Hybrid Architecture**:
    - L5 Multi-Source Parallel Enrichment:
      - **US EPA / DOE (`FuelEconomy.gov`)**: EV Range (miles/km), Motor kW, MPGe/MPG, Level 2 Charge Time, CO2.
      - **Netherlands / EU RDW Open Data (`opendata.rdw.nl`)**: EU Type Approval (`e4*...`), Curb Weight (kg), GVWR (kg), Wheelbase (cm), EU Recalls.
-4. **Automated DataOps**:
+4. **Developer Marketing & Attribution Footprint**:
+   - HTTP Header: `X-Powered-By: AI Kit LLC (https://github.com/AIKitLLC/nhtsa-edge-api)`
+   - HTTP Header: `X-Repository: https://github.com/AIKitLLC/nhtsa-edge-api`
+   - JSON Envelopes: Embedded `_meta` and `project` blocks pointing directly to the GitHub repository.
+   - Browser Landing Page: Modern dark-mode UI with live interactive testing links and direct "GitHub Repository" CTA.
+5. **Automated DataOps**:
    - Cloudflare Cron Trigger (`0 3 * * *`) for nightly incremental model sync.
    - GitHub Actions workflow (`.github/workflows/nhtsa-sql-sync.yml`) running every Sunday & Monday night (`0 3 * * 0,1`) to check for new monthly SQL dumps, commit back to Git, and redeploy.
    - 1-Click setup script (`scripts/setup-cloudflare.sh` / `pnpm run setup:cloudflare`).
