@@ -103,17 +103,31 @@ for (const spec of TABLE_SPECS) {
 
 // Objects read by the decode functions that data/vpic does not carry
 console.log("\nNot in data/vpic (read by the decode functions):");
-const exceptions = (await psqlOut(`COPY (SELECT DISTINCT wmi FROM vpic.wmiyearvalidchars_cacheexceptions ORDER BY 1) TO STDOUT`))
+// Its columns are introspected: the decode function reads a "wmi" column from it
+const exceptionColumns = (
+  await psqlOut(
+    `COPY (SELECT column_name FROM information_schema.columns WHERE table_schema = 'vpic' AND table_name = 'wmiyearvalidchars_cacheexceptions' ORDER BY ordinal_position) TO STDOUT`
+  )
+)
   .split("\n")
   .filter(Boolean);
-console.log(`  WMIYearValidChars_CacheExceptions: ${exceptions.length} WMIs${exceptions.length ? ` (${exceptions.slice(0, 20).join(", ")}${exceptions.length > 20 ? ", ..." : ""})` : ""}`);
+const exceptionRows = Number((await psqlOut(`COPY (SELECT count(*) FROM vpic.wmiyearvalidchars_cacheexceptions) TO STDOUT`)).trim());
+const sample = (await psqlOut(`COPY (SELECT * FROM vpic.wmiyearvalidchars_cacheexceptions LIMIT 5) TO STDOUT`)).trim();
+console.log(`  WMIYearValidChars_CacheExceptions: ${exceptionRows} rows, columns (${exceptionColumns.join(", ")})`);
+if (sample) console.log(sample.split("\n").map((l) => `    ${l}`).join("\n"));
+if (!exceptionColumns.includes("wmi")) {
+  console.log(
+    "  -> NOTE: no 'wmi' column. spvindecode_errorcode's `SELECT DISTINCT wmi FROM ...CacheExceptions`\n" +
+      "     then binds to the outer WMIYearValidChars.wmi (correlated), see docs/NHTSA-ERRATA.md."
+  );
+}
 for (const view of ["vncsabodytype", "vncsamake", "vncsamodel"]) {
   const n = (await psqlOut(`COPY (SELECT count(*) FROM vpic.${view}) TO STDOUT`)).trim();
   console.log(`  ${view}: ${n} rows (elements 96-98 are private; not part of public output)`);
 }
-if (exceptions.length > 0) {
+if (exceptionRows > 0) {
   failures.push("wmiyearvalidchars_cacheexceptions");
-  console.log("  -> the port does not read CacheExceptions yet: these WMIs need handling.");
+  console.log("  -> CacheExceptions is not empty: the port does not model it yet.");
 }
 
 if (failures.length > 0) {
