@@ -82,6 +82,39 @@ Remaining differences come mainly from **data freshness**: the live database kee
 changing between monthly dumps (new patterns, re-cased names such as
 `C-max` → `C-Max`). These differences shrink when the next dump is ingested.
 
+## Verification against the reference SQL functions
+
+Parity with the live API cannot tell a porting bug from newer live data. So the port is
+also compared with the verbatim NHTSA functions running in PostgreSQL on **the same
+data**, where any difference comes from the code (`scripts/vpic/sql-verify/`):
+
+```bash
+# PostgreSQL 16 and psql on PATH; libpq variables select the database
+export PGHOST=localhost PGPORT=5433 PGUSER=postgres PGDATABASE=postgres
+pnpm build:data
+bun scripts/vpic/sql-verify/load-db.ts                 # data/vpic + decode-functions.sql, ~40 s
+bun scripts/vpic/sql-verify/compare.ts --size=10000    # full decode, field by field
+bun scripts/vpic/sql-verify/functions.ts               # each ported helper vs its SQL function
+```
+
+`load-db.ts` rebuilds the tables from `data/vpic` (`createdon` = `changedon`, since every
+query reads `coalesce(UpdatedOn, CreatedOn)`; `WMIYearValidChars` expanded from its
+aggregate) and loads `decode-functions.sql` unchanged. By default it adds a sentinel row
+for (WMI, year) pairs missing from `WMIYearValidChars`, so the PostgreSQL fallback is
+skipped as the live API does (next section); `--pg-fallback` keeps it, and `compare.ts`
+then reports exactly those VINs (a useful negative control).
+
+Result on `vPICList_lite_2026_09`:
+
+| Check | Inputs | Differences |
+| :-- | --: | --: |
+| `spvindecode`, every element (seeds 1 and 7) | 11,000 VINs | 0, apart from conversion rounding (`DisplacementCI`/`DisplacementL`, numerically equal to 1e-6) |
+| `fvinwmi`, `fvindescriptor`, `fvincheckdigit`, `fvincheckdigit2`, `fvinmodelyear2` | 4,642 strings (VINs, lower case, truncated, padded, 6-char WMIs) | 0 |
+| `sqlwild_to_regex`, `fvalidcharsinkey` | 60,639 distinct pattern keys | 0 |
+| Pattern key match (`LIKE` / regex of `spvindecode_core`) | 3,842,143 VIN × key pairs (55,146 matching) | 0 |
+| `felementattributevalue` | 126,137 (element, attribute) pairs shipped in the assets | 0 |
+| Negative control (`--pg-fallback`) | 1,000 VINs | 22, all error codes 5 vs 0 as expected |
+
 ## Where the port follows the live API instead of the dump's PostgreSQL code
 
 The dump ships a PostgreSQL port of NHTSA's SQL Server decoder
