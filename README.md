@@ -92,7 +92,8 @@ Standardized clean JSON format, strongly typed numbers/booleans, omitting 100+ b
 
 | Method | Endpoint | Description | Cache TTL |
 | :--- | :--- | :--- | :--- |
-| `GET` | `/api/v1/vin/:vin` | Detailed VIN decode (Make, Model, Year, Cylinders, Body, etc.) | 30 days |
+| `GET` | `/api/v1/vin/:vin` | Compact VIN decode with automatic local engine fallback | 30 days |
+| `GET` | `/api/v1/vin/:vin/unified` | **Multi-Source Unified Profile** (NHTSA + US EPA EV Range + EU RDW Specs) | 30 days |
 | `GET` | `/api/v1/vin/:vin/local` | In-memory 49 CFR Part 565 fast decode (0.01ms - 5ms, 100% offline) | Permanent |
 | `GET` | `/api/v1/vin/:vin/compare` | Parity audit comparing local engine vs official NHTSA output | Realtime |
 | `GET` | `/api/v1/makes` | Comprehensive list of all registered vehicle makes | 7 days |

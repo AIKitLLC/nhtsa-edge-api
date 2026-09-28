@@ -19,6 +19,7 @@ import {
   seedInitialD1Data,
 } from "../services/d1-database";
 import type { RawVinValuesResult, VpicRawResponse } from "../types/nhtsa";
+import { resolveUnifiedVehicle } from "../services/multi-source-resolver";
 
 export const v1Router = new Hono<{ Bindings: Env }>();
 
@@ -73,6 +74,41 @@ v1Router.get("/vin/:vin", async (c) => {
 
   const upstreamRes = await fetchUpstream(upstreamUrl);
   if (upstreamRes.status !== 200) {
+    // Graceful Fallback: Fall back to local 49 CFR Part 565 engine if NHTSA is down
+    const local = decodeVinLocally(vin);
+    if (local.make && local.make !== "UNKNOWN") {
+      const fallbackSpec = {
+        vin,
+        make: local.make,
+        model: local.model || "Unknown",
+        year: local.year,
+        trim: null,
+        vehicleType: local.vehicleType,
+        bodyClass: null,
+        doors: null,
+        driveType: null,
+        engineCylinders: null,
+        displacementL: null,
+        engineHp: null,
+        fuelType: null,
+        plantCountry: local.plantCountry,
+        plantCity: null,
+        manufacturer: local.manufacturer,
+        isValidVin: local.isValidCheckDigit,
+        errorCode: "FALLBACK_LOCAL_ENGINE",
+        errorText: `NHTSA upstream status ${upstreamRes.status}; decoded via local 49 CFR Part 565 engine`,
+        extraAttributes: {},
+      };
+
+      return c.json({
+        success: true,
+        data: fallbackSpec,
+        source: "LOCAL_FALLBACK",
+        cached: false,
+        timestamp: new Date().toISOString(),
+      });
+    }
+
     return c.json(
       {
         success: false,
@@ -222,6 +258,82 @@ v1Router.get("/vin/:vin/local", async (c) => {
     data: localResult,
     source: localResult.decodeSource,
     latencyMs,
+  });
+});
+
+/**
+ * GET /api/v1/vin/:vin/unified
+ * Multi-Source Unified Vehicle Decoder with Intelligent Fallback Waterfall:
+ * - Tier 1: Local RAM Engine (0.01ms - 49 CFR Part 565 + 13,001 WMIs)
+ * - Tier 2: Edge Cache API
+ * - Tier 3: Primary NHTSA VPIC Upstream
+ * - Tier 4: Fallback to Local Engine if NHTSA is down or unrecognized
+ * - Tier 5: Enrichment with US EPA FuelEconomy (EV Range, MPGe, Motor kW)
+ *           and EU RDW Open Data (EU Type Approval, Curb Weight, GVWR, Axles)
+ */
+v1Router.get("/vin/:vin/unified", async (c) => {
+  const rawVin = c.req.param("vin").trim().toUpperCase();
+  const validation = VinParamSchema.safeParse(rawVin);
+
+  if (!validation.success) {
+    return c.json(
+      {
+        success: false,
+        error: {
+          code: "INVALID_VIN_FORMAT",
+          message: validation.error.errors[0]?.message ?? "Invalid VIN format",
+        },
+      },
+      400
+    );
+  }
+
+  const vin = validation.data;
+  const cacheKey = normalizeCacheKey(c.req.url);
+
+  // Check Edge Cache
+  const cached = await getFromCache(cacheKey, c.env);
+  if (cached) {
+    return new Response(cached.bodyText, {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+        [CONFIG.HEADERS.CACHE_STATUS]: "HIT",
+        [CONFIG.HEADERS.CACHE_TIER]: cached.tier,
+      },
+    });
+  }
+
+  const profile = await resolveUnifiedVehicle(vin, c.env, {
+    enrichWithEpa: c.req.query("epa") !== "false",
+    enrichWithEu: c.req.query("eu") !== "false",
+  });
+
+  const responsePayload = {
+    success: true,
+    data: profile,
+    cached: false,
+    timestamp: new Date().toISOString(),
+  };
+
+  const responseBody = JSON.stringify(responsePayload);
+  await saveToCache(
+    cacheKey,
+    JSON.stringify({ ...responsePayload, cached: true }),
+    CONFIG.CACHE.VIN_TTL_SECONDS,
+    "application/json; charset=utf-8",
+    c.env,
+    getSafeExecutionContext(c)
+  );
+
+  return new Response(responseBody, {
+    status: 200,
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+      "Cache-Control": `public, max-age=${CONFIG.CACHE.VIN_TTL_SECONDS}, s-maxage=${CONFIG.CACHE.VIN_TTL_SECONDS}, stale-while-revalidate=${CONFIG.CACHE.SWR_TTL_SECONDS}`,
+      [CONFIG.HEADERS.CACHE_STATUS]: "MISS",
+      [CONFIG.HEADERS.CACHE_TIER]: profile.provenance.primarySource,
+    },
   });
 });
 
