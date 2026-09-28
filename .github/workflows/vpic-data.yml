@@ -95,6 +95,10 @@ jobs:
           fi
           bun scripts/vpic/parity.ts --size=1000 --seed=1 --min-exact=${{ vars.VPIC_PARITY_MIN || '0.85' }} $GOLDEN
 
+      - name: Audit the dump for NHTSA defects (informational)
+        continue-on-error: true
+        run: bun scripts/vpic/errata/audit.ts --live --db="postgres://postgres:postgres@localhost:5432/postgres"
+
       - name: Typecheck and tests (against the new data)
         run: |
           pnpm typecheck
@@ -108,6 +112,7 @@ jobs:
           path: |
             build/parity/
             build/sql-verify/
+            build/errata/
 
       - name: Commit data/vpic and the golden fixture together
         id: commit

@@ -100,4 +100,7 @@ ANALYZE vpic.wmiyearvalidchars;
 }
 
 /** The same, on a database restored from the original dump. */
-export const cacheOnlyDumpSql = (): string => cacheOnlySql("SELECT DISTINCT wmi, year FROM vpic.wmiyearvalidchars");
+export const cacheOnlyDumpSql = (): string => `
+-- The dump's id sequence is not advanced past the restored rows
+SELECT setval(pg_get_serial_sequence('vpic.wmiyearvalidchars', 'id'), (SELECT max(id) FROM vpic.wmiyearvalidchars));
+${cacheOnlySql("SELECT DISTINCT wmi, year FROM vpic.wmiyearvalidchars")}`;
