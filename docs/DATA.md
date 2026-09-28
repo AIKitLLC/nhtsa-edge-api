@@ -115,21 +115,27 @@ Result on `vPICList_lite_2026_09`:
 | `felementattributevalue` | 126,137 (element, attribute) pairs shipped in the assets | 0 |
 | Negative control (`--pg-fallback`) | 1,000 VINs | 22, all error codes 5 vs 0 as expected |
 
+The weekly workflow repeats this on the **original dump**, restored unchanged in
+PostgreSQL 17 (`load-db.ts --dump=<zip>`): `projection.ts` proves every table in
+`data/vpic` equals the dump's rows, then `compare.ts` (3,000 VINs) and `functions.ts`
+run against the dump's own functions and data. Any difference blocks the data commit.
+`scripts/vpic/errata/audit.ts` then lists defects of the dump and checks them against the
+live API (informational) — see [NHTSA-ERRATA.md](NHTSA-ERRATA.md).
+
 ## Where the port follows the live API instead of the dump's PostgreSQL code
 
 The dump ships a PostgreSQL port of NHTSA's SQL Server decoder
 (`docs/vpic-reference/decode-functions.sql`). The live API runs on SQL Server, and
-parity showed three behaviours where the two differ; the live behaviour is used:
+parity showed four behaviours where the two differ; the live behaviour is used:
 
 | Topic | PostgreSQL port (dump) | Live API (implemented) |
 | :-- | :-- | :-- |
 | Unit conversions | `numeric` scale rules (`2.4/0.016387064 = 146.4569858273574815`) | SQL Server `decimal` typing, truncated (`146.45698582735`) — `src/vpic/tsql-decimal.ts` |
 | Position checks (codes 2-5) | recomputes valid characters when `WMIYearValidChars` lacks the (WMI, year) | uses `WMIYearValidChars` only |
 | Multi-value elements | insertion order | joined with `", "` (see known limitations) |
+| `VinDescriptor` model-year overrides | never applied (erratum E1) | applied — [NHTSA-ERRATA.md](NHTSA-ERRATA.md) |
 
-Everything else follows the dump's functions step by step, including behaviours that
-look like bugs but determine the output (for example, `spvindecode` computes the VIN
-descriptor before the VIN variable is assigned, so the `VinDescriptor` pass never runs).
+Everything else follows the dump's functions step by step.
 
 ## Known limitations
 

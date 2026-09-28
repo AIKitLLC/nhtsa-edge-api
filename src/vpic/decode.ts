@@ -144,7 +144,11 @@ export async function decodeVin(store: VpicStore, rawVin: string, options: Decod
 
   // Plan the passes first (only needs the WMI record), so that only the schemas of
   // the candidate model years are loaded: large WMIs have hundreds of schemas.
-  const dmy = core.vinDescriptors[vinDescriptor("")] ?? null; // descriptor of '' (see below)
+  // NHTSA erratum E1 (docs/NHTSA-ERRATA.md): the dump's spvindecode computes the
+  // descriptor before `vin` is assigned (from ''), so VinDescriptor overrides never
+  // apply there. The live API applies them; so does this port.
+  const descriptor = vinDescriptor(vin);
+  const dmy = core.vinDescriptors[descriptor] ?? null;
   let rmy: number | null = null;
   let omy: number | null = null;
   let conclusive = true;
@@ -192,12 +196,10 @@ export async function decodeVin(store: VpicStore, rawVin: string, options: Decod
     return result.returnCode;
   };
 
-  // The source computes the descriptor before `vin` is assigned, i.e. from '',
-  // so this pass only runs if vpic.VinDescriptor ever lists '***********'.
   let modelYearSource = "***X*|Y";
 
   if (dmy !== null && dmy >= 1980 && dmy <= vLimit) {
-    await run({ pass: 1, modelYear: dmy, vin, modelYearSource: vinDescriptor(""), conclusive: true, error12: year !== null && year !== dmy });
+    await run({ pass: 1, modelYear: dmy, vin, modelYearSource: descriptor, conclusive: true, error12: year !== null && year !== dmy });
   } else {
     let do3and4 = true;
     if (year !== null && year >= 1980 && year <= vLimit) {

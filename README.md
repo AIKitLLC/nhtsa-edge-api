@@ -10,6 +10,10 @@ An **offline VIN decoder** for the NHTSA vPIC database, running on **Cloudflare 
   recalls API are proxied and cached.
 - **Verified against the live API**: every data update is gated by a field-by-field
   comparison of 1,000 VINs with the live vPIC API (see [Accuracy](#accuracy)).
+- **Verified against NHTSA's own SQL**: the dump is restored unchanged in PostgreSQL and
+  its decode functions are compared with the port on every data update; defects found in
+  the dump are documented and, where the live API shows the right answer, fixed
+  ([NHTSA errata](docs/NHTSA-ERRATA.md)).
 - **Weekly data updates committed to git**: data and its expected results change in one
   commit, so an update can be reviewed and reverted like code.
 

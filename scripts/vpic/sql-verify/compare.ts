@@ -126,7 +126,11 @@ async function main(): Promise<void> {
 
 async function loadContext(sql: SQL): Promise<Context> {
   const conv = (await sql`SELECT DISTINCT toelementid FROM vpic.conversion`) as Array<{ toelementid: number }>;
-  return { conversionTargets: new Set(conv.map((r) => r.toelementid)) };
+  const desc = (await sql`SELECT descriptor FROM vpic.vindescriptor`) as Array<{ descriptor: string }>;
+  return {
+    conversionTargets: new Set(conv.map((r) => r.toelementid)),
+    vinDescriptors: new Set(desc.map((r) => r.descriptor)),
+  };
 }
 
 function report(results: ReadonlyArray<{ entry: CorpusEntry; diffs: FieldDiff[]; sqlMs: number; error?: string }>): void {
