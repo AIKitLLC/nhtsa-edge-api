@@ -16,7 +16,7 @@
     {
       "binding": "DB",
       "database_name": "nhtsa-db",
-      "database_id": "local-nhtsa-db",
+      "database_id": "43924716-1f92-4d2b-a316-c77435f3d455",
       "migrations_dir": "migrations"
     }
   ],
