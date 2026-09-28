@@ -157,6 +157,10 @@ v1Router.get("/vin/:vin", async (c) => {
     data: compactSpec,
     source: "UPSTREAM",
     cached: false,
+    _meta: {
+      poweredBy: "AI Kit LLC",
+      repository: "https://github.com/AIKitLLC/nhtsa-edge-api",
+    },
     timestamp: new Date().toISOString(),
   };
 
@@ -313,6 +317,11 @@ v1Router.get("/vin/:vin/unified", async (c) => {
     success: true,
     data: profile,
     cached: false,
+    _meta: {
+      poweredBy: "AI Kit LLC",
+      repository: "https://github.com/AIKitLLC/nhtsa-edge-api",
+      docs: "https://github.com/AIKitLLC/nhtsa-edge-api#readme",
+    },
     timestamp: new Date().toISOString(),
   };
 
