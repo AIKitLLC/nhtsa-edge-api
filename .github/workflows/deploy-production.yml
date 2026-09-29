@@ -78,9 +78,17 @@ jobs:
           curl -fsS "$SITE_URL/vpic" | grep -q 'id="vin-form"'
           curl -fsS "$SITE_URL/api/v1/vin/1HGCM82633A004352" -o decode.json
           node -e 'const d=require("./decode.json").data; if (d.make!=="HONDA" || d.modelYear!==2003) { console.error("unexpected decode", d); process.exit(1) }'
+          # The original workers.dev URL must keep working next to the custom domain
+          WORKERS_DEV=$(grep -oE 'https://nhtsa-edge-api\.[a-zA-Z0-9-]+\.workers\.dev' deploy.log | head -n 1)
+          if [[ -z "$WORKERS_DEV" ]]; then echo "FAIL: wrangler did not report a workers.dev URL (is workers_dev off?)"; exit 1; fi
+          for attempt in $(seq 1 12); do
+            if curl -fsS "$WORKERS_DEV/health" -o health-wd.json; then break; fi
+            echo "attempt $attempt: $WORKERS_DEV not reachable yet"; sleep 5
+          done
+          node -e 'const h=require("./health-wd.json"); if (h.status!=="healthy" || h.environment!=="production") { console.error("unexpected workers.dev health", h); process.exit(1) }'
           {
             echo "## Production deployed"
-            echo "- Site: $SITE_URL"
+            echo "- Site: $SITE_URL (also $WORKERS_DEV)"
             echo "- Data: \`$VERSION\`"
             echo "- Commit: \`${GITHUB_SHA::7}\`"
           } >> "$GITHUB_STEP_SUMMARY"

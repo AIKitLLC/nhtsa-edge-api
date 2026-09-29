@@ -68,14 +68,15 @@ if (zone) add(`Zone ${zoneName} is on account ${account.slice(0, 6)}...`, "same 
 if (zone) {
   const dns = await api<{ type: string; name: string; content: string; proxied: boolean }[]>(`/zones/${zone.id}/dns_records?name=${hostname}`);
   const records = dns.result ?? [];
+  // Informational: the custom-domain deploy worked without DNS access on the token
   add(
     `DNS records for ${hostname}`,
-    "Zone: DNS: Read (Edit to deploy)",
-    dns.ok && records.length === 0,
+    "optional: Zone: DNS: Read",
+    !dns.ok || records.length === 0,
     !dns.ok
-      ? fail(dns)
+      ? `not readable with this token (${fail(dns)}); not needed for the deploy`
       : records.length === 0
-        ? "none, so wrangler can create the record"
+        ? "none"
         : `existing: ${records.map((r) => `${r.type} ${r.content}${r.proxied ? " (proxied)" : ""}`).join(", ")}; a custom domain will not replace these`
   );
   const routes = await api<{ pattern: string; script?: string }[]>(`/zones/${zone.id}/workers/routes`);
@@ -111,8 +112,7 @@ const lines = [
   "| :-- | :-- | :-- | :-- |",
   ...rows.map((r) => `| ${r.check} | ${r.needs} | ${r.ok ? "ok" : "**MISSING**"} | ${r.detail} |`),
   "",
-  "Edit permissions cannot be tested without writing; the deploy itself needs, on the token:",
-  "Account: Workers Scripts: Edit, Zone: Workers Routes: Edit, Zone: DNS: Edit, Zone: Zone: Read (zone `" + zoneName + "`).",
+  "Edit permissions cannot be tested without writing. The production deploy has worked with: Account: Workers Scripts: Edit and Zone: Zone: Read on `" + zoneName + "`.",
 ];
 const report = lines.join("\n");
 console.log(report);

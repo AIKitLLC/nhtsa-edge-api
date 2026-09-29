@@ -65,7 +65,8 @@ Branding: `X-Powered-By` / `X-Repository` headers, `_meta` in v1 responses, land
 2. The weekly schedule runs on the default branch only; allow GitHub Actions to push to
    `main` if it is protected (the workflow commits data updates).
 3. Production (data.ai-kit.net): after checking the dev worker, run the *Deploy production*
-   workflow on `main` (or `pnpm deploy`). The token needs Workers Routes and DNS edit on the
-   `ai-kit.net` zone. Use Workers Paid (10 ms CPU limit on the free plan).
+   workflow on `main` (or `pnpm deploy`); it also smoke-tests the workers.dev URL. If a deploy
+   fails with an authentication error, run *Cloudflare check* (read-only). Use Workers Paid
+   (10 ms CPU limit on the free plan).
 4. Ideas: UK DVSA MOT history, Australian Green Vehicle Guide, Euro NCAP ratings — as
    further `src/enrichment/` modules.
