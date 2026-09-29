@@ -14,6 +14,11 @@
     "binding": "ASSETS",
     "run_worker_first": true
   },
+  // Production is served at data.ai-kit.net. The zone must be on the same Cloudflare
+  // account: wrangler creates the DNS record and the certificate on deploy. The workers.dev
+  // URL stays enabled. env.dev must override routes (below): it inherits them otherwise,
+  // and deploying dev would take the domain away from production.
+  "routes": [{ "pattern": "data.ai-kit.net", "custom_domain": true }],
   "vars": {
     "ENVIRONMENT": "production",
     "UPSTREAM_TIMEOUT_MS": "5000",
@@ -24,6 +29,7 @@
     "dev": {
       "name": "nhtsa-edge-api-dev",
       "workers_dev": true,
+      "routes": [],
       "assets": {
         "directory": "./build/assets",
         "binding": "ASSETS",

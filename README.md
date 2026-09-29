@@ -86,7 +86,9 @@ Offline responses carry `X-Decode-Source: LOCAL_VPIC` and `X-Vpic-Data-Version`
 
 | Method | Endpoint | Notes |
 | :-- | :-- | :-- |
-| `GET` | `/` | Health JSON: `status`, `dataVersion` (503 if the data assets are unreadable); browsers get a landing page |
+| `GET` | `/` | Browsers: the datasets hub. API clients: health JSON (`status`, `dataVersion`; 503 if the data assets are unreadable) |
+| `GET` | `/health` | Health JSON, always |
+| `GET` | `/vpic` | The live VIN decoder page |
 | `GET` | `/api/v1/vin/:vin/unified[?epa=false&eu=false]` | Offline decode + US EPA FuelEconomy.gov (EV range, MPGe, motor) + EU RDW (type approval, masses). Enrichments are model-level, not VIN-specific; a failed enrichment leaves its section `null` and the response uncached |
 | `GET` | `/api/v1/vin/:vin/compare` | Offline decode vs live vPIC, field by field (not cached) |
 | `GET` | `/api/v1/recalls/:vin` | Recalls for a 17-character VIN (proxied to `api.nhtsa.gov`, cached 6 h) |
@@ -185,11 +187,20 @@ or decoder change and smoke-tests it. Add these repository secrets
 
 Without them the deploy job is skipped with a warning; everything else still runs.
 
-### Production
+### Production (data.ai-kit.net)
 
-Production runs at `https://nhtsa-edge-api.tuannx87.workers.dev`. It is deployed
-manually (`pnpm deploy`) after the dev worker has been checked, so a data update never
-reaches production without a person looking at it.
+Production is served at **https://data.ai-kit.net** (the `nhtsa-edge-api.tuannx87.workers.dev`
+URL keeps working). It is deployed manually after the dev worker has been checked, so a data
+update never reaches production without a person looking at it:
+
+- **From GitHub:** Actions → *Deploy production* → Run workflow on `main`, type `deploy`.
+  It runs the tests, deploys, and smoke-tests the live site. Add required reviewers to the
+  `production` environment (Settings → Environments) to make it a two-person step.
+- **Or locally:** `pnpm deploy`.
+
+The custom domain is the `routes` entry of `wrangler.jsonc`. It needs the `ai-kit.net` zone
+on the same Cloudflare account, and an API token that also has **Workers Routes: Edit** and
+**DNS: Edit** for that zone; wrangler then creates the DNS record and certificate itself.
 
 ### Manual
 

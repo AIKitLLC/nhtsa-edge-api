@@ -1,7 +1,7 @@
 # NHTSA Edge API — Project Handoff
 
 > **Repository**: https://github.com/AIKitLLC/nhtsa-edge-api (AI Kit LLC)
-> **Production**: https://nhtsa-edge-api.tuannx87.workers.dev (deployed manually, `pnpm deploy`)
+> **Production**: https://data.ai-kit.net (also https://nhtsa-edge-api.tuannx87.workers.dev); manual deploy: GitHub Actions *Deploy production* or `pnpm deploy`
 > **Dev**: `nhtsa-edge-api-dev` (deployed by `.github/workflows/vpic-data.yml`)
 > **Data**: `vPICList_lite_2026_09` (see `data/vpic/manifest.json`)
 
@@ -38,7 +38,7 @@ runtime. The D1 database `nhtsa-db` is no longer bound and can be deleted.
 | `src/routes/v1/` | `/api/v1/vin/:vin`, `/unified`, `/compare`, catalog, recalls |
 | `src/routes/vpic-decode.ts`, `vpic-proxy.ts` | vPIC drop-in: offline decodes, other endpoints proxied + cached |
 | `src/enrichment/` | EPA FuelEconomy.gov and RDW lookups (model-level) |
-| `src/routes/health.ts`, `src/routes/landing/` | Health JSON; browser landing page (live decoder, `style.ts`, `script.ts`, `index.ts`) |
+| `src/routes/health.ts`, `src/routes/landing/` | `/` (hub for browsers, health JSON for API clients), `/health`, `/vpic`; pages: `layout.ts`, `hub.ts` (dataset registry), `vpic.ts`, `style.ts`, `script.ts` |
 | `scripts/vpic/` | `ingest-dump.ts`, `build-assets.ts`, `parity.ts`, `sql-verify/` |
 | `data/vpic/` | vPIC tables used by the decoder (git-tracked, reviewed and reverted like code) |
 | `docs/DATA.md` | Data pipeline, verification, revert procedure, known limitations |
@@ -64,7 +64,8 @@ Branding: `X-Powered-By` / `X-Repository` headers, `_meta` in v1 responses, land
 1. Repository secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` enable the dev deploy.
 2. The weekly schedule runs on the default branch only; allow GitHub Actions to push to
    `main` if it is protected (the workflow commits data updates).
-3. Production: after checking the dev worker, `pnpm deploy`. Use Workers Paid (10 ms CPU
-   limit on the free plan).
+3. Production (data.ai-kit.net): after checking the dev worker, run the *Deploy production*
+   workflow on `main` (or `pnpm deploy`). The token needs Workers Routes and DNS edit on the
+   `ai-kit.net` zone. Use Workers Paid (10 ms CPU limit on the free plan).
 4. Ideas: UK DVSA MOT history, Australian Green Vehicle Guide, Euro NCAP ratings — as
    further `src/enrichment/` modules.

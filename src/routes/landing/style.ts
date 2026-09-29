@@ -180,6 +180,27 @@ h2 { font-size: clamp(1.4rem, 3.4vw, 1.9rem); letter-spacing: -0.025em; line-hei
 footer.foot { margin-top: 56px; padding: 26px 0 40px; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.85rem; }
 footer.foot p { margin: 0 0 6px; }
 
+/* hub */
+.cta { display: flex; flex-wrap: wrap; gap: 10px; }
+.btn-link { display: inline-flex; align-items: center; height: 48px; padding: 0 22px; border-radius: 12px; background: var(--accent); color: var(--accent-ink); font-weight: 700; }
+.btn-link:hover { text-decoration: none; filter: brightness(1.08); }
+.btn-link.ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+.btn-link.ghost:hover { border-color: var(--accent); }
+.ds-grid { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+.ds { display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; min-width: 0; }
+.ds h3 { margin: 10px 0 6px; font-size: 1.1rem; letter-spacing: -0.01em; }
+.ds p { margin: 0; color: var(--muted); font-size: 0.95rem; }
+.ds-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.agency { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.status { font-size: 0.75rem; font-weight: 700; padding: 2px 10px; border-radius: 999px; border: 1px solid; }
+.status.live { color: var(--ok); border-color: color-mix(in srgb, var(--ok) 45%, transparent); background: color-mix(in srgb, var(--ok) 10%, transparent); }
+.status.partial { color: var(--warn); border-color: color-mix(in srgb, var(--warn) 45%, transparent); background: color-mix(in srgb, var(--warn) 10%, transparent); }
+.status.planned { color: var(--muted); border-color: var(--border); background: var(--surface-2); }
+.ds-facts { margin-top: 10px !important; font-size: 0.85rem !important; }
+.ds-facts code { font-size: 0.85em; color: var(--text); overflow-wrap: anywhere; }
+.ds-links { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: auto; padding-top: 14px; font-weight: 600; font-size: 0.95rem; }
+.ds-add { border-style: dashed; background: transparent; }
+
 @media (max-width: 720px) {
   .wrap { padding: 0 16px; }
   .ep li { grid-template-columns: 1fr; padding: 12px 16px; }

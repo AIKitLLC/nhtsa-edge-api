@@ -1,0 +1,86 @@
+name: Deploy production
+
+# Manual on purpose: data updates deploy to the dev worker automatically (vpic-data.yml);
+# production is published from main after the dev worker has been checked.
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type "deploy" to publish main to production (data.ai-kit.net)'
+        required: true
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+env:
+  SITE_URL: https://data.ai-kit.net
+
+jobs:
+  deploy:
+    name: Deploy nhtsa-edge-api to data.ai-kit.net
+    if: inputs.confirm == 'deploy' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    # Add required reviewers to this environment (Settings > Environments) to gate the deploy
+    environment: production
+    permissions:
+      contents: read
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Check Cloudflare credentials
+        run: |
+          if [[ -z "$CLOUDFLARE_API_TOKEN" || -z "$CLOUDFLARE_ACCOUNT_ID" ]]; then
+            echo "::error::CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID secrets are not set."
+            exit 1
+          fi
+
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck and tests
+        run: |
+          pnpm typecheck
+          pnpm test
+
+      - name: Build assets
+        run: bun scripts/vpic/build-assets.ts
+
+      - name: Deploy nhtsa-edge-api (production)
+        run: |
+          pnpm exec wrangler deploy 2>&1 | tee deploy.log
+
+      - name: Smoke test the live site
+        run: |
+          VERSION=$(node -p 'require("./data/vpic/manifest.json").dumpVersion')
+          # A new custom domain can take a minute for DNS and the certificate
+          for attempt in $(seq 1 36); do
+            if curl -fsS "$SITE_URL/health" -o health.json; then break; fi
+            echo "attempt $attempt: $SITE_URL not reachable yet"; sleep 5
+          done
+          cat health.json
+          node -e 'const h=require("./health.json"); if (h.status!=="healthy" || h.environment!=="production" || h.dataVersion!==process.argv[1]) { console.error("unexpected health", h); process.exit(1) }' "$VERSION"
+          curl -fsS -H "Accept: text/html" -D hub.headers "$SITE_URL/" -o hub.html
+          grep -q 'id="datasets"' hub.html
+          grep -qi "^content-security-policy:.*script-src 'nonce-" hub.headers
+          curl -fsS "$SITE_URL/vpic" | grep -q 'id="vin-form"'
+          curl -fsS "$SITE_URL/api/v1/vin/1HGCM82633A004352" -o decode.json
+          node -e 'const d=require("./decode.json").data; if (d.make!=="HONDA" || d.modelYear!==2003) { console.error("unexpected decode", d); process.exit(1) }'
+          {
+            echo "## Production deployed"
+            echo "- Site: $SITE_URL"
+            echo "- Data: \`$VERSION\`"
+            echo "- Commit: \`${GITHUB_SHA::7}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
