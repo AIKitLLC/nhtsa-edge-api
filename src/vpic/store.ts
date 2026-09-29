@@ -5,7 +5,16 @@
  */
 
 import { BoundedCache } from "./bounded-cache";
-import type { CoreAsset, SchemaBucket, SchemaRecord, SpecBucket, SpecSchema, WmiBucket, WmiRecord } from "./types";
+import type {
+  CoreAsset,
+  SchemaBucket,
+  SchemaRecord,
+  SpecBucket,
+  SpecSchema,
+  StatsAsset,
+  WmiBucket,
+  WmiRecord,
+} from "./types";
 
 export interface AssetReader {
   /** Returns the text of the asset at `path` (e.g. "vpic/core.json"), or null when absent. */
@@ -103,6 +112,11 @@ export class VpicStore {
       this.core = pending;
     }
     return this.core;
+  }
+
+  /** Headline counts of the bundled data; null for assets built before stats.json existed. */
+  getStats(): Promise<StatsAsset | null> {
+    return this.load<StatsAsset>("vpic/stats.json", false);
   }
 
   async getWmi(wmi: string): Promise<WmiRecord | null> {

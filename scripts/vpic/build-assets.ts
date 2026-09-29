@@ -6,6 +6,8 @@
  * - wmi/<n>.json         WMI records (bucketed by FNV-1a hash of the WMI)
  * - schema/<n>.json      VIN schemas with their patterns (bucketed by schema id)
  * - spec/<n>.json        vehicle spec schemas (bucketed by make id)
+ * - catalog/*.json       makes and their models
+ * - stats.json           headline counts shown on the landing page
  *
  * Lookup attribute ids are resolved to names here (vpic.fElementAttributeValue),
  * so the runtime never needs the lookup tables.
@@ -28,6 +30,7 @@ import type {
   SpecBucket,
   SpecPatternGroup,
   SpecSchema,
+  StatsAsset,
   WmiRecord,
 } from "../../src/vpic/types";
 import { ELEMENT_LOOKUP_TABLE } from "./lib/element-lookups";
@@ -331,9 +334,19 @@ function main(): void {
     writeJson(path, bucket);
   }
 
-  const fileCount = 2 + wmiBuckets.size + schemaBuckets.size + specBuckets.size + catalogBuckets.size;
+  const stats: StatsAsset = {
+    dumpVersion: manifest.dumpVersion,
+    wmis: wmiRows.length,
+    makes: makes.length,
+    models: lookups.get("model")?.size ?? 0,
+    elements: core.elements.length,
+    patterns: patternCount,
+  };
+  writeJson("vpic/stats.json", stats);
+
+  const fileCount = 3 + wmiBuckets.size + schemaBuckets.size + specBuckets.size + catalogBuckets.size;
   console.log(
-    `  wrote ${fileCount} files: ${wmiRows.length} WMIs, ${Object.keys(core.elements).length} elements, ${patternCount} decodable patterns`
+    `  wrote ${fileCount} files: ${wmiRows.length} WMIs, ${core.elements.length} elements, ${patternCount} decodable patterns`
   );
   // Sanity: the hash used for bucketing must be stable across builds/runtimes
   if (fnv1a("1HG") !== fnv1a("1HG")) throw new Error("unstable hash");
