@@ -38,7 +38,7 @@ runtime. The D1 database `nhtsa-db` is no longer bound and can be deleted.
 | `src/routes/v1/` | `/api/v1/vin/:vin`, `/unified`, `/compare`, catalog, recalls |
 | `src/routes/vpic-decode.ts`, `vpic-proxy.ts` | vPIC drop-in: offline decodes, other endpoints proxied + cached |
 | `src/enrichment/` | EPA FuelEconomy.gov and RDW lookups (model-level) |
-| `src/routes/health.ts`, `landing.ts` | Health JSON, browser landing page |
+| `src/routes/health.ts`, `src/routes/landing/` | Health JSON; browser landing page (live decoder, `style.ts`, `script.ts`, `index.ts`) |
 | `scripts/vpic/` | `ingest-dump.ts`, `build-assets.ts`, `parity.ts`, `sql-verify/` |
 | `data/vpic/` | vPIC tables used by the decoder (git-tracked, reviewed and reverted like code) |
 | `docs/DATA.md` | Data pipeline, verification, revert procedure, known limitations |

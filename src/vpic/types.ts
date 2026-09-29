@@ -62,6 +62,17 @@ export interface CoreAsset {
   readonly buckets: { readonly wmi: number; readonly schema: number; readonly spec: number; readonly catalog: number };
 }
 
+/** vpic/stats.json: headline counts of the bundled data, shown on the landing page. */
+export interface StatsAsset {
+  readonly dumpVersion: string;
+  readonly wmis: number;
+  readonly makes: number;
+  readonly models: number;
+  readonly elements: number;
+  /** Patterns the decoder can use (decodable, public or formula keys). */
+  readonly patterns: number;
+}
+
 /** vpic.Wmi_VinSchema row: [vinSchemaId, yearFrom, yearTo | null]. */
 export type WmiSchemaLink = readonly [number, number, number | null];
 

@@ -200,6 +200,12 @@ jobs:
           done
           cat health.json
           node -e 'const h=require("./health.json"); if (h.status!=="healthy" || h.dataVersion!==process.argv[1]) { console.error("unexpected health", h); process.exit(1) }' "$VERSION"
+          # Browsers get the landing page, with the deployed data version and a restrictive CSP
+          curl -fsS -H "Accept: text/html" -D landing.headers "$URL/" -o landing.html
+          grep -q 'id="vin-form"' landing.html
+          grep -q "$VERSION" landing.html
+          grep -qi "^content-security-policy:.*script-src 'nonce-" landing.headers
+          grep -qi "^vary:.*accept" landing.headers
           curl -fsS "$URL/api/v1/vin/1HGCM82633A004352" | tee decode.json
           node -e 'const d=require("./decode.json").data; if (d.make!=="HONDA" || d.modelYear!==2003) { console.error("unexpected decode", d); process.exit(1) }'
           {
