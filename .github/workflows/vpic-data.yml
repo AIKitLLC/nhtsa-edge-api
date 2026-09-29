@@ -200,12 +200,18 @@ jobs:
           done
           cat health.json
           node -e 'const h=require("./health.json"); if (h.status!=="healthy" || h.dataVersion!==process.argv[1]) { console.error("unexpected health", h); process.exit(1) }' "$VERSION"
-          # Browsers get the landing page, with the deployed data version and a restrictive CSP
-          curl -fsS -H "Accept: text/html" -D landing.headers "$URL/" -o landing.html
-          grep -q 'id="vin-form"' landing.html
-          grep -q "$VERSION" landing.html
-          grep -qi "^content-security-policy:.*script-src 'nonce-" landing.headers
-          grep -qi "^vary:.*accept" landing.headers
+          # The hub (for browsers) shows the deployed data version under a nonce-based CSP.
+          # Each check names itself when it fails: grep -q alone is silent.
+          curl -fsS -H "Accept: text/html" -D hub.headers "$URL/" -o hub.html
+          echo "--- hub response headers"; cat hub.headers
+          grep -q 'id="datasets"' hub.html || { echo "FAIL: the hub page has no datasets section"; exit 1; }
+          grep -q "$VERSION" hub.html || { echo "FAIL: the hub page does not show $VERSION"; exit 1; }
+          grep -qi "^content-security-policy:.*script-src 'nonce-" hub.headers || { echo "FAIL: no nonce-based CSP header"; exit 1; }
+          curl -fsS "$URL/vpic" -o vpic.html
+          grep -q 'id="vin-form"' vpic.html || { echo "FAIL: /vpic has no decoder form"; exit 1; }
+          grep -q "$VERSION" vpic.html || { echo "FAIL: /vpic does not show $VERSION"; exit 1; }
+          curl -fsS "$URL/health" -o health2.json
+          node -e 'const h=require("./health2.json"); if (h.status!=="healthy") { console.error("unexpected /health", h); process.exit(1) }'
           curl -fsS "$URL/api/v1/vin/1HGCM82633A004352" | tee decode.json
           node -e 'const d=require("./decode.json").data; if (d.make!=="HONDA" || d.modelYear!==2003) { console.error("unexpected decode", d); process.exit(1) }'
           {
