@@ -90,11 +90,19 @@ if (zone) {
 
 // 4. Workers on the account, and any existing custom domain binding
 const domains = await api<{ hostname: string; service: string }[]>(`/accounts/${account}/workers/domains?hostname=${hostname}`);
+const bound = domains.result ?? [];
+const elsewhere = bound.filter((d) => d.service !== PRODUCTION_WORKER);
 add(
   `Worker custom domain ${hostname}`,
   "Account: Workers Scripts: Read",
-  domains.ok && (domains.result ?? []).length === 0,
-  !domains.ok ? fail(domains) : (domains.result ?? []).length === 0 ? "not bound yet" : `already bound to Worker ${(domains.result ?? []).map((d) => d.service).join(", ")}`
+  domains.ok && elsewhere.length === 0,
+  !domains.ok
+    ? fail(domains)
+    : bound.length === 0
+      ? "not bound yet"
+      : elsewhere.length === 0
+        ? `bound to the production Worker ${PRODUCTION_WORKER}`
+        : `bound to another Worker (${elsewhere.map((d) => d.service).join(", ")}); deploying production would take it over`
 );
 const scripts = await api<{ id: string }[]>(`/accounts/${account}/workers/scripts`);
 const names = (scripts.result ?? []).map((s) => s.id);
