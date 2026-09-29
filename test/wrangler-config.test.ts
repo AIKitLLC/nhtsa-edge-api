@@ -5,6 +5,7 @@ import { describe, it, expect } from "vitest";
 interface WranglerConfig {
   name: string;
   routes?: { pattern: string; custom_domain?: boolean }[];
+  workers_dev?: boolean;
   vars: { ENVIRONMENT: string };
   env: { dev: { name: string; routes?: unknown[]; vars: { ENVIRONMENT: string } } };
 }
@@ -23,6 +24,11 @@ describe("wrangler.jsonc", () => {
   it("serves production at data.ai-kit.net as a custom domain", () => {
     expect(config.routes).toEqual([{ pattern: "data.ai-kit.net", custom_domain: true }]);
     expect(config.vars.ENVIRONMENT).toBe("production");
+  });
+
+  it("keeps the workers.dev URL of production on", () => {
+    // With routes configured, wrangler turns workers.dev off unless it is set explicitly
+    expect(config.workers_dev).toBe(true);
   });
 
   it("keeps the dev worker off the production domain", () => {

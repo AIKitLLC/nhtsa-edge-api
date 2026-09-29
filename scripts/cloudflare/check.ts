@@ -68,14 +68,15 @@ if (zone) add(`Zone ${zoneName} is on account ${account.slice(0, 6)}...`, "same 
 if (zone) {
   const dns = await api<{ type: string; name: string; content: string; proxied: boolean }[]>(`/zones/${zone.id}/dns_records?name=${hostname}`);
   const records = dns.result ?? [];
+  // Informational: the custom-domain deploy worked without DNS access on the token
   add(
     `DNS records for ${hostname}`,
-    "Zone: DNS: Read (Edit to deploy)",
-    dns.ok && records.length === 0,
+    "optional: Zone: DNS: Read",
+    !dns.ok || records.length === 0,
     !dns.ok
-      ? fail(dns)
+      ? `not readable with this token (${fail(dns)}); not needed for the deploy`
       : records.length === 0
-        ? "none, so wrangler can create the record"
+        ? "none"
         : `existing: ${records.map((r) => `${r.type} ${r.content}${r.proxied ? " (proxied)" : ""}`).join(", ")}; a custom domain will not replace these`
   );
   const routes = await api<{ pattern: string; script?: string }[]>(`/zones/${zone.id}/workers/routes`);
@@ -89,11 +90,19 @@ if (zone) {
 
 // 4. Workers on the account, and any existing custom domain binding
 const domains = await api<{ hostname: string; service: string }[]>(`/accounts/${account}/workers/domains?hostname=${hostname}`);
+const bound = domains.result ?? [];
+const elsewhere = bound.filter((d) => d.service !== PRODUCTION_WORKER);
 add(
   `Worker custom domain ${hostname}`,
   "Account: Workers Scripts: Read",
-  domains.ok && (domains.result ?? []).length === 0,
-  !domains.ok ? fail(domains) : (domains.result ?? []).length === 0 ? "not bound yet" : `already bound to Worker ${(domains.result ?? []).map((d) => d.service).join(", ")}`
+  domains.ok && elsewhere.length === 0,
+  !domains.ok
+    ? fail(domains)
+    : bound.length === 0
+      ? "not bound yet"
+      : elsewhere.length === 0
+        ? `bound to the production Worker ${PRODUCTION_WORKER}`
+        : `bound to another Worker (${elsewhere.map((d) => d.service).join(", ")}); deploying production would take it over`
 );
 const scripts = await api<{ id: string }[]>(`/accounts/${account}/workers/scripts`);
 const names = (scripts.result ?? []).map((s) => s.id);
@@ -111,8 +120,7 @@ const lines = [
   "| :-- | :-- | :-- | :-- |",
   ...rows.map((r) => `| ${r.check} | ${r.needs} | ${r.ok ? "ok" : "**MISSING**"} | ${r.detail} |`),
   "",
-  "Edit permissions cannot be tested without writing; the deploy itself needs, on the token:",
-  "Account: Workers Scripts: Edit, Zone: Workers Routes: Edit, Zone: DNS: Edit, Zone: Zone: Read (zone `" + zoneName + "`).",
+  "Edit permissions cannot be tested without writing. The production deploy has worked with: Account: Workers Scripts: Edit and Zone: Zone: Read on `" + zoneName + "`.",
 ];
 const report = lines.join("\n");
 console.log(report);

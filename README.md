@@ -198,9 +198,14 @@ update never reaches production without a person looking at it:
   `production` environment (Settings → Environments) to make it a two-person step.
 - **Or locally:** `pnpm deploy`.
 
-The custom domain is the `routes` entry of `wrangler.jsonc`. It needs the `ai-kit.net` zone
-on the same Cloudflare account, and an API token that also has **Workers Routes: Edit** and
-**DNS: Edit** for that zone; wrangler then creates the DNS record and certificate itself.
+The custom domain is the `routes` entry of `wrangler.jsonc`; it needs the `ai-kit.net` zone on
+the same Cloudflare account, and wrangler then creates the DNS record and the certificate itself.
+The first production deploy worked with the same API token that deploys the dev worker. If a
+deploy ever fails with an authentication error, run *Actions → Cloudflare check*: it reports
+the token, the zone and what is already bound to the hostname (read-only).
+
+`workers_dev` is set to `true` on purpose: configuring `routes` makes wrangler turn workers.dev
+off otherwise, which would take down the original URL.
 
 ### Manual
 
