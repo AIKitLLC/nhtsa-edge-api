@@ -31,6 +31,12 @@ its data is served from this Worker.
   ([NHTSA errata](docs/NHTSA-ERRATA.md)).
 - **Weekly data updates committed to git**: data and its expected results change in one
   commit, so an update can be reviewed and reverted like code.
+- **Documented**: [OpenAPI 3.1](https://data.ai-kit.net/openapi.json), a rendered
+  [API reference](https://data.ai-kit.net/docs), a [batch page](https://data.ai-kit.net/batch)
+  (paste or upload up to 500 VINs, download CSV) and `/llms.txt` for agents. API requests are
+  limited to 120 per minute per client and location (HTTP 429 with `Retry-After`).
+- **Honest comparison** with vPIC and with bundled-library approaches such as Corgi:
+  [docs/COMPARISON.md](docs/COMPARISON.md).
 
 ---
 
