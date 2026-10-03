@@ -22,6 +22,8 @@
   // Configuring routes makes wrangler turn workers.dev off unless it is set explicitly, which
   // would silently take down the original nhtsa-edge-api.<account>.workers.dev URL.
   "workers_dev": true,
+  // Per-client API limit (src/middleware/rate-limit.ts). namespace_id is any string unique in the account.
+  "ratelimits": [{ "name": "RATE_LIMITER", "namespace_id": "1001", "simple": { "limit": 120, "period": 60 } }],
   "vars": {
     "ENVIRONMENT": "production",
     "UPSTREAM_TIMEOUT_MS": "5000",
@@ -33,6 +35,7 @@
       "name": "nhtsa-edge-api-dev",
       "workers_dev": true,
       "routes": [],
+      "ratelimits": [{ "name": "RATE_LIMITER", "namespace_id": "1002", "simple": { "limit": 120, "period": 60 } }],
       "assets": {
         "directory": "./build/assets",
         "binding": "ASSETS",
