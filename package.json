@@ -1,7 +1,7 @@
 {
   "name": "nhtsa-edge-api",
   "version": "1.0.0",
-  "description": "Offline NHTSA vPIC VIN decoder and API gateway on Cloudflare Workers",
+  "description": "US public data at the edge (data.ai-kit.net): offline NHTSA vPIC VIN decoder and API gateway on Cloudflare Workers",
   "main": "src/index.ts",
   "type": "module",
   "scripts": {

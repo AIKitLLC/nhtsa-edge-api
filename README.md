@@ -1,6 +1,21 @@
-# NHTSA Edge API
+# AI Kit Data
 
-An **offline VIN decoder** for the NHTSA vPIC database, running on **Cloudflare Workers**.
+US public data at the edge, served at **https://data.ai-kit.net** from **Cloudflare Workers**.
+The site is a hub of datasets; the first one is NHTSA's vehicle database (vPIC), decoded
+**offline** inside the Worker. The repository, Worker and package keep the name
+`nhtsa-edge-api` (renaming a Worker would create a new one and break its URLs).
+
+| Dataset | Status |
+| :-- | :-- |
+| NHTSA vehicle identification (vPIC) | Live, served from bundled data |
+| NHTSA safety recalls | Partial: proxied to NHTSA and cached |
+| EPA / DOE fuel economy and electric range | Partial: model-level data in `/api/v1/vin/:vin/unified` |
+| NHTSA complaints and crash test ratings | Planned |
+
+The status list of the site lives in `src/routes/landing/hub.ts`; a dataset is only "Live" when
+its data is served from this Worker.
+
+## VIN decoder (vPIC)
 
 - Decodes full and partial VINs **without calling NHTSA**: a TypeScript port of vPIC's
   own `spVinDecode` runs over the official monthly vPIC dump, bundled with the worker as

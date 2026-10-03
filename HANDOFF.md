@@ -1,4 +1,4 @@
-# NHTSA Edge API — Project Handoff
+# AI Kit Data (nhtsa-edge-api) — Project Handoff
 
 > **Repository**: https://github.com/AIKitLLC/nhtsa-edge-api (AI Kit LLC)
 > **Production**: https://data.ai-kit.net (also https://nhtsa-edge-api.tuannx87.workers.dev); manual deploy: GitHub Actions *Deploy production* or `pnpm deploy`
@@ -9,7 +9,9 @@
 
 ## Summary
 
-A Cloudflare Worker (Hono) that decodes VINs **offline**: a TypeScript port of NHTSA's
+A Cloudflare Worker (Hono) that serves **https://data.ai-kit.net**, a hub of US public datasets whose first
+dataset is vPIC. The repository, Worker and package keep the name `nhtsa-edge-api` on purpose (renaming a
+Worker creates a new one and breaks its URLs). The vPIC part decodes VINs **offline**: a TypeScript port of NHTSA's
 own `spVinDecode` runs over the official monthly vPIC dump, bundled as static assets.
 It is a drop-in replacement for the vPIC decode endpoints, adds a clean v1 API, and a
 `/unified` profile enriched with US EPA and EU RDW reference data.
