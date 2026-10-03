@@ -3,7 +3,7 @@ import type { Context } from "hono";
 import type { Env } from "../types/env";
 import type { StatsAsset } from "../vpic/types";
 import { getVpicStore } from "../vpic/worker-store";
-import { renderHub, renderVpicPage, type PageInfo } from "./landing";
+import { renderDocsPage, renderHub, renderVpicPage, type PageInfo } from "./landing";
 
 export const healthRouter = new Hono<{ Bindings: Env }>();
 
@@ -112,3 +112,6 @@ healthRouter.get("/health", async (c) => healthJson(c, await snapshot(c)));
 
 // The VIN decoder page.
 healthRouter.get("/vpic", async (c) => htmlPage(c, await snapshot(c), renderVpicPage));
+
+// The API reference, rendered from the OpenAPI document.
+healthRouter.get("/docs", async (c) => htmlPage(c, await snapshot(c), renderDocsPage));

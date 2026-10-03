@@ -161,6 +161,12 @@ h2 { font-size: clamp(1.4rem, 3.4vw, 1.9rem); letter-spacing: -0.025em; line-hei
 .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; }
 .card h3 { margin: 0 0 6px; font-size: 1.05rem; letter-spacing: -0.01em; }
 .card p { margin: 0; color: var(--muted); font-size: 0.95rem; }
+.cards.one { grid-template-columns: 1fr; }
+.op h3 { overflow-wrap: anywhere; }
+.op h4 { margin: 14px 0 4px; font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+ul.plain { list-style: none; margin: 0; padding: 0; font-size: 0.92rem; }
+ul.plain li { padding: 3px 0; overflow-wrap: anywhere; }
+ul.plain .d { color: var(--muted); }
 .ico { width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center; margin-bottom: 12px; background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); }
 .ep { list-style: none; margin: 0 0 20px; padding: 0; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); overflow: hidden; }
 .ep li { display: grid; grid-template-columns: 64px minmax(0, 1.4fr) minmax(0, 1fr); gap: 4px 14px; padding: 12px 18px; border-bottom: 1px solid var(--border); align-items: baseline; }
