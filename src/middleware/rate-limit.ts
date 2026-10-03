@@ -2,7 +2,7 @@ import type { MiddlewareHandler } from "hono";
 import type { Env } from "../types/env";
 
 /** Pages and health checks are cheap and cacheable: only API traffic is limited. */
-const UNLIMITED_PATHS = new Set(["/", "/health", "/vpic", "/docs", "/openapi.json", "/llms.txt"]);
+const UNLIMITED_PATHS = new Set(["/", "/health", "/vpic", "/batch", "/docs", "/openapi.json", "/llms.txt"]);
 
 /**
  * Per-client rate limit using the Workers Rate Limiting binding (RATE_LIMITER).

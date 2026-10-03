@@ -3,6 +3,7 @@
  * API clients keep getting JSON from the same URLs (see routes/health.ts).
  */
 
+export { renderBatchPage } from "./batch";
 export { renderDocsPage } from "./docs";
 export { DATASETS, renderHub } from "./hub";
 export { type PageInfo } from "./layout";

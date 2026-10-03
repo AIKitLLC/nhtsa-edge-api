@@ -69,7 +69,7 @@ export function renderVpicPage(info: PageInfo): string {
             <div class="field"><input class="vin" id="vin" name="vin" type="text" inputmode="text" maxlength="17" spellcheck="false" autocapitalize="characters" autocomplete="off" placeholder="${escapeHtml(first)}" aria-describedby="vin-hint"></div>
             <button class="btn" id="decode-btn" type="submit">Decode</button>
           </div>
-          <p class="hint" id="vin-hint">3 to 17 characters. Use <code>*</code> as a wildcard; partial VINs are decoded too.</p>
+          <p class="hint" id="vin-hint">3 to 17 characters. Use <code>*</code> as a wildcard; partial VINs are decoded too. Have a list? <a href="/batch">Decode many VINs at once</a>.</p>
           <div class="chips"><span>Try:</span>${chips}</div>
         </form>
         <div class="result" id="result" aria-live="polite" hidden></div>
