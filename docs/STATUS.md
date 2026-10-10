@@ -12,6 +12,7 @@ None.
 
 | PR | Branch | Linked issues |
 | :-- | :-- | :-- |
+| [#6](https://github.com/AIKitLLC/nhtsa-edge-api/pull/6) Adopt agent standards, architecture map, and arcade-agent CI | `cursor/dev-standards-67a5` | None. The standards issue in Tracking setup was not created (HTTP 403), so this pull request cannot say `Closes #N` yet. |
 | [#5](https://github.com/AIKitLLC/nhtsa-edge-api/pull/5) Rate limit, OpenAPI + /docs + llms.txt, batch page, comparison doc | `claude/exciting-pascal-8khdrj` | None. The body does not contain `Closes #N` or `Fixes #N`. No open issue matches that work, so no comment was added. |
 
 Merged history (not open): #1 offline decoder, #2 website, #3 workers.dev URL, #4 AI Kit Data naming.
@@ -84,6 +85,6 @@ No `TODO` or `FIXME` comments in the source. `XXX` in `src/vpic` is the vPIC pla
 | Add Euro NCAP ratings | `HANDOFF.md` lists Euro NCAP ratings as a further enrichment. | `type:feature`, `area:enrichment`, `status:ready`, `priority:p2` | `M3 Further public datasets` |
 | Refresh the parity figure in HANDOFF.md | `HANDOFF.md` says 95.4% live parity; data commit `2b6ab65` reports 93.60%. | `type:docs`, `area:docs`, `status:ready`, `priority:p2` | — |
 
-The standards row is the issue for the pull request that adds this file. When that issue exists, the pull request description should say `Closes #N`. It was not opened: the token got HTTP 403, and a trial issue was not created.
+The standards row is the issue for pull request #6. When that issue exists, the pull request description should say `Closes #N`. It was not opened: the token got HTTP 403, and a trial issue was not created.
 
 Existing open issues to label: none.
