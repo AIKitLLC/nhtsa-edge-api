@@ -7,5 +7,8 @@ coverage
 .dev.vars
 build
 
+# arcade-agent MCP parse cache (see AGENTS.md)
+.arcade-cache/
+
 # NHTSA dumps downloaded by scripts/vpic/ingest-dump.ts
 vPICList_*.zip

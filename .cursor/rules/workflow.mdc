@@ -1,0 +1,14 @@
+---
+description: Issue, pull request, and deploy rules for this repository. See AGENTS.md.
+alwaysApply: true
+---
+
+# Workflow
+
+Follow `AGENTS.md` and `docs/STATUS.md`.
+
+1. Load `.agents/skills/ponytail/SKILL.md` and `.agents/skills/i-have-adhd/SKILL.md` (source URL, commit, and MIT license are in each file).
+2. Every change has a GitHub issue. The pull request says `Closes #N`. Update `docs/STATUS.md` in that pull request.
+3. Never merge without Tony's approval. Never deploy, never touch cloud accounts or secrets, never add a paid service.
+4. For Worker, Wrangler, asset, or page work, consult Cloudflare skills `wrangler`, `workers-best-practices`, and `web-perf` (https://github.com/cloudflare/skills, commit `0871daceb347e3c51693fbe9c77555468df7e410`). Do not vendor them.
+5. Before a large refactor, use the arcade-agent server in `.cursor/mcp.json`: `context_for_task`, then `diff_impact`.

@@ -1,0 +1,14 @@
+---
+description: Module boundaries for this repository. See docs/ARCHITECTURE.md.
+alwaysApply: true
+---
+
+# Architecture
+
+Decouple at real boundaries (domain modules, adapters for external services, platform bindings). No speculative abstractions or single-implementation interfaces.
+
+Modules talk through explicit public entry points. No deep imports across modules.
+
+The current directories, who they depend on, and the target boundaries are in `docs/ARCHITECTURE.md`. Ponytail still applies: do not add a module, wrapper, or interface for a single caller.
+
+Worker code stays on the Cloudflare skills named in `AGENTS.md`.

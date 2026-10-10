@@ -1,0 +1,30 @@
+name: Architecture
+
+# Report-only architecture drift for pull requests.
+# TypeScript is supported by arcade-agent, so this workflow is enabled.
+# Pinned to arcade-agent 0.4.1 (commit 2fde72bcf6cd1f861b8f25b09c0a1d7bc83b820d).
+# Read-only permissions: the job log is the report. Comments and artifact
+# uploads need write access, so those action inputs stay off.
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    name: Report architecture drift
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - name: Analyze with arcade-agent
+        uses: arcade-agent/arcade-agent/actions/analyze@2fde72bcf6cd1f861b8f25b09c0a1d7bc83b820d # 0.4.1
+        with:
+          arcade-agent-version: "0.4.1"
+          language: typescript
+          post-pr-comment: "false"
+          upload-artifacts: "false"
+          store-baseline-on-push: "false"
