@@ -79,7 +79,7 @@ export function renderPage(info: PageInfo, page: PageOptions): string {
     <nav class="nav" aria-label="Main">
       <a class="link" href="/#datasets">Datasets</a>
       <a class="link" href="/vpic">VIN decoder</a>
-      <a class="link hide-sm" href="${REPO}#readme">Docs</a>
+      <a class="link hide-sm" href="/docs">API docs</a>
       ${status}
       <a class="gh" href="${REPO}" rel="noopener">${GITHUB_ICON}GitHub</a>
     </nav>

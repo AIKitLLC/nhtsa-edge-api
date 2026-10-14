@@ -24,6 +24,11 @@ export interface Env {
   readonly NHTSA_CACHE_KV?: KVNamespace;
 
   /**
+   * Workers Rate Limiting binding (see wrangler.jsonc "ratelimits"); absent in tests and local dev.
+   */
+  readonly RATE_LIMITER?: RateLimit;
+
+  /**
    * Static assets built from data/vpic (scripts/vpic/build-assets.ts): the offline decoder's data.
    */
   readonly ASSETS: Fetcher;

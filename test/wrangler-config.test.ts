@@ -7,7 +7,8 @@ interface WranglerConfig {
   routes?: { pattern: string; custom_domain?: boolean }[];
   workers_dev?: boolean;
   vars: { ENVIRONMENT: string };
-  env: { dev: { name: string; routes?: unknown[]; vars: { ENVIRONMENT: string } } };
+  ratelimits?: { name: string; namespace_id: string }[];
+  env: { dev: { name: string; routes?: unknown[]; ratelimits?: { name: string; namespace_id: string }[]; vars: { ENVIRONMENT: string } } };
 }
 
 /** wrangler.jsonc without its comments (it has no trailing commas). */
@@ -37,5 +38,14 @@ describe("wrangler.jsonc", () => {
     expect(config.env.dev.routes).toEqual([]);
     expect(config.env.dev.name).not.toBe(config.name);
     expect(config.env.dev.vars.ENVIRONMENT).toBe("dev");
+  });
+
+  it("binds the rate limiter in production and dev with separate counters", () => {
+    // Bindings are not inherited by env.dev, and a shared namespace_id would share counters
+    const prod = config.ratelimits?.[0];
+    const dev = config.env.dev.ratelimits?.[0];
+    expect(prod?.name).toBe("RATE_LIMITER");
+    expect(dev?.name).toBe("RATE_LIMITER");
+    expect(prod?.namespace_id).not.toBe(dev?.namespace_id);
   });
 });

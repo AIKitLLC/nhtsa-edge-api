@@ -2,8 +2,10 @@ import { Hono } from "hono";
 import type { Env, AppVariables } from "./types/env";
 import { timingMiddleware } from "./middleware/timing";
 import { corsMiddleware } from "./middleware/cors";
+import { rateLimitMiddleware } from "./middleware/rate-limit";
 import { errorHandler } from "./middleware/error";
 import { healthRouter } from "./routes/health";
+import { openapiRouter } from "./routes/openapi";
 import { v1Router } from "./routes/v1";
 import { vpicProxyRouter } from "./routes/vpic-proxy";
 import { recallsProxyRouter } from "./routes/recalls-proxy";
@@ -13,6 +15,7 @@ const app = new Hono<{ Bindings: Env; Variables: AppVariables }>();
 // 1. Global middlewares
 app.use("*", timingMiddleware());
 app.use("*", corsMiddleware());
+app.use("*", rateLimitMiddleware());
 
 // 2. Global error handler
 app.onError(errorHandler);
@@ -20,6 +23,9 @@ app.onError(errorHandler);
 // 3. Routes
 // Health, data version and endpoint catalog
 app.route("/", healthRouter);
+
+// OpenAPI description and llms.txt
+app.route("/", openapiRouter);
 
 // Clean v1 API: offline VIN decode, catalog, recalls
 app.route("/api/v1", v1Router);
