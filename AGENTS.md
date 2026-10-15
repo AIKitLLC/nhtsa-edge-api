@@ -47,9 +47,9 @@ Before a large refactor, use the arcade-agent MCP server below: `context_for_tas
 4. Never merge without Tony's approval. Do not merge your own pull request.
 5. Never deploy. Never run `wrangler login`, `wrangler deploy`, or the Deploy production workflow. Never touch cloud accounts or secrets. Never add a paid service.
 
-`docs/STATUS.md` has a **Tracking setup** section for labels, milestones, and backlog issues. The GitHub token available to cloud agents received HTTP 403 on those APIs. Apply that section with an account that can administer the repo. Do not open a throwaway issue to test access.
+`docs/STATUS.md` is the live tracker. Labels and issues #7 through #14 exist. The milestones `M1 Foundation`, `M2 Dataset completeness`, and `M3 Further public datasets` are still only a plan in that file. Do not open a duplicate issue.
 
-Keep pull requests additive when other work is open. Open pull request #5 changes the Worker. Do not edit those same lines on `main` while it is open.
+Keep pull requests additive when other work is open.
 
 ## arcade-agent
 

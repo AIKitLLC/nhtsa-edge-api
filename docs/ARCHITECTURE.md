@@ -10,7 +10,7 @@ The Worker (Hono) serves https://data.ai-kit.net. VIN decode runs offline from g
 flowchart TD
   client[HTTP client]
   entry["src/index.ts"]
-  mw["src/middleware"]
+  mw["src/middleware including rate limit"]
   routes["src/routes"]
   validation["src/validation"]
   services["src/services"]
@@ -41,7 +41,7 @@ Dependency direction is downward in that diagram. `src/vpic` does not import `sr
 
 | Module | Path | Responsibility | Talks to |
 | :-- | :-- | :-- | :-- |
-| platform | `src/index.ts`, `src/middleware/`, `src/config.ts`, `src/types/`, `wrangler.jsonc` | Worker entry, CORS, timing, errors, constants, the `Env` bindings | mounts `routes` |
+| platform | `src/index.ts`, `src/middleware/`, `src/config.ts`, `src/types/`, `wrangler.jsonc` | Worker entry, CORS, timing, rate limit, errors, constants, the `Env` bindings | mounts `routes` |
 | routes | `src/routes/` | HTTP: health and HTML, v1 API, vPIC drop-in, recalls proxy | `vpic`, `services`, `validation`, `config`, `types` |
 | vpic | `src/vpic/` | Offline port of NHTSA `spVinDecode` and the response shapes | `ASSETS` only |
 | services | `src/services/` | Upstream fetch, Cache API / optional KV, unified profile assembly | `enrichment`, `vpic` types, `config`, `types` |
@@ -49,7 +49,7 @@ Dependency direction is downward in that diagram. `src/vpic` does not import `sr
 | validation | `src/validation/vin.ts` | VIN and model-year parsing at the trust boundary | Zod |
 | pipeline | `scripts/vpic/` | Ingest, asset build, live parity, SQL verification, errata audit | filesystem, NHTSA downloads, live vPIC API, PostgreSQL 17 |
 | data | `data/vpic/` | Git-tracked vPIC tables and `manifest.json` | read by the pipeline; the Worker reads the built assets |
-| docs | `docs/` | Data pipeline, NHTSA errata, verbatim SQL reference, this map, status | none at runtime |
+| docs | `docs/` | Data pipeline, NHTSA errata, comparison note, verbatim SQL reference, this map, status | none at runtime |
 
 `test/` is Vitest against the real built assets. It is not a product module. `scripts/cloudflare/check.ts` is a read-only ops check used by `.github/workflows/cloudflare-check.yml`. It is not on the request path.
 
@@ -57,8 +57,9 @@ Dependency direction is downward in that diagram. `src/vpic` does not import `sr
 
 | Path | Role |
 | :-- | :-- |
-| `src/routes/health.ts` | `GET /` (HTML hub for browsers, health JSON for API clients), `GET /health`, `GET /vpic` |
-| `src/routes/landing/` | Hub catalog (`hub.ts`) and the VIN page (`vpic.ts`). Public exports are `landing/index.ts` |
+| `src/routes/health.ts` | `GET /` (HTML hub for browsers, health JSON for API clients), `GET /health`, `GET /vpic`, `GET /batch`, `GET /docs` |
+| `src/routes/landing/` | Hub (`hub.ts`), VIN page (`vpic.ts`), batch page (`batch.ts`), docs page (`docs.ts`). Public exports are `landing/index.ts` |
+| `src/routes/openapi/` | `GET /openapi.json` and `GET /llms.txt`. `/docs` renders the same document |
 | `src/routes/v1/` | `/api/v1/vin/:vin`, `/unified`, `/compare`, `/makes`, `/models`, `/recalls/:vin` |
 | `src/routes/vpic-decode.ts` | Offline `DecodeVin`, `DecodeVinValues`, and `DecodeVINValuesBatch` |
 | `src/routes/vpic-proxy.ts` | Every other `/vehicles/*` call, proxied and cached. `*Extended` stays upstream |
@@ -96,7 +97,9 @@ From `src/types/env.ts` and `wrangler.jsonc`:
 | Binding | State | Use |
 | :-- | :-- | :-- |
 | `ASSETS` | Required. `run_worker_first: true` | Decoder JSON built from `data/vpic` into `build/assets` |
+| `RATE_LIMITER` | Bound in `wrangler.jsonc` (`ratelimits`, 120 requests / 60 seconds). Production namespace `1001`, dev `1002` | `src/middleware/rate-limit.ts`. Pages, `/health`, docs, and CORS preflight are exempt. Fails open if the binding is missing |
 | `NHTSA_CACHE_KV` | Unbound. `ENABLE_KV_CACHE` is `false` | Optional cache for proxied responses |
+| `DATA_GOV_API_KEY` | Optional Worker secret. Not in `wrangler.jsonc` | Sent as `api_key` to `api.nhtsa.gov` and as `X-Api-Key` on FuelEconomy.gov lookups. Health reports only whether it is set. Agents do not read or write it |
 | vars | `ENVIRONMENT`, `UPSTREAM_TIMEOUT_MS` | Health and upstream timeout |
 | routes | `data.ai-kit.net` on production; `env.dev` clears routes | Custom domain. `workers_dev` stays on |
 
@@ -126,15 +129,14 @@ flowchart LR
 | :-- | :-- | :-- |
 | `vpic.nhtsa.dot.gov` downloads | `scripts/vpic` | Weekly ingest |
 | `vpic.nhtsa.dot.gov/api` | `services/upstream.ts`, `scripts/vpic/parity.ts` | Proxied endpoints and the parity gate |
-| `api.nhtsa.gov` | recalls routes | Recalls proxy, cached 6 hours |
-| FuelEconomy.gov | `enrichment/epa.ts` | `/unified` |
+| `api.nhtsa.gov` | recalls routes and `services/upstream.ts` | Recalls proxy, cached 6 hours. An `api.data.gov` key is attached when `DATA_GOV_API_KEY` is set |
+| `api.data.gov` | `services/upstream.ts` | Key host for the optional data.gov credential. The secret itself is not stored in git |
+| FuelEconomy.gov | `enrichment/epa.ts` | `/unified`. The same secret is sent as `X-Api-Key` when it is set |
 | RDW Open Data | `enrichment/rdw.ts` | `/unified` |
 | Cloudflare Workers | the Worker | Runtime, static assets, optional KV |
 | PostgreSQL 17 | `scripts/vpic/sql-verify` | CI and local verification only |
 
-## In flight, not on main
-
-Pull request #5 (`claude/exciting-pascal-8khdrj`) adds rate limiting, OpenAPI, a batch page, and `docs/COMPARISON.md`. Those files are not in this tree. Do not document them as modules until that pull request merges.
+`docs/COMPARISON.md` compares this decoder with the live vPIC API and with bundled-library approaches. It is documentation, not a module.
 
 ## Target boundaries
 
