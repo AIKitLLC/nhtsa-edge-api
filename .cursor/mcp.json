@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "arcade-agent": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "arcade-agent[mcp,languages]==0.4.1",
+        "arcade-mcp"
+      ]
+    }
+  }
+}
