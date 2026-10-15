@@ -60,9 +60,19 @@ Pull requests run two workflows. A green check means the job ran and finished wi
 | [CI](.github/workflows/ci.yml) | Typecheck, Vitest on the real vPIC data, dry-run Worker bundle | `contents: read` |
 | [Architecture](.github/workflows/architecture.yml) | arcade-agent 0.4.1, action commit `2fde72bcf6cd1f861b8f25b09c0a1d7bc83b820d`, report only (`continue-on-error: true`) | `contents: read`, `actions: read` |
 
-The last green pair on this branch before the rebase onto `aa309df` was commit `1573bcc` on 2026-10-10: [CI run 38080104249](https://github.com/AIKitLLC/nhtsa-edge-api/actions/runs/38080104249) and [Architecture run 38080104252](https://github.com/AIKitLLC/nhtsa-edge-api/actions/runs/38080104252). Both concluded `success`. Those runs do not include `main` through `aa309df`. The checks on the head of pull request #6 after this update are the ones that count.
+On commit `7096f27` (rebased onto `aa309df`, 2026-10-15):
 
-Deploy production, the weekly vPIC data refresh, and the Cloudflare check workflow do not run on this pull request. They stay manual or on their own triggers. This change does not deploy.
+| Check | Result | Run |
+| :-- | :-- | :-- |
+| [CI](https://github.com/AIKitLLC/nhtsa-edge-api/actions/runs/38750177874) | `success`. Checkout, install, asset build, typecheck, tests, and dry-run bundle each finished `success`. None were skipped. | 38750177874 |
+| [Architecture](https://github.com/AIKitLLC/nhtsa-edge-api/actions/runs/38750177950) | `success`. The analyze step finished `success` in 34 seconds. | 38750177950 |
+| vPIC data refresh and dev deploy | `cancelled` during the SQL comparison step. The dev-deploy job never started, so nothing was deployed. | 38750169916 |
+
+The refresh workflow starts on a push that changes `src/**`. The rebase did that relative to the previous branch tip. Cancelling it from this agent returned HTTP 403; the run still ended `cancelled` before deploy. A docs-only commit does not match those paths, so it does not start that workflow again.
+
+Primary arcade-agent result on that run (algorithm `pkg`): 212 entities, 219 edges, 8 components, balanced score 0.6219, RCI (cohesive interactions) 0.6530. No baseline artifact exists on `main`, so there is no drift delta yet. The job log is the report.
+
+Deploy production and the Cloudflare check workflow do not run on this pull request. This change does not deploy.
 
 ## Known blockers
 
