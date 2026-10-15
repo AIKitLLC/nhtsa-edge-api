@@ -28,6 +28,8 @@ concurrency:
 jobs:
   refresh:
     name: Ingest, verify against live vPIC, commit
+    # A manual dispatch on a branch must not ingest or commit data there
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       contents: write
