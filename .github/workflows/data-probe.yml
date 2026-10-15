@@ -1,0 +1,86 @@
+name: Data source probe
+
+# Read-only: asks each candidate public dataset what it serves today (status, size, format, columns)
+# so ingestion is written against the real files. No secrets, nothing is committed or deployed.
+# Runs by hand, and on a push that changes this file.
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/data-probe.yml
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    name: Probe candidate datasets
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Headers of every candidate
+        run: |
+          set -u
+          while read -r name url; do
+            [ -z "$name" ] && continue
+            echo "=== $name  $url"
+            curl -sSIL -m 30 -A "ai-kit-data-probe (+https://github.com/AIKitLLC/nhtsa-edge-api)" "$url" \
+              | grep -iE '^(HTTP|content-type|content-length|last-modified|location)' || echo "  (no answer)"
+          done <<'EOF'
+          epa-vehicles https://www.fueleconomy.gov/feg/epadata/vehicles.csv.zip
+          epa-emissions https://www.fueleconomy.gov/feg/epadata/emissions.csv.zip
+          nhtsa-recalls-post2010 https://static.nhtsa.gov/odi/ffdd/rcl/FLAT_RCL_POST_2010.zip
+          nhtsa-recalls-pre2010 https://static.nhtsa.gov/odi/ffdd/rcl/FLAT_RCL_PRE_2010.zip
+          nhtsa-recalls-layout https://static.nhtsa.gov/odi/ffdd/rcl/RCL.txt
+          nhtsa-complaints https://static.nhtsa.gov/odi/ffdd/cmpl/FLAT_CMPL.zip
+          nhtsa-complaints-layout https://static.nhtsa.gov/odi/ffdd/cmpl/CMPL.txt
+          nhtsa-investigations https://static.nhtsa.gov/odi/ffdd/inv/FLAT_INV.zip
+          nhtsa-tsb https://static.nhtsa.gov/odi/tsbs/TSBS_RECEIVED_2025-2025.zip
+          fars-2022 https://static.nhtsa.gov/nhtsa/downloads/FARS/2022/National/FARS2022NationalCSV.zip
+          ncap-years https://api.nhtsa.gov/SafetyRatings
+          ncap-models https://api.nhtsa.gov/SafetyRatings/modelyear/2022/make/Honda/model/Accord
+          recalls-api https://api.nhtsa.gov/products/vehicle/makes?modelYear=2022&issueType=r
+          EOF
+
+      - name: Samples of the small files, listing of the zips
+        run: |
+          set -u
+          mkdir -p probe && cd probe
+          UA="ai-kit-data-probe (+https://github.com/AIKitLLC/nhtsa-edge-api)"
+          for pair in \
+            "epa-vehicles https://www.fueleconomy.gov/feg/epadata/vehicles.csv.zip" \
+            "recalls-post2010 https://static.nhtsa.gov/odi/ffdd/rcl/FLAT_RCL_POST_2010.zip" \
+            "complaints https://static.nhtsa.gov/odi/ffdd/cmpl/FLAT_CMPL.zip" \
+            "investigations https://static.nhtsa.gov/odi/ffdd/inv/FLAT_INV.zip" \
+            "fars-2022 https://static.nhtsa.gov/nhtsa/downloads/FARS/2022/National/FARS2022NationalCSV.zip"; do
+            set -- $pair
+            echo; echo "################ $1"
+            if curl -sSL -m 300 -A "$UA" -o "$1.zip" "$2"; then
+              ls -l "$1.zip"
+              unzip -l "$1.zip" | head -30
+              mkdir -p "x-$1" && unzip -oq "$1.zip" -d "x-$1" || true
+              for f in $(find "x-$1" -maxdepth 2 -type f | head -4); do
+                echo "--- $f ($(wc -l < "$f") lines, $(du -h "$f" | cut -f1))"
+                head -c 1500 "$f" | head -6
+              done
+            else
+              echo "download failed"
+            fi
+          done
+
+      - name: Layout files, as published
+        run: |
+          UA="ai-kit-data-probe (+https://github.com/AIKitLLC/nhtsa-edge-api)"
+          for u in https://static.nhtsa.gov/odi/ffdd/rcl/RCL.txt https://static.nhtsa.gov/odi/ffdd/cmpl/CMPL.txt; do
+            echo; echo "################ $u"; curl -sSL -m 60 -A "$UA" "$u" | head -60
+          done
+
+      - name: JSON sources
+        run: |
+          UA="ai-kit-data-probe (+https://github.com/AIKitLLC/nhtsa-edge-api)"
+          for u in \
+            "https://api.nhtsa.gov/SafetyRatings" \
+            "https://api.nhtsa.gov/SafetyRatings/modelyear/2022/make/Honda/model/Accord" \
+            "https://api.nhtsa.gov/products/vehicle/makes?modelYear=2022&issueType=r"; do
+            echo; echo "################ $u"; curl -sSL -m 60 -A "$UA" "$u" | head -c 1500; echo
+          done
