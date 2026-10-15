@@ -50,7 +50,10 @@ export async function serveCachedUpstream(
     });
   }
 
-  const upstream = await fetchUpstream(upstreamUrl, { timeoutMs: upstreamTimeoutMs(c.env) });
+  const upstream = await fetchUpstream(upstreamUrl, {
+    timeoutMs: upstreamTimeoutMs(c.env),
+    apiKey: c.env?.DATA_GOV_API_KEY,
+  });
   const result: TransformedBody = transform
     ? transform(upstream)
     : { status: upstream.status, body: upstream.bodyText };

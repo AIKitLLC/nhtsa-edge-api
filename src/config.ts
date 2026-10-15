@@ -6,6 +6,7 @@ export const CONFIG = {
   UPSTREAM: {
     VPIC_BASE_URL: "https://vpic.nhtsa.dot.gov/api",
     RECALLS_BASE_URL: "https://api.nhtsa.gov",
+    DATA_GOV_BASE_URL: "https://api.data.gov",
     DEFAULT_TIMEOUT_MS: 5000,
     MAX_RETRIES: 2,
     RETRY_BASE_DELAY_MS: 300,

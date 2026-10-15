@@ -70,7 +70,11 @@ function healthJson(c: AppContext, snap: Snapshot): Response {
         docs: "https://github.com/AIKitLLC/nhtsa-edge-api#readme",
         license: "MIT",
       },
-      edge: { location: snap.colo, country: snap.country },
+      edge: {
+        location: snap.colo,
+        country: snap.country,
+        dataGovApiKeyConfigured: Boolean(c.env?.DATA_GOV_API_KEY),
+      },
       datasets: {
         vpic: "live (offline VIN decoding)",
         recalls: "partial (proxied to NHTSA, cached)",

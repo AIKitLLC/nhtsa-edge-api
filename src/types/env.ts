@@ -32,6 +32,11 @@ export interface Env {
    * Static assets built from data/vpic (scripts/vpic/build-assets.ts): the offline decoder's data.
    */
   readonly ASSETS: Fetcher;
+
+  /**
+   * Official api.data.gov API Key for elevated rate limits (10,000+ req/hr)
+   */
+  readonly DATA_GOV_API_KEY?: string;
 }
 
 export type AppVariables = {

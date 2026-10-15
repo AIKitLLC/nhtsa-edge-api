@@ -40,6 +40,7 @@ export interface UnifiedVehicleProfile {
 export interface UnifiedOptions {
   readonly enrichWithEpa?: boolean;
   readonly enrichWithEu?: boolean;
+  readonly apiKey?: string;
 }
 
 const skipped = <T>(): Promise<EnrichmentResult<T>> => Promise.resolve({ outcome: "skipped", data: null });
@@ -54,7 +55,7 @@ export async function resolveUnifiedVehicle(
 
   const [epa, eu] = await Promise.all([
     options.enrichWithEpa !== false && canEnrich && modelYear !== null
-      ? fetchEpaEnergySpecs(make, model, modelYear)
+      ? fetchEpaEnergySpecs(make, model, modelYear, options.apiKey)
       : skipped<EpaEnergySpecs>(),
     options.enrichWithEu !== false && canEnrich ? fetchRdwEuropeanSpecs(make, model) : skipped<RdwEuropeanSpecs>(),
   ]);

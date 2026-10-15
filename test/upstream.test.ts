@@ -64,4 +64,50 @@ describe("Upstream Service", () => {
     expect(res.status).toBe(200);
     expect(res.bodyText).toBe(successPayload);
   });
+
+  describe("api.data.gov API Key Authentication", () => {
+    it("should inject X-Api-Key header and api_key query param for federal endpoints", async () => {
+      let interceptedUrl = "";
+      let interceptedHeaders: Headers | undefined;
+
+      vi.spyOn(globalThis, "fetch").mockImplementation(async (input, init) => {
+        interceptedUrl = typeof input === "string" ? input : (input as Request).url;
+        interceptedHeaders = new Headers(init?.headers);
+        return new Response(JSON.stringify({ ok: true }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      });
+
+      const federalUrl = "https://api.nhtsa.gov/recalls/recallsByVin?vin=1HGCR2F83HA";
+      await fetchUpstream(federalUrl, {
+        apiKey: "test-data-gov-key-12345",
+      });
+
+      expect(interceptedHeaders?.get("X-Api-Key")).toBe("test-data-gov-key-12345");
+      expect(interceptedUrl).toContain("api_key=test-data-gov-key-12345");
+    });
+
+    it("should set X-Api-Key header on unauthenticated VPIC endpoints without altering existing query params", async () => {
+      let interceptedUrl = "";
+      let interceptedHeaders: Headers | undefined;
+
+      vi.spyOn(globalThis, "fetch").mockImplementation(async (input, init) => {
+        interceptedUrl = typeof input === "string" ? input : (input as Request).url;
+        interceptedHeaders = new Headers(init?.headers);
+        return new Response(JSON.stringify({ Count: 1, Results: [] }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      });
+
+      const vpicUrl = "https://vpic.nhtsa.dot.gov/api/vehicles/GetAllMakes?format=json";
+      await fetchUpstream(vpicUrl, {
+        apiKey: "test-vpic-key-67890",
+      });
+
+      expect(interceptedHeaders?.get("X-Api-Key")).toBe("test-vpic-key-67890");
+      expect(interceptedUrl).toBe(vpicUrl);
+    });
+  });
 });

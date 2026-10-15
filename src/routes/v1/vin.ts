@@ -63,7 +63,7 @@ vinRouter.get("/vin/:vin/compare", async (c) => {
   if (year.value !== null) query.set("modelyear", String(year.value));
   const upstream = await fetchUpstream(
     `${CONFIG.UPSTREAM.VPIC_BASE_URL}/vehicles/DecodeVinValues/${encodeURIComponent(parsed.vin)}?${query.toString()}`,
-    { timeoutMs: upstreamTimeoutMs(c.env) }
+    { timeoutMs: upstreamTimeoutMs(c.env), apiKey: c.env?.DATA_GOV_API_KEY }
   );
   if (upstream.status !== 200) {
     return jsonError(c, 502, "UPSTREAM_ERROR", `NHTSA vPIC returned status ${upstream.status}`);

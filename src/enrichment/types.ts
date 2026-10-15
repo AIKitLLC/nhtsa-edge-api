@@ -15,9 +15,17 @@ export const ENRICHMENT_TIMEOUT_MS = 3500;
 /** Model-level reference data changes rarely; let Cloudflare cache the lookups. */
 export const ENRICHMENT_FETCH_CACHE = { cacheTtl: 86400, cacheEverything: true } as const;
 
-export async function fetchJson<T>(url: string): Promise<T> {
+export async function fetchJson<T>(url: string, apiKey?: string): Promise<T> {
+  const headers: Record<string, string> = {
+    Accept: "application/json",
+    "User-Agent": "nhtsa-edge-api (+https://github.com/AIKitLLC/nhtsa-edge-api)",
+  };
+  if (apiKey) {
+    headers["X-Api-Key"] = apiKey;
+  }
+
   const res = await fetch(url, {
-    headers: { Accept: "application/json", "User-Agent": "nhtsa-edge-api (+https://github.com/AIKitLLC/nhtsa-edge-api)" },
+    headers,
     signal: AbortSignal.timeout(ENRICHMENT_TIMEOUT_MS),
     cf: ENRICHMENT_FETCH_CACHE,
   } as RequestInit);

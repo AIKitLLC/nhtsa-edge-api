@@ -32,6 +32,7 @@ export async function fetchUpstream(
     timeoutMs?: number;
     maxRetries?: number;
     headers?: Record<string, string>;
+    apiKey?: string;
   }
 ): Promise<UpstreamFetchResult> {
   // Check if an identical request is already currently in flight
@@ -54,6 +55,7 @@ async function executeFetchWithRetry(
     timeoutMs?: number;
     maxRetries?: number;
     headers?: Record<string, string>;
+    apiKey?: string;
   }
 ): Promise<UpstreamFetchResult> {
   const timeoutMs = options?.timeoutMs ?? CONFIG.UPSTREAM.DEFAULT_TIMEOUT_MS;
@@ -62,19 +64,39 @@ async function executeFetchWithRetry(
   let attempt = 0;
   let lastError: Error | null = null;
 
+  // Build target URL (inject api_key for api.data.gov / api.nhtsa.gov if needed)
+  let targetUrl = url;
+  if (options?.apiKey && (url.includes("api.data.gov") || url.includes("api.nhtsa.gov"))) {
+    try {
+      const parsed = new URL(url);
+      if (!parsed.searchParams.has("api_key")) {
+        parsed.searchParams.set("api_key", options.apiKey);
+        targetUrl = parsed.toString();
+      }
+    } catch {
+      // Keep original url if parsing fails
+    }
+  }
+
+  const reqHeaders: Record<string, string> = {
+    Accept: "application/json",
+    "User-Agent": "NHTSA-Cloudflare-Edge-Proxy/1.0",
+    ...options?.headers,
+  };
+
+  if (options?.apiKey) {
+    reqHeaders["X-Api-Key"] = options.apiKey;
+  }
+
   while (attempt <= maxRetries) {
     const startTime = performance.now();
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
     try {
-      const response = await fetch(url, {
+      const response = await fetch(targetUrl, {
         method: "GET",
-        headers: {
-          Accept: "application/json",
-          "User-Agent": "NHTSA-Cloudflare-Edge-Proxy/1.0",
-          ...options?.headers,
-        },
+        headers: reqHeaders,
         signal: controller.signal,
       });
 

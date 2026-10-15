@@ -11,6 +11,9 @@ describe("App: health, CORS, validation", () => {
     const json = (await res.json()) as Record<string, unknown>;
     expect(json["status"]).toBe("healthy");
     expect(json["dataVersion"]).toMatch(/^vPICList_lite_\d{4}_\d{2}$/);
+    const edge = json["edge"] as Record<string, unknown>;
+    expect(edge).toBeDefined();
+    expect(typeof edge["dataGovApiKeyConfigured"]).toBe("boolean");
   });
 
   it("reports degraded (503) when the data assets are unreadable", async () => {
