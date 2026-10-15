@@ -51,10 +51,11 @@ M1, M2, and M3 are **to create**. The GitHub [API](https://en.wikipedia.org/wiki
 
 ## Pull requests
 
-Fetched 2026-10-15, before this docs pull request opened, no pull request was open. This page is a docs commit on top of `main` at `e37679c8ca168bf5c8aeaff24359a7b075aa83b2`.
+This page is the open draft [#17](https://github.com/AIKitLLC/nhtsa-edge-api/pull/17), a docs commit on top of `main` at `e37679c8ca168bf5c8aeaff24359a7b075aa83b2`.
 
 | Pull request | State | Head [SHA](https://en.wikipedia.org/wiki/SHA-1) | Linked issue |
 | :-- | :-- | :-- | :-- |
+| [#17](https://github.com/AIKitLLC/nhtsa-edge-api/pull/17) Refresh `docs/STATUS.md` for 2026-10-15 | Open, draft. Branch `cursor/docs-status-refresh-773a`. | [`8654266144aba46f577b06f73ae4fd71cd2c9faf`](https://github.com/AIKitLLC/nhtsa-edge-api/commit/8654266144aba46f577b06f73ae4fd71cd2c9faf), plus this pull-request row | none |
 | [#6](https://github.com/AIKitLLC/nhtsa-edge-api/pull/6) Adopt agent standards, architecture map, and arcade-agent [CI](https://en.wikipedia.org/wiki/Continuous_integration) (continuous integration) | Merged 2026-10-15T19:21:14Z. Merge commit [`e37679c8ca168bf5c8aeaff24359a7b075aa83b2`](https://github.com/AIKitLLC/nhtsa-edge-api/commit/e37679c8ca168bf5c8aeaff24359a7b075aa83b2). Branch `cursor/dev-standards-67a5`. | [`c370f631a0cfa63b080948cc0efc4af1525621bb`](https://github.com/AIKitLLC/nhtsa-edge-api/commit/c370f631a0cfa63b080948cc0efc4af1525621bb) | Closed [#7](https://github.com/AIKitLLC/nhtsa-edge-api/issues/7) |
 | [#16](https://github.com/AIKitLLC/nhtsa-edge-api/pull/16) Run the [vPIC](https://vpic.nhtsa.dot.gov/) data refresh and dev deploy on `main` | Merged 2026-10-15T19:20:56Z. Merge commit [`cb593739344482881e8469bab2257fa2225096d8`](https://github.com/AIKitLLC/nhtsa-edge-api/commit/cb593739344482881e8469bab2257fa2225096d8). | [`95dbf3092ad7691d9e7dd045fc54d68703e2647e`](https://github.com/AIKitLLC/nhtsa-edge-api/commit/95dbf3092ad7691d9e7dd045fc54d68703e2647e) | Closed [#15](https://github.com/AIKitLLC/nhtsa-edge-api/issues/15) |
 
