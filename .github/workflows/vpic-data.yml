@@ -10,6 +10,8 @@ on:
         description: 'Dump name to ingest (default: newest on the NHTSA downloads page)'
         required: false
   push:
+    # Only main: PR / feature branches must not ingest, commit data or deploy
+    branches: [main]
     # Re-run when the ingestion, asset build or decoder changes
     paths:
       - 'scripts/vpic/**'
@@ -26,6 +28,8 @@ concurrency:
 jobs:
   refresh:
     name: Ingest, verify against live vPIC, commit
+    # A manual dispatch on a branch must not ingest or commit data there
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -140,6 +144,8 @@ jobs:
   deploy-dev:
     name: Deploy dev worker
     needs: refresh
+    # Never deploy from a non-main ref (e.g. workflow_dispatch on a feature branch)
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       contents: read
