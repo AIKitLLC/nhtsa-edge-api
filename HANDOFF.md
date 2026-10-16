@@ -1,7 +1,7 @@
 # AI Kit Data (nhtsa-edge-api) — Project Handoff
 
 > **Repository**: https://github.com/AIKitLLC/nhtsa-edge-api (AI Kit LLC)
-> **Production**: https://data.ai-kit.net (also https://nhtsa-edge-api.tuannx87.workers.dev); manual deploy: GitHub Actions *Deploy production* or `pnpm deploy`
+> **Production**: https://data.ai-kit.net; manual deploy: GitHub Actions *Deploy production* or `pnpm deploy`
 > **Dev**: `nhtsa-edge-api-dev` (deployed by `.github/workflows/vpic-data.yml`)
 > **Data**: `vPICList_lite_2026_09` (see `data/vpic/manifest.json`)
 
