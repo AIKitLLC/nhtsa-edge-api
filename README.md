@@ -210,8 +210,7 @@ Without them the deploy job is skipped with a warning; everything else still run
 
 ### Production (data.ai-kit.net)
 
-Production is served at **https://data.ai-kit.net** (the `nhtsa-edge-api.tuannx87.workers.dev`
-URL keeps working). It is deployed manually after the dev worker has been checked, so a data
+Production is served at **https://data.ai-kit.net**. It is deployed manually after the dev worker has been checked, so a data
 update never reaches production without a person looking at it:
 
 - **From GitHub:** Actions → *Deploy production* → Run workflow on `main`, type `deploy`.
