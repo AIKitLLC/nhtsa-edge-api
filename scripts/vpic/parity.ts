@@ -11,7 +11,10 @@
  * and <out>/live-sample.json (raw live results, reused as regression fixtures).
  * With --golden, the VINs that matched on every field are saved with their live
  * results (non-empty values only) as the regression fixture of test/vpic/golden.test.ts.
- * Exits non-zero when the share of VINs matching on every field is below --min-exact.
+ * Differences listed in --renames (data/vpic-known-renames.json) do not fail a VIN; such VINs are
+ * reported separately as allowlisted matches, and allowlist entries that the dump already
+ * resolves are reported as stale (with a GitHub ::warning).
+ * Exits non-zero when strict plus allowlisted matches are below --min-exact.
  */
 
 import { appendFileSync, mkdirSync, writeFileSync } from "node:fs";
@@ -21,6 +24,7 @@ import { toDecodeVinValues } from "../../src/vpic/format";
 import { VpicStore } from "../../src/vpic/store";
 import { buildCorpus, type CorpusEntry } from "./lib/corpus";
 import { fsAssetReader } from "./lib/fs-reader";
+import { describeRename, loadKnownRenames, RenameMatcher } from "./lib/known-renames";
 
 const BATCH_URL = "https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVINValuesBatch/";
 const BATCH_SIZE = 50;
@@ -39,6 +43,7 @@ const dataDir = resolve(root, arg("data", "data/vpic"));
 const outDir = resolve(root, arg("out", "build/parity"));
 const goldenPath = arg("golden", "");
 const goldenSize = Number(arg("golden-size", "300"));
+const renamesPath = resolve(root, arg("renames", "data/vpic-known-renames.json"));
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -91,6 +96,8 @@ async function main(): Promise<void> {
   }
   console.log();
 
+  const renames = new RenameMatcher(loadKnownRenames(renamesPath));
+  let allowlisted = 0;
   const mismatches: Mismatch[] = [];
   const fieldCounts = new Map<string, number>();
   const kindStats = new Map<string, { total: number; exact: number }>();
@@ -118,6 +125,7 @@ async function main(): Promise<void> {
     const localRow = toDecodeVinValues(decoded, liveRow["VIN"] ?? entry.vin);
 
     let vinOk = true;
+    let vinOkWithRenames = true;
     let vinOkIgnoringCase = true;
     for (const field of new Set([...Object.keys(liveRow), ...Object.keys(localRow)])) {
       const a = localRow[field];
@@ -125,14 +133,17 @@ async function main(): Promise<void> {
       if (a === undefined) keysOnlyLive.add(field);
       if (b === undefined) keysOnlyLocal.add(field);
       if (a === undefined || b === undefined) continue;
+      renames.observe(entry.vin, field, a, b);
       if (a.trim().toLowerCase() !== b.trim().toLowerCase()) vinOkIgnoringCase = false;
       if (a.trim() !== b.trim()) {
         vinOk = false;
+        if (!renames.explains(entry.vin, field, a, b)) vinOkWithRenames = false;
         fieldCounts.set(field, (fieldCounts.get(field) ?? 0) + 1);
         mismatches.push({ vin: entry.vin, modelYear: entry.modelYear, kind: entry.kind, field, local: a, live: b });
       }
     }
     if (vinOk) exact++;
+    else if (vinOkWithRenames) allowlisted++;
     if (vinOkIgnoringCase) caseInsensitive++;
     if (vinOk && golden.length < goldenSize) {
       const nonEmpty = Object.fromEntries(Object.entries(liveRow).filter(([, v]) => v.trim() !== ""));
@@ -150,6 +161,10 @@ async function main(): Promise<void> {
   }
 
   const exactRate = exact / Math.max(1, corpus.length);
+  const allowlistedRate = allowlisted / Math.max(1, corpus.length);
+  const gateRate = exactRate + allowlistedRate;
+  const usedRenames = renames.usedEntries();
+  const staleRenames = renames.staleEntries();
   const topFields = [...fieldCounts.entries()].sort((a, b) => b[1] - a[1]);
 
   mkdirSync(outDir, { recursive: true });
@@ -162,6 +177,11 @@ async function main(): Promise<void> {
         size: corpus.length,
         seed,
         exactRate,
+        allowlistedMatches: allowlisted,
+        allowlistedRate,
+        gateRate,
+        renamesUsed: usedRenames,
+        renamesStale: staleRenames,
         caseInsensitiveRate: caseInsensitive / Math.max(1, corpus.length),
         byModelYear: Object.fromEntries(yearStats),
         avgLocalMs: localMs / Math.max(1, corpus.length),
@@ -184,7 +204,9 @@ async function main(): Promise<void> {
     `## vPIC parity: offline decoder vs live API (${core.dumpVersion})`,
     ``,
     `- VINs checked: **${corpus.length}** (seed ${seed})`,
-    `- Identical on every field: **${(exactRate * 100).toFixed(2)}%** (threshold ${(minExact * 100).toFixed(2)}%)`,
+    `- Identical on every field (strict): **${(exactRate * 100).toFixed(2)}%** (${exact} VINs)`,
+    `- Matching only through the known-renames allowlist: ${(allowlistedRate * 100).toFixed(2)}% (${allowlisted} VINs)`,
+    `- Gate (strict + allowlisted): **${(gateRate * 100).toFixed(2)}%** (threshold ${(minExact * 100).toFixed(2)}%)`,
     `- Identical ignoring letter case: ${((caseInsensitive / Math.max(1, corpus.length)) * 100).toFixed(2)}% (live data gets re-cased after the dump is published)`,
     `- Average local decode: ${(localMs / Math.max(1, corpus.length)).toFixed(2)} ms`,
     ``,
@@ -200,6 +222,13 @@ async function main(): Promise<void> {
     `| --- | ---: |`,
     ...topFields.slice(0, 25).map(([f, n]) => `| ${f} | ${n} |`),
   ];
+  if (usedRenames.length > 0) {
+    lines.push("", "Known renames applied:", ...usedRenames.map((e) => `- ${describeRename(e)}`));
+  }
+  for (const e of staleRenames) {
+    lines.push("", `- Stale known rename: ${describeRename(e)}. The dump already has the live value; remove this entry from data/vpic-known-renames.json.`);
+    console.log(`::warning title=Stale vPIC known rename::${describeRename(e)} is already in the dump; remove it from data/vpic-known-renames.json`);
+  }
   if (keysOnlyLive.size > 0) lines.push("", `Keys only in live output: ${[...keysOnlyLive].sort().join(", ")}`);
   if (keysOnlyLocal.size > 0) lines.push("", `Keys only in local output: ${[...keysOnlyLocal].sort().join(", ")}`);
   lines.push("", "<details><summary>Examples per field</summary>", "", "```");
@@ -234,8 +263,8 @@ async function main(): Promise<void> {
   if (stepSummary) appendFileSync(stepSummary, summary);
   console.log(summary);
 
-  if (exactRate < minExact) {
-    console.error(`Parity ${(exactRate * 100).toFixed(2)}% is below the ${(minExact * 100).toFixed(2)}% threshold`);
+  if (gateRate < minExact) {
+    console.error(`Parity ${(gateRate * 100).toFixed(2)}% (strict + allowlisted) is below the ${(minExact * 100).toFixed(2)}% threshold`);
     process.exit(1);
   }
 }

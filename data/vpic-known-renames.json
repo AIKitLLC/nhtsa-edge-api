@@ -1,0 +1,29 @@
+{
+  "$comment": "Manufacturer names that the live vPIC API changed after the bundled dump was published. Used by scripts/vpic/parity.ts. Remove an entry once the run reports it as stale.",
+  "entries": [
+    {
+      "scope": { "wmi": "ZAC" },
+      "field": "Manufacturer",
+      "local": "FCA ITALY S.P.A.",
+      "live": "STELLANTIS EUROPE SPA",
+      "added": "2026-10-16",
+      "source": "https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValues/ZACCJABT0FPB71014?format=json returns Manufacturer \"STELLANTIS EUROPE SPA\" (checked 2026-10-16); dump vPICList_lite_2026_09 has \"FCA ITALY S.P.A.\""
+    },
+    {
+      "scope": { "wmi": "ZFB" },
+      "field": "Manufacturer",
+      "local": "FCA ITALY S.P.A.",
+      "live": "STELLANTIS EUROPE SPA",
+      "added": "2026-10-16",
+      "source": "https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValues/ZFBCFXBT0GP338271?format=json returns Manufacturer \"STELLANTIS EUROPE SPA\" (checked 2026-10-16); dump vPICList_lite_2026_09 has \"FCA ITALY S.P.A.\""
+    },
+    {
+      "scope": { "vin": "1HD1FS504X9018268" },
+      "field": "Manufacturer",
+      "local": "HARLEY-DAVIDSON MOTOR COMPANY",
+      "live": "HARLEY-DAVIDSON MOTOR COMPANY, INC.",
+      "added": "2026-10-16",
+      "source": "https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValues/1HD1FS504X9018268?format=json returns Manufacturer \"HARLEY-DAVIDSON MOTOR COMPANY, INC.\" (checked 2026-10-16); dump vPICList_lite_2026_09 has \"HARLEY-DAVIDSON MOTOR COMPANY\""
+    }
+  ]
+}
