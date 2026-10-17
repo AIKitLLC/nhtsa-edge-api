@@ -7,9 +7,11 @@ const UNLIMITED_PATHS = new Set(["/", "/health", "/vpic", "/batch", "/docs", "/o
 /**
  * Per-client rate limit using the Workers Rate Limiting binding (RATE_LIMITER).
  *
- * Fails open: without the binding (tests, local dev) or if the binding errors, requests pass,
- * because a limiter outage must not become an API outage. Limits are enforced per Cloudflare
- * location, which is enough to stop one client from running up the bill.
+ * Fail closed when the binding throws: HTTP 503, not 429. The client is not over the limit,
+ * but a limiter outage must not become unlimited traffic against NHTSA or the data.gov quota.
+ * Retry-After tells the client to back off. 429 stays reserved for a real limit.
+ * No binding at all (tests, local dev without the binding) still passes: there is no backend to fail.
+ * Limits are enforced per Cloudflare location.
  */
 export const rateLimitMiddleware = (): MiddlewareHandler<{ Bindings: Env }> => {
   return async (c, next) => {
@@ -21,7 +23,19 @@ export const rateLimitMiddleware = (): MiddlewareHandler<{ Bindings: Env }> => {
     try {
       allowed = (await limiter.limit({ key: client })).success;
     } catch (err) {
-      console.error("[RATE_LIMITER] binding error, allowing request:", err);
+      console.error("[RATE_LIMITER] binding error, rejecting request:", err);
+      c.header("Retry-After", "60");
+      return c.json(
+        {
+          success: false,
+          error: {
+            code: "RATE_LIMIT_UNAVAILABLE",
+            message: "The rate limiter is unavailable. Retry shortly.",
+          },
+          timestamp: new Date().toISOString(),
+        },
+        503
+      );
     }
     if (allowed) return next();
 

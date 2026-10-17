@@ -12,8 +12,9 @@ describe("App: health, CORS, validation", () => {
     expect(json["status"]).toBe("healthy");
     expect(json["dataVersion"]).toMatch(/^vPICList_lite_\d{4}_\d{2}$/);
     const edge = json["edge"] as Record<string, unknown>;
-    expect(edge).toBeDefined();
-    expect(typeof edge["dataGovApiKeyConfigured"]).toBe("boolean");
+    expect(edge).toEqual({ location: expect.any(String), country: expect.any(String) });
+    expect(JSON.stringify(json)).not.toContain("dataGovApiKeyConfigured");
+    expect(JSON.stringify(json)).not.toContain("DATA_GOV");
   });
 
   it("reports degraded (503) when the data assets are unreadable", async () => {
@@ -25,12 +26,19 @@ describe("App: health, CORS, validation", () => {
     expect(res.status).toBe(503);
   });
 
-  it("adds timing and CORS headers, answers preflight", async () => {
+  it("adds timing, CORS, and security headers, and answers preflight", async () => {
     const res = await request("/");
     expect(res.headers.get("Server-Timing")).toContain("edge;dur=");
     expect(res.headers.get("Access-Control-Allow-Origin")).toBe("*");
+    expect(res.headers.get("Strict-Transport-Security")).toBe("max-age=31536000");
+    expect(res.headers.get("X-Content-Type-Options")).toBe("nosniff");
+    expect(res.headers.get("X-Frame-Options")).toBe("DENY");
+    expect(res.headers.get("Referrer-Policy")).toBe("no-referrer");
+    expect(res.headers.get("Permissions-Policy")).toContain("camera=()");
+    expect(res.headers.get("Content-Security-Policy")).toContain("default-src 'none'");
     const preflight = await request("/", { method: "OPTIONS" });
     expect(preflight.status).toBe(204);
+    expect(preflight.headers.get("Strict-Transport-Security")).toBe("max-age=31536000");
   });
 
   it("rejects malformed VINs and model years with 400", async () => {

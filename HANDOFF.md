@@ -20,8 +20,8 @@ It is a drop-in replacement for the vPIC decode endpoints, adds a clean v1 API, 
 | :-- | :-- |
 | Decoder | Full `spVinDecode` port (`src/vpic/`), every public vPIC variable, partial VINs, error codes |
 | Correctness vs NHTSA's SQL | 0 unexplained differences on 11,000 VINs and ~4 M function inputs; re-checked weekly on the original dump ([docs/DATA.md](docs/DATA.md#verification-against-the-reference-sql-functions)) |
-| Parity vs live API | 93.6 % of 1,000 VINs identical on every field in the 2026-10-03 run (see the data commit message for the current rate); the rest is newer live data |
-| Latency | p50 1.4 ms, p95 6.2 ms per decode, no network call |
+| Parity vs live API | 83.20% strict (832/1,000 VINs identical on every field) in commit `68623a7` for `vPICList_lite_2026_09`. The gate passes via the known-renames allowlist (threshold 85%) |
+| Latency | README performance table is unverified (no recorded run in the repo) |
 | Data updates | Weekly workflow: ingest dump → verify → commit `data/vpic` to git → deploy dev |
 | Tests | `pnpm typecheck && pnpm test` (Vitest, real data assets) |
 

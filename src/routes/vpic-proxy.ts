@@ -3,8 +3,10 @@ import type { Env } from "../types/env";
 import { CONFIG } from "../config";
 import { buildCacheKey, canonicalQuery } from "../services/cache";
 import { serveCachedUpstream } from "../services/cached-upstream";
+import { jsonError } from "../services/responses";
 import { cleanEmptyFields } from "../services/transformer";
 import type { VpicRawResponse } from "../types/nhtsa";
+import { allowVehiclesPath, encodeUpstreamPath, queryValuesOk } from "../validation/upstream-path";
 import { matchOfflineDecode, serveOfflineBatch, serveOfflineDecode } from "./vpic-decode";
 
 export const vpicProxyRouter = new Hono<{ Bindings: Env }>();
@@ -67,13 +69,15 @@ vpicProxyRouter.post("/vehicles/*", async (c) => {
 /**
  * Drop-in VPIC API. Matches both /vehicles/* and /api/vehicles/*
  * (the router is mounted at "/" and "/api"). DecodeVinValues and DecodeVin are
- * answered by the offline decoder; every other endpoint is proxied and cached.
+ * answered by the offline decoder; every other allowlisted endpoint is proxied and cached.
+ * vPIC paths are case-insensitive, so the canonical path is lowercase and one cache entry.
  */
 vpicProxyRouter.get("/vehicles/*", async (c) => {
   const url = new URL(c.req.url);
   // Strip optional '/api' prefix; VPIC paths are case-insensitive
   const subPath = url.pathname.replace(/^\/api\//, "/");
-  const lowerPath = subPath.toLowerCase();
+  const allowed = allowVehiclesPath(subPath);
+  if (!allowed.ok) return jsonError(c, 400, "INVALID_UPSTREAM_PATH", allowed.message);
 
   const offline = matchOfflineDecode(subPath);
   if (offline) {
@@ -86,21 +90,24 @@ vpicProxyRouter.get("/vehicles/*", async (c) => {
     query.set("format", "json");
     query.sort();
   }
+  if (!queryValuesOk(query)) {
+    return jsonError(c, 400, "INVALID_QUERY", "A query value is too long or contains a control character.");
+  }
 
   const isCleanRequested =
     url.searchParams.get("clean") === "true" || url.searchParams.get("compact") === "true";
 
-  const upstreamUrl = `${CONFIG.UPSTREAM.VPIC_BASE_URL}${subPath}?${query.toString()}`;
+  const upstreamUrl = `${CONFIG.UPSTREAM.VPIC_BASE_URL}${encodeUpstreamPath(allowed.canonicalPath)}?${query.toString()}`;
   const cacheKey = buildCacheKey(
     c.req.url,
-    ["vpic", lowerPath, isCleanRequested ? "clean" : "raw"],
+    ["vpic", allowed.canonicalPath, isCleanRequested ? "clean" : "raw"],
     query
   );
 
   return serveCachedUpstream(c, {
     cacheKey,
     upstreamUrl,
-    ttlSeconds: ttlForPath(lowerPath),
+    ttlSeconds: ttlForPath(allowed.canonicalPath),
     transform: (upstream) => ({
       status: upstream.status,
       body:

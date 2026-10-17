@@ -50,12 +50,15 @@ describe("Rate limit", () => {
     expect(lim.limit).not.toHaveBeenCalled();
   });
 
-  it("fails open when the binding is missing or throws", async () => {
+  it("passes when the binding is missing, and fails closed with 503 when the binding throws", async () => {
     expect((await call(`/api/v1/vin/${VIN}`, testEnv())).status).toBe(200);
 
     const broken = { limit: vi.fn(async () => Promise.reject(new Error("down"))) };
     const spy = vi.spyOn(console, "error").mockImplementation(() => undefined);
-    expect((await call(`/api/v1/vin/${VIN}`, { ...testEnv(), RATE_LIMITER: broken })).status).toBe(200);
+    const res = await call(`/api/v1/vin/${VIN}`, { ...testEnv(), RATE_LIMITER: broken });
+    expect(res.status).toBe(503);
+    expect(res.headers.get("Retry-After")).toBe("60");
+    expect(((await res.json()) as { error: { code: string } }).error.code).toBe("RATE_LIMIT_UNAVAILABLE");
     spy.mockRestore();
   });
 });

@@ -35,6 +35,7 @@ its data is served from this Worker.
   [API reference](https://data.ai-kit.net/docs), a [batch page](https://data.ai-kit.net/batch)
   (paste or upload up to 500 VINs, download CSV) and `/llms.txt` for agents. API requests are
   limited to 120 per minute per client and location (HTTP 429 with `Retry-After`).
+  If the rate-limiter binding errors, the API fails closed with HTTP 503 rather than serving the request.
 - **Honest comparison** with vPIC and with bundled-library approaches such as Corgi:
   [docs/COMPARISON.md](docs/COMPARISON.md).
 
@@ -111,10 +112,10 @@ Offline responses carry `X-Decode-Source: LOCAL_VPIC` and `X-Vpic-Data-Version`
 | `GET` | `/health` | Health JSON, always |
 | `GET` | `/vpic` | The live VIN decoder page |
 | `GET` | `/api/v1/vin/:vin/unified[?epa=false&eu=false]` | Offline decode + US EPA FuelEconomy.gov (EV range, MPGe, motor) + EU RDW (type approval, masses). Enrichments are model-level, not VIN-specific; a failed enrichment leaves its section `null` and the response uncached |
-| `GET` | `/api/v1/vin/:vin/compare` | Offline decode vs live vPIC, field by field (not cached) |
+| `GET` | `/api/v1/vin/:vin/compare` | Offline decode vs live vPIC, field by field (cached 24 h) |
 | `GET` | `/api/v1/recalls/:vin` | Recalls for a 17-character VIN (proxied to `api.nhtsa.gov`, cached 6 h) |
-| `GET` | `/vehicles/*` | Any other vPIC endpoint, including `*Extended` decodes (proxied, cached) |
-| `GET` | `/recalls/*` | Recalls API drop-in proxy (cached) |
+| `GET` | `/vehicles/*` | Allowlisted vPIC endpoints, including `*Extended` decodes (proxied, cached). Other paths are HTTP 400 |
+| `GET` | `/recalls/*` | Allowlisted recalls endpoints (`recallsByVehicle`, `recallsByVin`), cached. Other paths are HTTP 400 |
 
 Proxied endpoints forward only known query parameters, so extra parameters cannot bypass
 the cache. The Cache API is a no-op on `*.workers.dev`; attach a custom domain (or enable
@@ -127,20 +128,23 @@ depend on it.
 
 `scripts/vpic/parity.ts` decodes a deterministic set of 1,000 VINs (real VINs from the
 dump, VINs built from real model patterns, and error cases) and compares **every field**
-with the live `DecodeVINValuesBatch` API. The weekly workflow fails, and nothing is
-committed or deployed, when the share of fully identical VINs drops below the
-`VPIC_PARITY_MIN` threshold (default 85%).
+with the live `DecodeVINValuesBatch` API.
 
-The latest report is in the job summary of the `vPIC data refresh & dev deploy` workflow,
-and its parity rate is part of each data commit message. Most remaining differences
-are NHTSA data changes made after the dump was published (new patterns, re-cased names);
-they disappear with the next dump. Details: [docs/DATA.md](docs/DATA.md).
+The latest **strict** rate is **83.20%** (832 of 1,000 VINs identical on every field) for
+`vPICList_lite_2026_09`. That number is the `exactRate` recorded in commit
+[`68623a7`](https://github.com/AIKitLLC/nhtsa-edge-api/commit/68623a70948afd615e0d5aee60e5dc3f15103c87)
+(`data(vpic): vPICList_lite_2026_09 (live parity 83.20%)`). The weekly gate still passes:
+VINs whose only differences are on the known-renames allowlist count together with the
+strict matches toward `VPIC_PARITY_MIN` (default 85%). The strict rate moves when NHTSA
+edits data after the dump is published. Details: [docs/DATA.md](docs/DATA.md).
 
 ### Performance
 
-Measured on 3,000 varied VINs (the parity corpus) with the production cache settings:
+**Unverified.** No script output, CI artifact, or other record in this repository shows the
+run behind this table. [`scripts/benchmark.sh`](scripts/benchmark.sh) measures HTTP latency
+from your own network and does not produce these rows.
 
-| Metric | Value |
+| Metric | Value (unverified) |
 | :-- | :-- |
 | Decode time p50 / p95 / p99 (including cold asset reads) | 1.4 ms / 6.2 ms / 10.9 ms |
 | Decode time, warm (asset already cached in the isolate) | ~1–3 ms |

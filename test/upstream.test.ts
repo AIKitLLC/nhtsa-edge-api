@@ -65,49 +65,56 @@ describe("Upstream Service", () => {
     expect(res.bodyText).toBe(successPayload);
   });
 
-  describe("api.data.gov API Key Authentication", () => {
-    it("should inject X-Api-Key header and api_key query param for federal endpoints", async () => {
-      let interceptedUrl = "";
-      let interceptedHeaders: Headers | undefined;
+  describe("api.data.gov API key", () => {
+    const key = "test-data-gov-key-12345";
 
+    it("sends the key only as X-Api-Key, and only to api.data.gov and api.nhtsa.gov", async () => {
+      const { fetchJson } = await import("../src/enrichment/types");
+      const seen: { url: string; header: string | null }[] = [];
       vi.spyOn(globalThis, "fetch").mockImplementation(async (input, init) => {
-        interceptedUrl = typeof input === "string" ? input : (input as Request).url;
-        interceptedHeaders = new Headers(init?.headers);
-        return new Response(JSON.stringify({ ok: true }), {
-          status: 200,
-          headers: { "Content-Type": "application/json" },
-        });
+        const url = typeof input === "string" ? input : (input as Request).url;
+        seen.push({ url, header: new Headers(init?.headers).get("X-Api-Key") });
+        return new Response(JSON.stringify({ ok: true }), { status: 200 });
       });
 
-      const federalUrl = "https://api.nhtsa.gov/recalls/recallsByVin?vin=1HGCR2F83HA";
-      await fetchUpstream(federalUrl, {
-        apiKey: "test-data-gov-key-12345",
-      });
+      const cases: { url: string; header: boolean }[] = [
+        { url: "https://api.nhtsa.gov/recalls/recallsByVin?vin=1HGCR2F83HA", header: true },
+        { url: "https://api.data.gov/nhtsa/recalls?vin=1", header: true },
+        { url: "https://API.NHTSA.GOV/recalls/recallsByVehicle", header: true },
+        { url: "https://api.nhtsa.gov:443/recalls/recallsByVin?vin=1", header: true },
+        { url: "https://vpic.nhtsa.dot.gov/api/vehicles/GetAllMakes?format=json", header: false },
+        { url: "https://www.fueleconomy.gov/ws/rest/vehicle/menu/model?year=2020&make=honda", header: false },
+        { url: "https://opendata.rdw.nl/resource/m9d7-ebf2.json?merk=TESLA", header: false },
+        { url: "https://evil.example/path?next=https://api.nhtsa.gov/", header: false },
+        { url: "https://api.nhtsa.gov.evil.example/recalls", header: false },
+        { url: "https://api.nhtsa.gov@evil.example/recalls", header: false },
+        { url: "https://not-api.nhtsa.gov/recalls", header: false },
+      ];
 
-      expect(interceptedHeaders?.get("X-Api-Key")).toBe("test-data-gov-key-12345");
-      expect(interceptedUrl).toContain("api_key=test-data-gov-key-12345");
+      for (const entry of cases) {
+        await fetchUpstream(entry.url, { apiKey: key, headers: { "X-Api-Key": key } });
+        await fetchJson(entry.url, key);
+      }
+
+      expect(seen).toHaveLength(cases.length * 2);
+      seen.forEach((call, index) => {
+        const expectHeader = cases[Math.floor(index / 2)]?.header;
+        expect(call.url, call.url).not.toContain(key);
+        expect(call.url.toLowerCase(), call.url).not.toContain("api_key=");
+        expect(call.header, call.url).toBe(expectHeader ? key : null);
+      });
     });
 
-    it("should set X-Api-Key header on unauthenticated VPIC endpoints without altering existing query params", async () => {
+    it("strips an api_key query parameter even on an allowed host", async () => {
       let interceptedUrl = "";
-      let interceptedHeaders: Headers | undefined;
-
-      vi.spyOn(globalThis, "fetch").mockImplementation(async (input, init) => {
+      vi.spyOn(globalThis, "fetch").mockImplementation(async (input) => {
         interceptedUrl = typeof input === "string" ? input : (input as Request).url;
-        interceptedHeaders = new Headers(init?.headers);
-        return new Response(JSON.stringify({ Count: 1, Results: [] }), {
-          status: 200,
-          headers: { "Content-Type": "application/json" },
-        });
+        return new Response("{}", { status: 200 });
       });
 
-      const vpicUrl = "https://vpic.nhtsa.dot.gov/api/vehicles/GetAllMakes?format=json";
-      await fetchUpstream(vpicUrl, {
-        apiKey: "test-vpic-key-67890",
-      });
-
-      expect(interceptedHeaders?.get("X-Api-Key")).toBe("test-vpic-key-67890");
-      expect(interceptedUrl).toBe(vpicUrl);
+      await fetchUpstream(`https://api.nhtsa.gov/recalls/recallsByVin?vin=1&api_key=${key}`, { apiKey: key });
+      expect(interceptedUrl).not.toContain(key);
+      expect(interceptedUrl).toContain("vin=1");
     });
   });
 });

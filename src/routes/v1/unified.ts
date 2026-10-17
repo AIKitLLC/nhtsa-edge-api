@@ -53,7 +53,6 @@ unifiedRouter.get("/vin/:vin/unified", async (c) => {
   const profile = await resolveUnifiedVehicle(toV1Spec(result), result.dumpVersion, {
     enrichWithEpa: c.req.query("epa") !== "false",
     enrichWithEu: c.req.query("eu") !== "false",
-    apiKey: c.env?.DATA_GOV_API_KEY,
   });
   const payload = {
     success: true,

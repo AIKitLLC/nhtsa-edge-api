@@ -1,18 +1,18 @@
 # Status
 
-Updated in the same pull request as every code or docs change. Last updated: 2026-10-15.
+Updated in the same pull request as every code or docs change. Last updated: 2026-10-17.
 
-Figures are from the GitHub API (application programming interface) for `AIKitLLC/nhtsa-edge-api` on that date. Default branch: `main`. `main` is `aa309df` (`feat(auth): integrate api.data.gov API key into upstream proxy and enrichment services`).
+Figures are from the GitHub API (application programming interface) for `AIKitLLC/nhtsa-edge-api` on that date. Default branch: `main`. `main` is `68623a7` (`data(vpic): vPICList_lite_2026_09 (live parity 83.20%)`).
 
 [NHTSA](https://www.nhtsa.gov/) is the National Highway Traffic Safety Administration. [vPIC](https://vpic.nhtsa.dot.gov/) is NHTSA's Product Information Catalog and Vehicle Listing. A [VIN](https://www.nhtsa.gov/vin-decoder) is a vehicle identification number.
 
 ## Open issues
 
-Eight issues are open. None use `status:blocked`. Milestone fields are empty because no milestone exists on the repository yet.
+Eight issues are open. None use `status:blocked`. Milestone fields are empty because no milestone exists on the repository yet. Issue #7 is closed.
 
 | Issue | Labels | Proposed milestone |
 | :-- | :-- | :-- |
-| [#7](https://github.com/AIKitLLC/nhtsa-edge-api/issues/7) Adopt Tony's agent and architecture standards | `type:chore`, `status:in-review`, `priority:p1` | none |
+| [#20](https://github.com/AIKitLLC/nhtsa-edge-api/issues/20) Stop sending the data.gov key off-host and close the proxy cache bypass | none (this token cannot add labels) | none |
 | [#8](https://github.com/AIKitLLC/nhtsa-edge-api/issues/8) Bundle an offline copy of NHTSA safety recalls | `type:feature`, `area:pipeline`, `area:routes`, `status:ready`, `priority:p2` | M2 Dataset completeness |
 | [#9](https://github.com/AIKitLLC/nhtsa-edge-api/issues/9) Serve the full [EPA](https://www.epa.gov/) (Environmental Protection Agency) and [DOE](https://www.energy.gov/) (Department of Energy) fuel-economy dataset | `type:feature`, `area:enrichment`, `status:ready`, `priority:p2` | M2 Dataset completeness |
 | [#10](https://github.com/AIKitLLC/nhtsa-edge-api/issues/10) Add NHTSA complaints and [NCAP](https://www.nhtsa.gov/ratings) (New Car Assessment Program) crash-test ratings | `type:feature`, `area:enrichment`, `status:ready`, `priority:p2` | M2 Dataset completeness |
@@ -23,15 +23,16 @@ Eight issues are open. None use `status:blocked`. Milestone fields are empty bec
 
 Euro NCAP in #13 is a separate program from NHTSA NCAP in #10.
 
-Issue #14's body still says `HANDOFF.md` quotes 95.4% live parity. On `main`, commit `53dc681` already sets that sentence to 93.6% for the 2026-10-03 run. The issue stays open until someone closes it. This pull request does not close it.
+Issue #14's body still says `HANDOFF.md` quotes 95.4% live parity. This pull request sets that sentence to the strict rate **83.20%** from commit `68623a7` (the gate passes via the known-renames allowlist). The issue stays open until someone closes it. This pull request closes #20, not #14.
 
 ## Open pull requests
 
 | Pull request | Branch | Linked issue |
 | :-- | :-- | :-- |
-| [#6](https://github.com/AIKitLLC/nhtsa-edge-api/pull/6) Adopt agent standards, architecture map, and arcade-agent CI (continuous integration) | `cursor/dev-standards-67a5` | [Closes #7](https://github.com/AIKitLLC/nhtsa-edge-api/issues/7) |
+| [#17](https://github.com/AIKitLLC/nhtsa-edge-api/pull/17) docs: refresh STATUS.md (2026-10-15) | `cursor/docs-status-refresh-773a` | none (draft) |
+| this pull request | `cursor/security-hardening-a411` | [Closes #20](https://github.com/AIKitLLC/nhtsa-edge-api/issues/20) |
 
-Merged, not open: [#5](https://github.com/AIKitLLC/nhtsa-edge-api/pull/5) (rate limit, [OpenAPI](https://www.openapis.org/) description, `/docs`, `llms.txt`, batch page, comparison doc), #4 naming, #3 workers.dev address, #2 website, #1 offline decoder.
+Merged, not open: [#6](https://github.com/AIKitLLC/nhtsa-edge-api/pull/6) (agent standards, closes #7), [#5](https://github.com/AIKitLLC/nhtsa-edge-api/pull/5) (rate limit, [OpenAPI](https://www.openapis.org/) description, `/docs`, `llms.txt`, batch page, comparison doc), #4 naming, #3 workers.dev address, #2 website, #1 offline decoder.
 
 ## Labels
 
@@ -60,7 +61,7 @@ Pull requests run two workflows. A green check means the job ran and finished wi
 | [CI](.github/workflows/ci.yml) | Typecheck, Vitest on the real vPIC data, dry-run Worker bundle | `contents: read` |
 | [Architecture](.github/workflows/architecture.yml) | arcade-agent 0.4.1, action commit `2fde72bcf6cd1f861b8f25b09c0a1d7bc83b820d`, report only (`continue-on-error: true`) | `contents: read`, `actions: read` |
 
-On commit `7096f27` (rebased onto `aa309df`, 2026-10-15):
+Checks for `cursor/security-hardening-a411` start when that branch is pushed. They are not copied into this file until they finish. The last recorded runs below are from commit `7096f27` (rebased onto `aa309df`, 2026-10-15):
 
 | Check | Result | Run |
 | :-- | :-- | :-- |
@@ -83,7 +84,7 @@ Deploy production and the Cloudflare check workflow do not run on this pull requ
 
 ## Next steps
 
-1. Review pull request #6. Merge only with Tony's approval. Merging it closes #7.
+1. Security (Chuyên gia Bảo mật) PASS on this pull request, then Tony's approval. Do not merge or deploy before that.
 2. Create milestones M1, M2, and M3, then assign #8–#10 to M2 and #11–#13 to M3.
-3. Close #14, or rewrite its body, after confirming `HANDOFF.md` already says 93.6%.
+3. Close #14 after confirming `HANDOFF.md` quotes the strict 83.20% rate.
 4. Leave deploy and secrets alone.

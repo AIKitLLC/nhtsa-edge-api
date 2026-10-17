@@ -1,4 +1,4 @@
-import { CONFIG } from "../config";
+import { CONFIG, dataGovKeyHeader, stripApiKeyQuery } from "../config";
 import type { Env } from "../types/env";
 
 export interface UpstreamFetchResult {
@@ -35,17 +35,18 @@ export async function fetchUpstream(
     apiKey?: string;
   }
 ): Promise<UpstreamFetchResult> {
-  // Check if an identical request is already currently in flight
-  const existing = inFlightRequests.get(url);
+  // The coalescing key must not contain the credential, and must not vary by it.
+  const targetUrl = stripApiKeyQuery(url);
+  const existing = inFlightRequests.get(targetUrl);
   if (existing) {
     return existing;
   }
 
-  const promise = executeFetchWithRetry(url, options).finally(() => {
-    inFlightRequests.delete(url);
+  const promise = executeFetchWithRetry(targetUrl, options).finally(() => {
+    inFlightRequests.delete(targetUrl);
   });
 
-  inFlightRequests.set(url, promise);
+  inFlightRequests.set(targetUrl, promise);
   return promise;
 }
 
@@ -63,30 +64,17 @@ async function executeFetchWithRetry(
 
   let attempt = 0;
   let lastError: Error | null = null;
-
-  // Build target URL (inject api_key for api.data.gov / api.nhtsa.gov if needed)
-  let targetUrl = url;
-  if (options?.apiKey && (url.includes("api.data.gov") || url.includes("api.nhtsa.gov"))) {
-    try {
-      const parsed = new URL(url);
-      if (!parsed.searchParams.has("api_key")) {
-        parsed.searchParams.set("api_key", options.apiKey);
-        targetUrl = parsed.toString();
-      }
-    } catch {
-      // Keep original url if parsing fails
-    }
-  }
+  const targetUrl = stripApiKeyQuery(url);
 
   const reqHeaders: Record<string, string> = {
     Accept: "application/json",
     "User-Agent": "NHTSA-Cloudflare-Edge-Proxy/1.0",
     ...options?.headers,
   };
-
-  if (options?.apiKey) {
-    reqHeaders["X-Api-Key"] = options.apiKey;
-  }
+  // A caller-supplied header must not smuggle the key onto vPIC or any other host.
+  delete reqHeaders["X-Api-Key"];
+  delete reqHeaders["x-api-key"];
+  Object.assign(reqHeaders, dataGovKeyHeader(targetUrl, options?.apiKey));
 
   while (attempt <= maxRetries) {
     const startTime = performance.now();

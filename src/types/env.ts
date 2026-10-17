@@ -34,7 +34,7 @@ export interface Env {
   readonly ASSETS: Fetcher;
 
   /**
-   * Official api.data.gov API Key for elevated rate limits (10,000+ req/hr)
+   * api.data.gov key. Sent only as `X-Api-Key` to api.data.gov and api.nhtsa.gov, never in a URL.
    */
   readonly DATA_GOV_API_KEY?: string;
 }

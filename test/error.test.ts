@@ -27,6 +27,7 @@ describe("Error boundary", () => {
 
     const res = await app.request("/vehicles/GetAllMakes");
     expect(res.status).toBe(500);
+    expect(res.headers.get("Strict-Transport-Security")).toBe("max-age=31536000");
 
     const body = await res.text();
     expect(body).toContain("INTERNAL_SERVER_ERROR");

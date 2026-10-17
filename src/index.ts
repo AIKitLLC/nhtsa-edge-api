@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import type { Env, AppVariables } from "./types/env";
 import { timingMiddleware } from "./middleware/timing";
+import { securityHeadersMiddleware } from "./middleware/security-headers";
 import { corsMiddleware } from "./middleware/cors";
 import { rateLimitMiddleware } from "./middleware/rate-limit";
 import { errorHandler } from "./middleware/error";
@@ -14,6 +15,7 @@ const app = new Hono<{ Bindings: Env; Variables: AppVariables }>();
 
 // 1. Global middlewares
 app.use("*", timingMiddleware());
+app.use("*", securityHeadersMiddleware());
 app.use("*", corsMiddleware());
 app.use("*", rateLimitMiddleware());
 
