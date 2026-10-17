@@ -30,7 +30,7 @@ Issue #14's body still says `HANDOFF.md` quotes 95.4% live parity. This pull req
 | Pull request | Branch | Linked issue |
 | :-- | :-- | :-- |
 | [#17](https://github.com/AIKitLLC/nhtsa-edge-api/pull/17) docs: refresh STATUS.md (2026-10-15) | `cursor/docs-status-refresh-773a` | none (draft) |
-| this pull request | `cursor/security-hardening-a411` | [Closes #20](https://github.com/AIKitLLC/nhtsa-edge-api/issues/20) |
+| [#21](https://github.com/AIKitLLC/nhtsa-edge-api/pull/21) Keep the data.gov key on its hosts and close the proxy cache bypass | `cursor/security-hardening-a411` | [Closes #20](https://github.com/AIKitLLC/nhtsa-edge-api/issues/20) |
 
 Merged, not open: [#6](https://github.com/AIKitLLC/nhtsa-edge-api/pull/6) (agent standards, closes #7), [#5](https://github.com/AIKitLLC/nhtsa-edge-api/pull/5) (rate limit, [OpenAPI](https://www.openapis.org/) description, `/docs`, `llms.txt`, batch page, comparison doc), #4 naming, #3 workers.dev address, #2 website, #1 offline decoder.
 
@@ -84,7 +84,7 @@ Deploy production and the Cloudflare check workflow do not run on this pull requ
 
 ## Next steps
 
-1. Security (Chuyên gia Bảo mật) PASS on this pull request, then Tony's approval. Do not merge or deploy before that.
+1. Security (Chuyên gia Bảo mật) PASS on pull request #21, then Tony's approval. Do not merge or deploy before that.
 2. Create milestones M1, M2, and M3, then assign #8–#10 to M2 and #11–#13 to M3.
 3. Close #14 after confirming `HANDOFF.md` quotes the strict 83.20% rate.
 4. Leave deploy and secrets alone.
