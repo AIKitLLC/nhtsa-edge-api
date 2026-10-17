@@ -186,6 +186,12 @@ jobs:
           pnpm install --frozen-lockfile
           bun scripts/vpic/build-assets.ts
 
+      - name: Dry-run and confirm RATE_LIMITER is bound
+        if: steps.creds.outputs.ready == 'true'
+        run: |
+          pnpm exec wrangler deploy --dry-run --env dev --outdir /tmp/nhtsa-dry-run 2>&1 | tee dry-run.log
+          grep -q 'RATE_LIMITER' dry-run.log || { echo "FAIL: RATE_LIMITER is not bound"; exit 1; }
+
       - name: Deploy nhtsa-edge-api-dev
         id: deploy
         if: steps.creds.outputs.ready == 'true'
@@ -218,6 +224,8 @@ jobs:
           grep -q "$VERSION" vpic.html || { echo "FAIL: /vpic does not show $VERSION"; exit 1; }
           curl -fsS "$URL/health" -o health2.json
           node -e 'const h=require("./health2.json"); if (h.status!=="healthy") { console.error("unexpected /health", h); process.exit(1) }'
+          code=$(curl -sS -o /dev/null -w '%{http_code}' "$URL/api/v1/makes")
+          if [[ "$code" == "503" ]]; then echo "FAIL: /api/v1/makes returned 503 (rate limiter missing)"; exit 1; fi
           curl -fsS "$URL/api/v1/vin/1HGCM82633A004352" | tee decode.json
           node -e 'const d=require("./decode.json").data; if (d.make!=="HONDA" || d.modelYear!==2003) { console.error("unexpected decode", d); process.exit(1) }'
           {

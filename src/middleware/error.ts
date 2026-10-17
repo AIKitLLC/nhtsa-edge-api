@@ -1,4 +1,5 @@
 import type { ErrorHandler } from "hono";
+import { applySecurityHeaders } from "./security-headers";
 
 /**
  * Safe error boundary complying with high-performance doctrine.
@@ -16,6 +17,8 @@ export const errorHandler: ErrorHandler = (err, c) => {
     : "An unexpected error occurred processing your request.";
 
   console.error(`[${errorCode}] ${c.req.method} ${c.req.path}:`, err);
+  // onError runs outside the middleware chain, so it must set the headers itself.
+  applySecurityHeaders(c, true);
 
   return c.json(
     {

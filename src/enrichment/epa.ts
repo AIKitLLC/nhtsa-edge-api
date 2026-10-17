@@ -44,19 +44,18 @@ function pickModel(menu: MenuItem[], model: string): MenuItem | undefined {
 export async function fetchEpaEnergySpecs(
   make: string,
   model: string,
-  year: number,
-  apiKey?: string
+  year: number
 ): Promise<EnrichmentResult<EpaEnergySpecs>> {
   try {
     const q = `year=${year}&make=${encodeURIComponent(make.trim())}`;
-    const modelItem = pickModel(items(await fetchJson<Menu>(`${BASE}/vehicle/menu/model?${q}`, apiKey)), model);
+    const modelItem = pickModel(items(await fetchJson<Menu>(`${BASE}/vehicle/menu/model?${q}`)), model);
     if (!modelItem) return { outcome: "no-match", data: null };
 
-    const options = items(await fetchJson<Menu>(`${BASE}/vehicle/menu/options?${q}&model=${encodeURIComponent(modelItem.value)}`, apiKey));
+    const options = items(await fetchJson<Menu>(`${BASE}/vehicle/menu/options?${q}&model=${encodeURIComponent(modelItem.value)}`));
     const option = options[0];
     if (!option) return { outcome: "no-match", data: null };
 
-    const v = await fetchJson<Record<string, string>>(`${BASE}/vehicle/${encodeURIComponent(option.value)}`, apiKey);
+    const v = await fetchJson<Record<string, string>>(`${BASE}/vehicle/${encodeURIComponent(option.value)}`);
     const rangeMiles = positiveInt(v["range"]);
     const charge = v["charge240"] !== undefined ? parseFloat(v["charge240"]) : NaN;
     const co2 = v["co2"] !== undefined ? parseInt(v["co2"], 10) : NaN;

@@ -1,3 +1,5 @@
+import { dataGovKeyHeader, stripApiKeyQuery } from "../config";
+
 /**
  * Shared shape of the optional third-party enrichments of /api/v1/vin/:vin/unified.
  * `error` (timeout, HTTP error, bad payload) is kept apart from `no-match` so a
@@ -16,20 +18,27 @@ export const ENRICHMENT_TIMEOUT_MS = 3500;
 export const ENRICHMENT_FETCH_CACHE = { cacheTtl: 86400, cacheEverything: true } as const;
 
 export async function fetchJson<T>(url: string, apiKey?: string): Promise<T> {
+  const target = stripApiKeyQuery(url);
+  const keyHeader = dataGovKeyHeader(target, apiKey);
+  const sendsKey = Object.keys(keyHeader).length > 0;
   const headers: Record<string, string> = {
     Accept: "application/json",
     "User-Agent": "nhtsa-edge-api (+https://github.com/AIKitLLC/nhtsa-edge-api)",
+    ...keyHeader,
   };
-  if (apiKey) {
-    headers["X-Api-Key"] = apiKey;
-  }
 
-  const res = await fetch(url, {
+  const res = await fetch(target, {
     headers,
+    // manual: a 3xx must not carry X-Api-Key to a different host.
+    redirect: sendsKey ? "manual" : "follow",
     signal: AbortSignal.timeout(ENRICHMENT_TIMEOUT_MS),
     cf: ENRICHMENT_FETCH_CACHE,
   } as RequestInit);
-  if (!res.ok) throw new Error(`HTTP ${res.status} from ${new URL(url).host}`);
+  if (sendsKey && res.status >= 300 && res.status < 400) {
+    await res.body?.cancel().catch(() => undefined);
+    throw new Error(`HTTP ${res.status} redirect from ${new URL(target).host}`);
+  }
+  if (!res.ok) throw new Error(`HTTP ${res.status} from ${new URL(target).host}`);
   return (await res.json()) as T;
 }
 

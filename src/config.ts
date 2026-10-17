@@ -31,5 +31,42 @@ export const CONFIG = {
     SERVER_TIMING: "Server-Timing",
     DATA_VERSION: "X-Vpic-Data-Version",
     DECODE_SOURCE: "X-Decode-Source",
+    /** Real status of a cached upstream error. The Cache API only stores HTTP 200. */
+    CACHED_STATUS: "X-Cached-Status",
   },
 } as const;
+
+/** Hosts that may see DATA_GOV_API_KEY. Exact hostname, not a substring and not a subdomain. */
+const DATA_GOV_KEY_HOSTS: ReadonlySet<string> = new Set(["api.data.gov", "api.nhtsa.gov"]);
+
+/**
+ * Drops every `api_key` query parameter. The data.gov credential is a header, never a URL:
+ * URLs land in access logs, caches, and Referer.
+ */
+export function stripApiKeyQuery(url: string): string {
+  let parsed: URL;
+  try {
+    parsed = new URL(url);
+  } catch {
+    return url;
+  }
+  const secretNames = [...parsed.searchParams.keys()].filter((key) => key.toLowerCase() === "api_key");
+  if (secretNames.length === 0) return url;
+  for (const key of secretNames) parsed.searchParams.delete(key);
+  return parsed.toString();
+}
+
+/**
+ * `X-Api-Key` only when `url`'s hostname is api.data.gov or api.nhtsa.gov.
+ * Any other host, including one that merely contains those names, gets nothing.
+ */
+export function dataGovKeyHeader(url: string, apiKey: string | undefined): Record<string, string> {
+  if (!apiKey) return {};
+  let host: string;
+  try {
+    host = new URL(url).hostname.toLowerCase().replace(/\.$/, "");
+  } catch {
+    return {};
+  }
+  return DATA_GOV_KEY_HOSTS.has(host) ? { "X-Api-Key": apiKey } : {};
+}
