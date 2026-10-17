@@ -159,3 +159,4 @@
 201	Fuel-Tank Material	FuelTankMaterial	FuelTankMaterial	\N	Exterior/Motorcycle	lookup	Pattern	\N
 202	Combined Braking System (CBS)	CombinedBrakingSystem	CombinedBrakingSystem	\N	Exterior/Motorcycle	lookup	Pattern	\N
 203	Wheelie Mitigation	WheelieMitigation	WheelieMitigation	\N	Exterior/Motorcycle	lookup	Pattern	\N
+204	Plant Address	PlantAddress	\N	f	General	string	Pattern	\N
