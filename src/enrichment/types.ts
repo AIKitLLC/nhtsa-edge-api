@@ -19,17 +19,25 @@ export const ENRICHMENT_FETCH_CACHE = { cacheTtl: 86400, cacheEverything: true }
 
 export async function fetchJson<T>(url: string, apiKey?: string): Promise<T> {
   const target = stripApiKeyQuery(url);
+  const keyHeader = dataGovKeyHeader(target, apiKey);
+  const sendsKey = Object.keys(keyHeader).length > 0;
   const headers: Record<string, string> = {
     Accept: "application/json",
     "User-Agent": "nhtsa-edge-api (+https://github.com/AIKitLLC/nhtsa-edge-api)",
-    ...dataGovKeyHeader(target, apiKey),
+    ...keyHeader,
   };
 
   const res = await fetch(target, {
     headers,
+    // manual: a 3xx must not carry X-Api-Key to a different host.
+    redirect: sendsKey ? "manual" : "follow",
     signal: AbortSignal.timeout(ENRICHMENT_TIMEOUT_MS),
     cf: ENRICHMENT_FETCH_CACHE,
   } as RequestInit);
+  if (sendsKey && res.status >= 300 && res.status < 400) {
+    await res.body?.cancel().catch(() => undefined);
+    throw new Error(`HTTP ${res.status} redirect from ${new URL(target).host}`);
+  }
   if (!res.ok) throw new Error(`HTTP ${res.status} from ${new URL(target).host}`);
   return (await res.json()) as T;
 }

@@ -6,7 +6,8 @@ import { serveCachedUpstream } from "../services/cached-upstream";
 import { jsonError } from "../services/responses";
 import { cleanEmptyFields } from "../services/transformer";
 import type { VpicRawResponse } from "../types/nhtsa";
-import { allowVehiclesPath, encodeUpstreamPath, queryValuesOk } from "../validation/upstream-path";
+import { allowVehiclesPath, encodeUpstreamPath, proxyInputOk } from "../validation/upstream-path";
+import { loadProxyCatalog } from "./proxy-catalog";
 import { matchOfflineDecode, serveOfflineBatch, serveOfflineDecode } from "./vpic-decode";
 
 export const vpicProxyRouter = new Hono<{ Bindings: Env }>();
@@ -90,8 +91,9 @@ vpicProxyRouter.get("/vehicles/*", async (c) => {
     query.set("format", "json");
     query.sort();
   }
-  if (!queryValuesOk(query)) {
-    return jsonError(c, 400, "INVALID_QUERY", "A query value is too long or contains a control character.");
+  const catalog = await loadProxyCatalog(c.env.ASSETS);
+  if (!proxyInputOk(allowed.canonicalPath, query, catalog)) {
+    return jsonError(c, 400, "INVALID_QUERY", "A query or path value is not an allowed format or a bundled catalog entry.");
   }
 
   const isCleanRequested =

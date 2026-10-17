@@ -121,9 +121,38 @@ describe("Upstream proxy mechanics (non-decode vPIC endpoints, recalls)", () => 
 
     expect(seen[0]?.url).toContain("vpic.nhtsa.dot.gov");
     expect(seen[0]?.header).toBeNull();
-    expect(seen[1]?.url).toBe("https://api.nhtsa.gov/recalls/recallsByVehicle?make=honda&model=accord&modelYear=2015");
+    expect(seen[1]?.url).toBe("https://api.nhtsa.gov/recalls/recallsByVehicle?make=Honda&model=accord&modelYear=2015");
     expect(seen[1]?.header).toBe(key);
     for (const call of seen) expect(call.url).not.toContain(key);
+  });
+
+  it("forwards Battery Type after decoding the path, and rejects values that are not in the catalog", async () => {
+    const fetchSpy = mockUpstreamOk({ Count: 0, Results: [] });
+    const ok = await request("/vehicles/GetVehicleVariableValuesList/Battery%20Type");
+    expect(ok.status).toBe(200);
+    expect(String(fetchSpy.mock.calls[0]?.[0])).toContain("/vehicles/getvehiclevariablevalueslist/battery%20type");
+
+    const bad = [
+      "/vehicles/GetAllMakes?format=yaml",
+      "/vehicles/GetAllMakes?year=15",
+      "/vehicles/GetAllMakes?modelyear=201",
+      "/vehicles/GetAllMakes?page=0",
+      "/vehicles/GetAllMakes?page=1000",
+      "/vehicles/GetModelsForMake/NotARealMakeZZ",
+      "/vehicles/GetVehicleVariableValuesList/NotARealVariable",
+      "/vehicles/GetModelsForMakeYear/make/honda/modelyear/20",
+      "/recalls/recallsByVehicle?make=not-a-real-make-zz",
+      "/recalls/recallsByVehicle?make=Honda&campaignNumber=nope",
+      "/recalls/recallsByVehicle?vin=1HGCM82633A00435",
+      "/recalls/recallsByVehicle?vin=1HGCM82633A00435*",
+      "/recalls/recallsByVin/1HGCG5655WA",
+    ];
+    for (const path of bad) {
+      const res = await request(path);
+      expect(res.status, path).toBe(400);
+      expect(((await res.json()) as { error: { code: string } }).error.code, path).toBe("INVALID_QUERY");
+    }
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
   });
 
   it("rejects an oversized query value without calling upstream", async () => {
@@ -150,6 +179,16 @@ describe("Upstream proxy mechanics (non-decode vPIC endpoints, recalls)", () => 
     const url = String(fetchSpy.mock.calls[0]?.[0]);
     expect(url).toContain("vpic.nhtsa.dot.gov");
     expect(url).not.toContain("api_key");
+  });
+
+  it("rejects a partial or wildcard VIN on /compare before calling vPIC", async () => {
+    const fetchSpy = vi.spyOn(globalThis, "fetch");
+    for (const vin of ["1HGCG5655WA", "1HGCM82633A00435*"]) {
+      const res = await request(`/api/v1/vin/${encodeURIComponent(vin)}/compare`);
+      expect(res.status, vin).toBe(400);
+      expect(((await res.json()) as { error: { code: string } }).error.code).toBe("INVALID_VIN_FORMAT");
+    }
+    expect(fetchSpy).not.toHaveBeenCalled();
   });
 
   it("v1 recalls requires a full 17-character VIN", async () => {

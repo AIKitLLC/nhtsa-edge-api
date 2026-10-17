@@ -40,7 +40,7 @@ export const OPENAPI = {
     description:
       "Decodes VINs inside the Worker with a port of NHTSA's `spVinDecode` over the official vPIC dump, checked against NHTSA's SQL and the live API. " +
       "No API key. Requests are limited to 120 per minute per client and location; over the limit the API answers 429 with `Retry-After`. " +
-      "If the limiter binding errors, the API answers 503 instead of serving the request. " +
+      "If the limiter binding is missing or errors, the API answers 503 with `Retry-After` instead of serving the request. " +
       "Independent project, not affiliated with any U.S. government agency.",
     license: { name: "MIT", url: "https://github.com/AIKitLLC/nhtsa-edge-api/blob/main/LICENSE" },
     contact: { name: "AI Kit LLC", url: "https://github.com/AIKitLLC/nhtsa-edge-api" },

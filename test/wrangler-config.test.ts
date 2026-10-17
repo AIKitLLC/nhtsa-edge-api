@@ -40,6 +40,11 @@ describe("wrangler.jsonc", () => {
     expect(config.env.dev.vars.ENVIRONMENT).toBe("dev");
   });
 
+  it("never sets ALLOW_NO_RATE_LIMIT", () => {
+    const text = readFileSync(resolve(__dirname, "../wrangler.jsonc"), "utf-8");
+    expect(text).not.toContain("ALLOW_NO_RATE_LIMIT");
+  });
+
   it("binds the rate limiter in production and dev with separate counters", () => {
     // Bindings are not inherited by env.dev, and a shared namespace_id would share counters
     const prod = config.ratelimits?.[0];

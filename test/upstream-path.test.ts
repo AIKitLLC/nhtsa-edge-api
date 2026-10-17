@@ -35,6 +35,16 @@ describe("upstream path allowlist", () => {
     expect(allowRecallsPath("/recalls/recallsByVehicle/extra").ok).toBe(false);
   });
 
+  it("decodes a percent-encoded segment before the charset check", () => {
+    expect(allowVehiclesPath("/vehicles/GetVehicleVariableValuesList/Battery%20Type")).toEqual({
+      ok: true,
+      canonicalPath: "/vehicles/getvehiclevariablevalueslist/battery type",
+    });
+    expect(allowVehiclesPath("/vehicles/GetModelsForMake/%2e%2e").ok).toBe(false);
+    expect(allowVehiclesPath("/vehicles/GetModelsForMake/Honda%2FAcura").ok).toBe(false);
+    expect(allowVehiclesPath("/vehicles/GetAllMakes/%").ok).toBe(false);
+  });
+
   it("encodes spaces in a variable name", () => {
     const allowed = allowVehiclesPath("/vehicles/GetVehicleVariableValuesList/battery type");
     expect(allowed.ok).toBe(true);

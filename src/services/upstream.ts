@@ -71,10 +71,13 @@ async function executeFetchWithRetry(
     "User-Agent": "NHTSA-Cloudflare-Edge-Proxy/1.0",
     ...options?.headers,
   };
-  // A caller-supplied header must not smuggle the key onto vPIC or any other host.
-  delete reqHeaders["X-Api-Key"];
-  delete reqHeaders["x-api-key"];
-  Object.assign(reqHeaders, dataGovKeyHeader(targetUrl, options?.apiKey));
+  // Any casing: a caller-supplied header must not smuggle the key onto another host.
+  for (const name of Object.keys(reqHeaders)) {
+    if (name.toLowerCase() === "x-api-key") delete reqHeaders[name];
+  }
+  const keyHeader = dataGovKeyHeader(targetUrl, options?.apiKey);
+  Object.assign(reqHeaders, keyHeader);
+  const sendsKey = Object.keys(keyHeader).length > 0;
 
   while (attempt <= maxRetries) {
     const startTime = performance.now();
@@ -86,10 +89,17 @@ async function executeFetchWithRetry(
         method: "GET",
         headers: reqHeaders,
         signal: controller.signal,
+        // manual: a 3xx must not carry X-Api-Key to a different host.
+        redirect: sendsKey ? "manual" : "follow",
       });
 
       clearTimeout(timeoutId);
       const latencyMs = Math.round(performance.now() - startTime);
+
+      if (sendsKey && response.status >= 300 && response.status < 400) {
+        await response.body?.cancel().catch(() => undefined);
+        return { status: 502, headers: new Headers(), bodyText: "", latencyMs };
+      }
 
       if (RETRYABLE_STATUSES.has(response.status) && attempt < maxRetries) {
         attempt++;

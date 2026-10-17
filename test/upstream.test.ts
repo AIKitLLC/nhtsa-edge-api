@@ -105,6 +105,42 @@ describe("Upstream Service", () => {
       });
     });
 
+    it("drops any casing of X-Api-Key and does not follow a redirect when the key is attached", async () => {
+      const { fetchJson } = await import("../src/enrichment/types");
+      let calls = 0;
+      vi.spyOn(globalThis, "fetch").mockImplementation(async (input, init) => {
+        calls++;
+        const headers = new Headers(init?.headers);
+        expect(init?.redirect).toBe("manual");
+        expect(headers.get("X-Api-Key")).toBe("real-key");
+        expect(String(input)).not.toContain("real-key");
+        return new Response(null, { status: 302, headers: { Location: "https://evil.example/steal" } });
+      });
+
+      const result = await fetchUpstream("https://api.nhtsa.gov/recalls/recallsByVehicle", {
+        apiKey: "real-key",
+        maxRetries: 2,
+        headers: { "X-API-KEY": "smuggled" },
+      });
+      expect(calls).toBe(1);
+      expect(result.status).toBe(502);
+      expect(result.headers.get("Location")).toBeNull();
+      expect(result.bodyText).not.toContain("evil.example");
+
+      calls = 0;
+      await expect(fetchJson("https://api.nhtsa.gov/recalls/recallsByVin", "real-key")).rejects.toThrow(/302 redirect from api\.nhtsa\.gov/);
+      expect(calls).toBe(1);
+    });
+
+    it("follows redirects when no key is attached", async () => {
+      vi.spyOn(globalThis, "fetch").mockImplementation(async (_input, init) => {
+        expect(init?.redirect).toBe("follow");
+        return new Response("{}", { status: 200 });
+      });
+      const result = await fetchUpstream("https://vpic.nhtsa.dot.gov/api/vehicles/GetAllMakes?format=json");
+      expect(result.status).toBe(200);
+    });
+
     it("strips an api_key query parameter even on an allowed host", async () => {
       let interceptedUrl = "";
       vi.spyOn(globalThis, "fetch").mockImplementation(async (input) => {

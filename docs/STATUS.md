@@ -2,7 +2,7 @@
 
 Updated in the same pull request as every code or docs change. Last updated: 2026-10-17.
 
-Figures are from the GitHub API (application programming interface) for `AIKitLLC/nhtsa-edge-api` on that date. Default branch: `main`. `main` is `68623a7` (`data(vpic): vPICList_lite_2026_09 (live parity 83.20%)`).
+Figures are from the GitHub API (application programming interface) for `AIKitLLC/nhtsa-edge-api` on that date. Default branch: `main`. `main` is `68623a7` (`data(vpic): vPICList_lite_2026_09`). The strict parity rate is the `exactRate` in the [vPIC data refresh job summary](https://github.com/AIKitLLC/nhtsa-edge-api/actions/workflows/vpic-data.yml).
 
 [NHTSA](https://www.nhtsa.gov/) is the National Highway Traffic Safety Administration. [vPIC](https://vpic.nhtsa.dot.gov/) is NHTSA's Product Information Catalog and Vehicle Listing. A [VIN](https://www.nhtsa.gov/vin-decoder) is a vehicle identification number.
 
@@ -23,7 +23,9 @@ Eight issues are open. None use `status:blocked`. Milestone fields are empty bec
 
 Euro NCAP in #13 is a separate program from NHTSA NCAP in #10.
 
-Issue #14's body still says `HANDOFF.md` quotes 95.4% live parity. This pull request sets that sentence to the strict rate **83.20%** from commit `68623a7` (the gate passes via the known-renames allowlist). The issue stays open until someone closes it. This pull request closes #20, not #14.
+Issue #14's body still says `HANDOFF.md` quotes 95.4% live parity. This pull request points that sentence at the [vPIC data refresh job summary](https://github.com/AIKitLLC/nhtsa-edge-api/actions/workflows/vpic-data.yml), where `exactRate` is printed, instead of a frozen percentage. The issue stays open until someone closes it. This pull request closes #20, not #14.
+
+Security review comment [6234989570](https://github.com/AIKitLLC/nhtsa-edge-api/issues/20#issuecomment-6234989570) on pull request #21 was WARN. The follow-up on the same branch stops keyed redirects, rejects bad proxy query values before upstream, requires a full VIN on `/compare`, decodes path segments before the allowlist, removes unsourced performance numbers, and fails closed when `RATE_LIMITER` is missing. It does not deploy.
 
 ## Open pull requests
 
@@ -86,5 +88,5 @@ Deploy production and the Cloudflare check workflow do not run on this pull requ
 
 1. Security (Chuyên gia Bảo mật) PASS on pull request #21, then Tony's approval. Do not merge or deploy before that.
 2. Create milestones M1, M2, and M3, then assign #8–#10 to M2 and #11–#13 to M3.
-3. Close #14 after confirming `HANDOFF.md` quotes the strict 83.20% rate.
+3. Close #14 when Tony accepts the job-summary link in `HANDOFF.md` in place of a frozen parity percentage.
 4. Leave deploy and secrets alone.

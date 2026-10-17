@@ -1,3 +1,5 @@
+import { FullVinSchema, parseVin } from "./vin";
+
 /**
  * Allowlist for the /vehicles/* and /recalls/* proxies.
  * An unknown path used to miss the cache and still call upstream (with the data.gov key
@@ -77,7 +79,13 @@ function splitPath(pathname: string): string[] | null {
   if (raw.some((piece) => piece.length === 0)) return null;
   const parts: string[] = [];
   for (const piece of raw) {
-    const segment = piece.trim();
+    let decoded: string;
+    try {
+      decoded = decodeURIComponent(piece);
+    } catch {
+      return null;
+    }
+    const segment = decoded.trim();
     if (!segmentOk(segment)) return null;
     parts.push(segment);
   }
@@ -133,11 +141,110 @@ export function encodeUpstreamPath(canonicalPath: string): string {
     .join("/");
 }
 
-/** Rejects query values that would mint a new cache entry per byte of junk. */
-export function queryValuesOk(query: URLSearchParams): boolean {
-  for (const value of query.values()) {
-    if (value.length > MAX_QUERY_VALUE_LENGTH) return false;
-    if (/[\u0000-\u001F\u007F]/.test(value)) return false;
+const FORMATS: ReadonlySet<string> = new Set(["json", "xml", "csv"]);
+const YEAR_KEYS: ReadonlySet<string> = new Set(["year", "modelyear"]);
+const CAMPAIGN = /^\d{2}[A-Z]\d{6}$/;
+const PAGE = /^[1-9]\d{0,2}$/;
+
+export interface CatalogNames {
+  readonly makeByUpper: ReadonlyMap<string, string>;
+  readonly variables: ReadonlySet<string>;
+}
+
+/** Uppercased make names (value is the bundled spelling) and variable names plus element ids. */
+export function catalogFrom(
+  makes: readonly { readonly name: string }[],
+  elements: readonly { readonly id: number; readonly name: string }[]
+): CatalogNames {
+  const makeByUpper = new Map<string, string>();
+  for (const make of makes) {
+    const trimmed = make.name.trim();
+    const key = trimmed.toUpperCase();
+    if (key.length > 0 && !makeByUpper.has(key)) makeByUpper.set(key, trimmed);
+  }
+  const variables = new Set<string>();
+  for (const element of elements) {
+    const name = element.name.trim().toUpperCase();
+    if (name.length > 0) variables.add(name);
+    variables.add(String(element.id));
+  }
+  return { makeByUpper, variables };
+}
+
+function makeOk(value: string, catalog: CatalogNames): string | null {
+  const trimmed = value.trim();
+  if (trimmed === "*") return "*";
+  return catalog.makeByUpper.get(trimmed.toUpperCase()) ?? null;
+}
+
+function variableOk(value: string, catalog: CatalogNames): boolean {
+  const trimmed = value.trim();
+  if (/^\d+$/.test(trimmed)) return catalog.variables.has(trimmed);
+  return catalog.variables.has(trimmed.toUpperCase());
+}
+
+/** Make and variable path segments, and a 4-digit modelyear pair, must match the bundled tables. */
+function pathValuesOk(canonicalPath: string, catalog: CatalogNames): boolean {
+  const parts = canonicalPath.split("/").filter((part) => part.length > 0);
+  const endpoint = parts[1];
+  const rest = parts.slice(2);
+  if (parts[0] === "recalls" && endpoint === "recallsByVin" && rest[0] && !parseVin(rest[0], FullVinSchema).ok) {
+    return false;
+  }
+  if (parts[0] !== "vehicles" || !endpoint) return true;
+  if ((endpoint === "getmodelsformake" || endpoint === "getvehicletypesformake") && rest[0] && !makeOk(rest[0], catalog)) {
+    return false;
+  }
+  if (endpoint === "getvehiclevariablevalueslist" && rest[0] && !variableOk(rest[0], catalog)) return false;
+  if (endpoint === "getmodelsformakeyear" || endpoint === "getmodelsformakeidyear") {
+    for (let i = 0; i < rest.length; i += 2) {
+      const key = rest[i];
+      const value = rest[i + 1];
+      if (!key || value === undefined) return false;
+      if (key === "make" && !makeOk(value, catalog)) return false;
+      if (key === "modelyear" && !/^\d{4}$/.test(value)) return false;
+    }
   }
   return true;
+}
+
+/**
+ * Rejects query values that would mint a cache entry per byte of junk, then writes the
+ * canonical spelling back so case variants share one entry. Returns false before any upstream call.
+ */
+export function normalizeProxyQuery(query: URLSearchParams, catalog: CatalogNames): boolean {
+  for (const [key, value] of [...query.entries()]) {
+    if (value.length > MAX_QUERY_VALUE_LENGTH) return false;
+    if (/[\u0000-\u001F\u007F]/.test(value)) return false;
+    const name = key.toLowerCase();
+    if (name === "format") {
+      const format = value.toLowerCase();
+      if (!FORMATS.has(format)) return false;
+      query.set(key, format);
+    } else if (YEAR_KEYS.has(name)) {
+      if (!/^\d{4}$/.test(value)) return false;
+    } else if (name === "page") {
+      if (!PAGE.test(value) || Number(value) > 999) return false;
+    } else if (name === "vin") {
+      const parsed = parseVin(value, FullVinSchema);
+      if (!parsed.ok) return false;
+      query.set(key, parsed.vin);
+    } else if (name === "campaignnumber") {
+      const campaign = value.trim().toUpperCase();
+      if (!CAMPAIGN.test(campaign)) return false;
+      query.set(key, campaign);
+    } else if (name === "make") {
+      const canonical = makeOk(value, catalog);
+      if (!canonical) return false;
+      query.set(key, canonical);
+    } else if (name === "variable" && !variableOk(value, catalog)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/** Path catalog check plus query normalization. Mutates `query` when the values are valid. */
+export function proxyInputOk(canonicalPath: string, query: URLSearchParams, catalog: CatalogNames): boolean {
+  return pathValuesOk(canonicalPath, catalog) && normalizeProxyQuery(query, catalog);
 }

@@ -4,7 +4,8 @@ import { CONFIG } from "../config";
 import { buildCacheKey, canonicalQuery } from "../services/cache";
 import { serveCachedUpstream } from "../services/cached-upstream";
 import { jsonError } from "../services/responses";
-import { allowRecallsPath, encodeUpstreamPath, queryValuesOk } from "../validation/upstream-path";
+import { allowRecallsPath, encodeUpstreamPath, proxyInputOk } from "../validation/upstream-path";
+import { loadProxyCatalog } from "./proxy-catalog";
 
 export const recallsProxyRouter = new Hono<{ Bindings: Env }>();
 
@@ -24,8 +25,9 @@ recallsProxyRouter.get("/recalls/*", async (c) => {
   if (!allowed.ok) return jsonError(c, 400, "INVALID_UPSTREAM_PATH", allowed.message);
 
   const query = canonicalQuery(url.searchParams, RECALLS_QUERY_PARAMS);
-  if (!queryValuesOk(query)) {
-    return jsonError(c, 400, "INVALID_QUERY", "A query value is too long or contains a control character.");
+  const catalog = await loadProxyCatalog(c.env.ASSETS);
+  if (!proxyInputOk(allowed.canonicalPath, query, catalog)) {
+    return jsonError(c, 400, "INVALID_QUERY", "A query or path value is not an allowed format or a bundled catalog entry.");
   }
   const search = query.toString();
 

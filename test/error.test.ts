@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { app } from "../src/index";
+import { testEnv } from "./helpers/assets";
 
 describe("Error boundary", () => {
   beforeEach(() => {
@@ -14,7 +15,7 @@ describe("Error boundary", () => {
       throw err;
     });
 
-    const res = await app.request("/vehicles/GetAllMakes");
+    const res = await app.request("/vehicles/GetAllMakes", undefined, testEnv());
     expect(res.status).toBe(504);
 
     const body = await res.text();
@@ -25,7 +26,7 @@ describe("Error boundary", () => {
   it("maps unexpected failures to a generic 500", async () => {
     vi.spyOn(globalThis, "fetch").mockRejectedValue(new Error("secret internal detail"));
 
-    const res = await app.request("/vehicles/GetAllMakes");
+    const res = await app.request("/vehicles/GetAllMakes", undefined, testEnv());
     expect(res.status).toBe(500);
     expect(res.headers.get("Strict-Transport-Security")).toBe("max-age=31536000");
 

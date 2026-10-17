@@ -19,7 +19,7 @@ its data is served from this Worker.
 
 - Decodes full and partial VINs **without calling NHTSA**: a TypeScript port of vPIC's
   own `spVinDecode` runs over the official monthly vPIC dump, bundled with the worker as
-  static assets. Median decode time is a few milliseconds.
+  static assets.
 - **Drop-in compatible** with `vpic.nhtsa.dot.gov/api`: `DecodeVinValues`, `DecodeVin`
   and `DecodeVINValuesBatch` return the same JSON shape; all other vPIC endpoints and the
   recalls API are proxied and cached.
@@ -35,7 +35,7 @@ its data is served from this Worker.
   [API reference](https://data.ai-kit.net/docs), a [batch page](https://data.ai-kit.net/batch)
   (paste or upload up to 500 VINs, download CSV) and `/llms.txt` for agents. API requests are
   limited to 120 per minute per client and location (HTTP 429 with `Retry-After`).
-  If the rate-limiter binding errors, the API fails closed with HTTP 503 rather than serving the request.
+  If the rate-limiter binding is missing or errors, the API fails closed with HTTP 503 and `Retry-After`.
 - **Honest comparison** with vPIC and with bundled-library approaches such as Corgi:
   [docs/COMPARISON.md](docs/COMPARISON.md).
 
@@ -130,26 +130,11 @@ depend on it.
 dump, VINs built from real model patterns, and error cases) and compares **every field**
 with the live `DecodeVINValuesBatch` API.
 
-The latest **strict** rate is **83.20%** (832 of 1,000 VINs identical on every field) for
-`vPICList_lite_2026_09`. That number is the `exactRate` recorded in commit
-[`68623a7`](https://github.com/AIKitLLC/nhtsa-edge-api/commit/68623a70948afd615e0d5aee60e5dc3f15103c87)
-(`data(vpic): vPICList_lite_2026_09 (live parity 83.20%)`). The weekly gate still passes:
-VINs whose only differences are on the known-renames allowlist count together with the
-strict matches toward `VPIC_PARITY_MIN` (default 85%). The strict rate moves when NHTSA
-edits data after the dump is published. Details: [docs/DATA.md](docs/DATA.md).
-
-### Performance
-
-**Unverified.** No script output, CI artifact, or other record in this repository shows the
-run behind this table. [`scripts/benchmark.sh`](scripts/benchmark.sh) measures HTTP latency
-from your own network and does not produce these rows.
-
-| Metric | Value (unverified) |
-| :-- | :-- |
-| Decode time p50 / p95 / p99 (including cold asset reads) | 1.4 ms / 6.2 ms / 10.9 ms |
-| Decode time, warm (asset already cached in the isolate) | ~1–3 ms |
-| Peak heap of the per-isolate data cache (4 MB JSON budget, LRU) | ~42 MB |
-| Worker script size | ~61 KB gzip (data ships as static assets) |
+The strict rate is the `exactRate` printed in the
+[vPIC data refresh job summary](https://github.com/AIKitLLC/nhtsa-edge-api/actions/workflows/vpic-data.yml)
+(and in that run's data commit message). The weekly gate passes when the strict matches
+plus the known-renames allowlist meet `VPIC_PARITY_MIN` (default 85%). The strict rate
+moves when NHTSA edits data after the dump is published. Details: [docs/DATA.md](docs/DATA.md).
 
 ---
 

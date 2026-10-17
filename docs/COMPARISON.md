@@ -51,10 +51,9 @@ What it adds, and how to check each claim:
 | Claim | How to check it |
 | :-- | :-- |
 | The decoder reproduces NHTSA's own `spVinDecode` | Weekly CI restores NHTSA's original dump in PostgreSQL and compares this decoder with NHTSA's SQL functions: 0 unexplained differences on 11,000 VINs. Method and numbers: [DATA.md](DATA.md#verification-against-the-reference-sql-functions) |
-| It matches the live API | A fixed sample of 1,000 VINs is compared field by field with the live vPIC API. The latest strict rate is 83.20% identical on every field ([`68623a7`](https://github.com/AIKitLLC/nhtsa-edge-api/commit/68623a70948afd615e0d5aee60e5dc3f15103c87)); the gate passes because the known-renames allowlist counts toward the 85% threshold. The strict rate moves with NHTSA's edits |
+| It matches the live API | A fixed sample of 1,000 VINs is compared field by field with the live vPIC API. The strict `exactRate` is the figure in the [vPIC data refresh job summary](https://github.com/AIKitLLC/nhtsa-edge-api/actions/workflows/vpic-data.yml). The gate passes when strict matches plus the known-renames allowlist meet `VPIC_PARITY_MIN` (default 85%). The strict rate moves with NHTSA's edits |
 | Defects in NHTSA's dump are handled and written down | [NHTSA-ERRATA.md](NHTSA-ERRATA.md), with VINs that reproduce each one |
 | Data changes are reviewable | `data/vpic` is committed to git; an update is a diff and a revert is `git revert` |
-| Decode time | The README table (p50 1.4 ms, p95 6.2 ms) is unverified: nothing in the repo records that run. It would exclude the network to the edge, which dominates for a single call |
 
 ## Limits worth knowing
 

@@ -9,7 +9,7 @@ import { decodeVin } from "../../vpic/decode";
 import { toDecodeVinValues } from "../../vpic/format";
 import { toV1Spec } from "../../vpic/v1-format";
 import { getVpicStore } from "../../vpic/worker-store";
-import { parseModelYear, parseVin } from "../../validation/vin";
+import { FullVinSchema, parseModelYear, parseVin } from "../../validation/vin";
 
 export const vinRouter = new Hono<{ Bindings: Env }>();
 
@@ -56,7 +56,7 @@ vinRouter.get("/vin/:vin", async (c) => {
  * The live call is vPIC, so it does not carry the data.gov key.
  */
 vinRouter.get("/vin/:vin/compare", async (c) => {
-  const parsed = parseVin(c.req.param("vin"));
+  const parsed = parseVin(c.req.param("vin"), FullVinSchema);
   if (!parsed.ok) return jsonError(c, 400, "INVALID_VIN_FORMAT", parsed.message);
 
   const year = parseModelYear(c.req.query("modelyear"));
