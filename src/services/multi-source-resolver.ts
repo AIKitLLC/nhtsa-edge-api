@@ -44,6 +44,12 @@ export interface UnifiedOptions {
 
 const skipped = <T>(): Promise<EnrichmentResult<T>> => Promise.resolve({ outcome: "skipped", data: null });
 
+/** FuelEconomy.gov only. Make, model, and model year all have to be present or the lookup is skipped. */
+export async function lookupFuelEconomy(spec: V1VehicleSpec): Promise<EnrichmentResult<EpaEnergySpecs>> {
+  if (spec.make === null || spec.model === null || spec.modelYear === null) return { outcome: "skipped", data: null };
+  return fetchEpaEnergySpecs(spec.make, spec.model, spec.modelYear);
+}
+
 export async function resolveUnifiedVehicle(
   spec: V1VehicleSpec,
   dataVersion: string,
@@ -53,9 +59,7 @@ export async function resolveUnifiedVehicle(
   const canEnrich = make !== null && model !== null;
 
   const [epa, eu] = await Promise.all([
-    options.enrichWithEpa !== false && canEnrich && modelYear !== null
-      ? fetchEpaEnergySpecs(make, model, modelYear)
-      : skipped<EpaEnergySpecs>(),
+    options.enrichWithEpa !== false ? lookupFuelEconomy(spec) : skipped<EpaEnergySpecs>(),
     options.enrichWithEu !== false && canEnrich ? fetchRdwEuropeanSpecs(make, model) : skipped<RdwEuropeanSpecs>(),
   ]);
 

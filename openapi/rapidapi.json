@@ -1,0 +1,170 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "AI Kit Data RapidAPI",
+    "version": "1.0.0",
+    "description": "VIN batch decode for requests that arrive through the RapidAPI proxy. The Worker compares the X-RapidAPI-Proxy-Secret header with the RAPIDAPI_PROXY_SECRET Worker secret and answers 403 when the header is missing or wrong. That header is injected by the RapidAPI proxy; it is not a client parameter. X-RapidAPI-User and X-RapidAPI-Subscription are logged and are not used for access control. Each item is an offline vPIC decode. Recall campaigns are included when api.nhtsa.gov returns them for a 17-character VIN. FuelEconomy.gov figures are included when that source matches the decoded make, model, and year. A source that does not answer leaves its section empty and the decode still returns. The public API is unchanged: POST /vehicles/DecodeVINValuesBatch/ still accepts at most 50 VINs and does not read the proxy secret."
+  },
+  "servers": [{ "url": "https://data.ai-kit.net" }],
+  "paths": {
+    "/rapid/v1/batch": {
+      "post": {
+        "operationId": "rapidBatchDecode",
+        "summary": "Decode a batch of VINs with recalls and fuel data",
+        "description": "Default limit is 100 VINs. RAPIDAPI_BATCH_MAX can set a lower or higher limit up to 200. A partial VIN is decoded and its recalls section is skipped.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/BatchRequest" },
+              "example": {
+                "vins": [
+                  { "vin": "1HGCM82633A004352" },
+                  { "vin": "5YJ3E1EB1NF000001", "modelYear": 2022 }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "One result per VIN, in request order",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/BatchResponse" }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not JSON, a VIN or model year is invalid, or the batch exceeds the configured maximum",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          },
+          "403": {
+            "description": "X-RapidAPI-Proxy-Secret is missing or does not match RAPIDAPI_PROXY_SECRET",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BatchRequest": {
+        "type": "object",
+        "required": ["vins"],
+        "properties": {
+          "vins": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["vin"],
+              "properties": {
+                "vin": {
+                  "type": "string",
+                  "minLength": 3,
+                  "maxLength": 17,
+                  "description": "Letters, digits, or * wildcards. 3 to 17 characters."
+                },
+                "modelYear": {
+                  "type": "integer",
+                  "minimum": 1000,
+                  "maximum": 9999,
+                  "description": "Optional model-year hint. Four digits."
+                }
+              }
+            }
+          }
+        }
+      },
+      "BatchResponse": {
+        "type": "object",
+        "required": ["success", "data"],
+        "properties": {
+          "success": { "type": "boolean", "enum": [true] },
+          "data": {
+            "type": "object",
+            "required": ["count", "results"],
+            "properties": {
+              "count": { "type": "integer" },
+              "results": {
+                "type": "array",
+                "items": { "$ref": "#/components/schemas/BatchItem" }
+              }
+            }
+          },
+          "timestamp": { "type": "string", "format": "date-time" }
+        }
+      },
+      "BatchItem": {
+        "type": "object",
+        "required": ["decode", "recalls", "fuel"],
+        "properties": {
+          "decode": {
+            "type": "object",
+            "description": "Offline vPIC decode. Headline fields are null when the VIN does not determine them.",
+            "properties": {
+              "vin": { "type": "string" },
+              "make": { "type": "string", "nullable": true },
+              "model": { "type": "string", "nullable": true },
+              "modelYear": { "type": "integer", "nullable": true },
+              "fuelType": { "type": "string", "nullable": true }
+            }
+          },
+          "recalls": {
+            "type": "object",
+            "required": ["outcome"],
+            "properties": {
+              "outcome": { "type": "string", "enum": ["provided", "unavailable", "skipped"] },
+              "count": { "type": "integer", "nullable": true },
+              "campaigns": {
+                "type": "array",
+                "nullable": true,
+                "items": { "type": "object", "additionalProperties": true },
+                "description": "Campaign objects as returned by api.nhtsa.gov, when outcome is provided."
+              }
+            }
+          },
+          "fuel": {
+            "type": "object",
+            "required": ["outcome"],
+            "properties": {
+              "outcome": { "type": "string", "enum": ["matched", "no-match", "error", "skipped"] },
+              "data": {
+                "type": "object",
+                "nullable": true,
+                "description": "FuelEconomy.gov match for the decoded model year, when outcome is matched.",
+                "properties": {
+                  "epaVehicleId": { "type": "string" },
+                  "combinedMpgOrMpge": { "type": "integer" },
+                  "isElectricVehicle": { "type": "boolean" },
+                  "matchLevel": { "type": "string", "enum": ["model-year"] }
+                }
+              }
+            }
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "required": ["success", "error"],
+        "properties": {
+          "success": { "type": "boolean", "enum": [false] },
+          "error": {
+            "type": "object",
+            "required": ["code", "message"],
+            "properties": {
+              "code": { "type": "string" },
+              "message": { "type": "string" }
+            }
+          },
+          "timestamp": { "type": "string", "format": "date-time" }
+        }
+      }
+    }
+  }
+}
