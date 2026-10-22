@@ -32,7 +32,7 @@ No open issue tracks `POST /rapid/v1/batch`. This pull request does not close #8
 | Pull request | Branch | Linked issue |
 | :-- | :-- | :-- |
 | [#17](https://github.com/AIKitLLC/nhtsa-edge-api/pull/17) docs: refresh STATUS.md (2026-10-15) | `cursor/docs-status-refresh-773a` | none (draft) |
-| this pull request | `cursor/rapidapi-proxy-route-d053` | none (no matching open issue) |
+| [#23](https://github.com/AIKitLLC/nhtsa-edge-api/pull/23) Add a RapidAPI proxy batch route | `cursor/rapidapi-proxy-route-d053` | none (no matching open issue; draft) |
 
 Merged, not open: [#21](https://github.com/AIKitLLC/nhtsa-edge-api/pull/21) (data.gov key stays on its hosts, closes #20), [#6](https://github.com/AIKitLLC/nhtsa-edge-api/pull/6) (agent standards, closes #7), [#5](https://github.com/AIKitLLC/nhtsa-edge-api/pull/5) (rate limit, [OpenAPI](https://www.openapis.org/) description, `/docs`, `llms.txt`, batch page, comparison doc), #4 naming, #3 workers.dev address, #2 website, #1 offline decoder.
 
@@ -76,7 +76,7 @@ Deploy production and the Cloudflare check workflow do not run on this pull requ
 
 ## Next steps
 
-1. Tony's review of `cursor/rapidapi-proxy-route-d053`. Do not merge or deploy before that. `RAPIDAPI_PROXY_SECRET` stays unset until a person sets it.
+1. Tony's review of [#23](https://github.com/AIKitLLC/nhtsa-edge-api/pull/23). Do not merge or deploy before that. `RAPIDAPI_PROXY_SECRET` stays unset until a person sets it.
 2. Create milestones M1, M2, and M3, then assign #8–#10 to M2 and #11–#13 to M3.
 3. Close #14 when Tony accepts the job-summary link in `HANDOFF.md` in place of a frozen parity percentage.
 4. Leave deploy and secrets alone. #22 tracks non-blocking follow-ups from the review of #21.
