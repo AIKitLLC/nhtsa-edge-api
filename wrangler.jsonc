@@ -24,6 +24,9 @@
   "workers_dev": true,
   // Per-client API limit (src/middleware/rate-limit.ts). namespace_id is any string unique in the account.
   "ratelimits": [{ "name": "RATE_LIMITER", "namespace_id": "1001", "simple": { "limit": 120, "period": 60 } }],
+  // RAPIDAPI_PROXY_SECRET is a Worker secret (`wrangler secret put`), not a var.
+  // Do not put the value here. Optional plain var RAPIDAPI_BATCH_MAX (default 100,
+  // ceiling 200) sizes POST /rapid/v1/batch. Leave it unset to use the default.
   "vars": {
     "ENVIRONMENT": "production",
     "UPSTREAM_TIMEOUT_MS": "5000",
