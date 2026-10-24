@@ -31,20 +31,40 @@
             "description": "One result per VIN, in request order",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/BatchResponse" }
+                "schema": { "$ref": "#/components/schemas/BatchResponse" },
+                "example": {
+                  "success": true,
+                  "data": {
+                    "count": 1,
+                    "results": [
+                      {
+                        "decode": { "vin": "1HGCM82633A004352", "make": "HONDA", "model": "Accord", "modelYear": 2003 },
+                        "recalls": { "outcome": "provided", "count": 1, "campaigns": [{ "NHTSACampaignNumber": "23V123000" }] },
+                        "fuel": { "outcome": "matched", "data": { "epaVehicleId": "10001", "combinedMpgOrMpge": 132, "isElectricVehicle": true, "matchLevel": "model-year" } }
+                      }
+                    ]
+                  },
+                  "timestamp": "2026-10-24T18:00:00.000Z"
+                }
               }
             }
           },
           "400": {
             "description": "The body is not JSON, a VIN or model year is invalid, or the batch exceeds the configured maximum",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "success": false, "error": { "code": "BATCH_TOO_LARGE", "message": "At most 100 VINs per request" }, "timestamp": "2026-10-24T18:00:00.000Z" }
+              }
             }
           },
           "403": {
             "description": "X-RapidAPI-Proxy-Secret is missing or does not match RAPIDAPI_PROXY_SECRET",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/Error" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "success": false, "error": { "code": "RAPIDAPI_PROXY_REQUIRED", "message": "This route accepts only RapidAPI proxy requests." }, "timestamp": "2026-10-24T18:00:00.000Z" }
+              }
             }
           }
         }

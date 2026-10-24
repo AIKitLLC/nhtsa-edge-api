@@ -279,5 +279,12 @@ describe("RapidAPI OpenAPI document", () => {
     expect(spec.paths["/rapid/v1/batch"]?.post?.operationId).toBe("rapidBatchDecode");
     expect(JSON.stringify(spec)).not.toContain(SECRET);
     expect(JSON.stringify(spec)).not.toContain("RAPIDAPI_PROXY_SECRET=");
+
+    const responses = (spec.paths["/rapid/v1/batch"]?.post as unknown as {
+      responses: Record<string, { content: Record<string, { example?: { error?: { code?: string }; data?: { count?: number } } }> }>;
+    }).responses;
+    expect(responses["200"]?.content["application/json"]?.example?.data?.count).toBe(1);
+    expect(responses["400"]?.content["application/json"]?.example?.error?.code).toBe("BATCH_TOO_LARGE");
+    expect(responses["403"]?.content["application/json"]?.example?.error?.code).toBe("RAPIDAPI_PROXY_REQUIRED");
   });
 });

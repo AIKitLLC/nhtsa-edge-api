@@ -1,6 +1,6 @@
 # Status
 
-Updated in the same pull request as every code or docs change. Last updated: 2026-10-22.
+Updated in the same pull request as every code or docs change. Last updated: 2026-10-24.
 
 Figures are from the GitHub API (application programming interface) for `AIKitLLC/nhtsa-edge-api` on that date. Default branch: `main`. `main` is `851729d` (`data(vpic): vPICList_lite_2026_10`). The strict parity rate is the `exactRate` in the [vPIC data refresh job summary](https://github.com/AIKitLLC/nhtsa-edge-api/actions/workflows/vpic-data.yml).
 
@@ -25,7 +25,7 @@ Euro NCAP in #13 is a separate program from NHTSA NCAP in #10.
 
 Issue #14's body still says `HANDOFF.md` quotes 95.4% live parity. `HANDOFF.md` points that sentence at the [vPIC data refresh job summary](https://github.com/AIKitLLC/nhtsa-edge-api/actions/workflows/vpic-data.yml), where `exactRate` is printed, instead of a frozen percentage. The issue stays open until someone closes it.
 
-No open issue tracks `POST /rapid/v1/batch`. This pull request does not close #8 or #9: recalls and fuel on that route are still live lookups, not bundled datasets.
+No open issue tracks `POST /rapid/v1/batch`. Three ready-to-file issues (secret configuration, console import, acceptance tests) are written verbatim in `docs/RAPIDAPI.md`; this agent has no GitHub issue write access, so they are not filed yet. This pull request does not close #8 or #9: recalls and fuel on that route are still live lookups, not bundled datasets.
 
 ## Open pull requests
 
@@ -63,7 +63,7 @@ Pull requests run two workflows. A green check means the job ran and finished wi
 | [CI](.github/workflows/ci.yml) | Typecheck, Vitest on the real vPIC data, dry-run Worker bundle | `contents: read` |
 | [Architecture](.github/workflows/architecture.yml) | arcade-agent 0.4.1, action commit `2fde72bcf6cd1f861b8f25b09c0a1d7bc83b820d`, report only (`continue-on-error: true`) | `contents: read`, `actions: read` |
 
-Checks for `cursor/rapidapi-proxy-route-d053` start when that branch is pushed. They are not copied into this file until they finish.
+Checks on the first push of `cursor/rapidapi-proxy-route-d053` (2026-10-22): CI `success` (typecheck, tests, dry-run bundle) and Architecture `success`. Checks for later pushes are not copied into this file until they finish.
 
 Deploy production and the Cloudflare check workflow do not run on this pull request. This change does not deploy and does not set `RAPIDAPI_PROXY_SECRET`.
 
@@ -77,6 +77,7 @@ Deploy production and the Cloudflare check workflow do not run on this pull requ
 ## Next steps
 
 1. Tony's review of [#23](https://github.com/AIKitLLC/nhtsa-edge-api/pull/23). Do not merge or deploy before that. `RAPIDAPI_PROXY_SECRET` stays unset until a person sets it.
-2. Create milestones M1, M2, and M3, then assign #8–#10 to M2 and #11–#13 to M3.
-3. Close #14 when Tony accepts the job-summary link in `HANDOFF.md` in place of a frozen parity percentage.
-4. Leave deploy and secrets alone. #22 tracks non-blocking follow-ups from the review of #21.
+2. File the three ready-to-file issues in `docs/RAPIDAPI.md` (secret configuration, console import, acceptance tests).
+3. Create milestones M1, M2, and M3, then assign #8–#10 to M2 and #11–#13 to M3.
+4. Close #14 when Tony accepts the job-summary link in `HANDOFF.md` in place of a frozen parity percentage.
+5. Leave deploy and secrets alone. #22 tracks non-blocking follow-ups from the review of #21.

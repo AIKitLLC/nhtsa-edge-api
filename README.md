@@ -138,7 +138,8 @@ When FuelEconomy.gov matches the decoded make, model, and year, those figures ar
 If a source does not answer, that section is empty and the decode is still returned.
 
 The import file for the proxy routes is [`openapi/rapidapi.json`](openapi/rapidapi.json)
-(OpenAPI 3.0.3). It is not served at `/openapi.json`.
+(OpenAPI 3.0.3). It is not served at `/openapi.json`. Full integration steps, acceptance
+tests, and ready-to-file issues: [`docs/RAPIDAPI.md`](docs/RAPIDAPI.md).
 
 Local development reads gitignored `.dev.vars` (do not commit it):
 
@@ -151,8 +152,8 @@ On a deployed Worker the secret is set with Wrangler. `wrangler secret put` publ
 Worker version, so run it only when a deploy is intended:
 
 ```bash
-npx wrangler secret put RAPIDAPI_PROXY_SECRET           # production
-npx wrangler secret put RAPIDAPI_PROXY_SECRET --env dev # dev worker
+npx wrangler secret put RAPIDAPI_PROXY_SECRET --env dev # dev worker first
+npx wrangler secret put RAPIDAPI_PROXY_SECRET           # production, separately approved
 ```
 
 Use the same value RapidAPI is configured to send in `X-RapidAPI-Proxy-Secret`. This
