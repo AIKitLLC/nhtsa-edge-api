@@ -1,26 +1,31 @@
 # Status
 
-Updated in the same pull request as every code or docs change. Last updated: 2026-10-15.
+Updated in the same pull request as every code or docs change. Last updated: 2026-10-17.
 
-Figures are from the GitHub [API](https://en.wikipedia.org/wiki/API) (application programming interface) for `AIKitLLC/nhtsa-edge-api` on that date. Default branch: `main`. `main` is [`e37679c8ca168bf5c8aeaff24359a7b075aa83b2`](https://github.com/AIKitLLC/nhtsa-edge-api/commit/e37679c8ca168bf5c8aeaff24359a7b075aa83b2) (`Merge pull request #6 from AIKitLLC/cursor/dev-standards-67a5`). Times below are [UTC](https://en.wikipedia.org/wiki/Coordinated_Universal_Time) (Coordinated Universal Time). A commit [SHA](https://en.wikipedia.org/wiki/SHA-1) is the Secure Hash Algorithm 1 identifier GitHub stores for that commit.
+Figures are from the GitHub API (application programming interface) for `AIKitLLC/nhtsa-edge-api` on that date. Default branch: `main`. `main` is `68623a7` (`data(vpic): vPICList_lite_2026_09`). The strict parity rate is the `exactRate` in the [vPIC data refresh job summary](https://github.com/AIKitLLC/nhtsa-edge-api/actions/workflows/vpic-data.yml).
 
 [NHTSA](https://www.nhtsa.gov/) is the National Highway Traffic Safety Administration. [vPIC](https://vpic.nhtsa.dot.gov/) is [NHTSA](https://www.nhtsa.gov/)'s Product Information Catalog and Vehicle Listing. A [VIN](https://www.nhtsa.gov/vin-decoder) is a vehicle identification number.
 
 ## Standards
 
-These stay in force. `AGENTS.md` and the Cursor rules on this branch are the source.
+Eight issues are open. None use `status:blocked`. Milestone fields are empty because no milestone exists on the repository yet. Issue #7 is closed.
 
 | Standard | Where it lives | What it requires |
 | :-- | :-- | :-- |
-| Ponytail | `.agents/skills/ponytail/`, vendored from [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail) commit `9b58c1ffb790c075ca32e70a89cf1d80588f4abf`, [MIT](https://opensource.org/license/mit) License | Smallest complete diff. Reuse what is already here. |
-| i-have-adhd | `.agents/skills/i-have-adhd/`, vendored from [ayghri/i-have-adhd](https://github.com/ayghri/i-have-adhd) commit `723af7d9afaf43eb871dbcce6129e2bf80de90d5`, [MIT](https://opensource.org/license/mit) License | Next action first, numbered steps, short lists. |
-| Cloudflare skills | Referenced from [cloudflare/skills](https://github.com/cloudflare/skills) commit `0871daceb347e3c51693fbe9c77555468df7e410`. The text is kept upstream. | Read `wrangler`, `workers-best-practices`, and `web-perf` before Worker design. |
-| Decoupling, multi-module | `docs/ARCHITECTURE.md` and `.cursor/rules/architecture.mdc` | Domain modules, adapters for external services, and platform bindings. Modules talk through public entry points. |
-| arcade-agent | [PyPI](https://pypi.org/project/arcade-agent/) (Python Package Index) package `arcade-agent==0.4.1`, action commit `2fde72bcf6cd1f861b8f25b09c0a1d7bc83b820d`, [docs](https://arcade-agent.dev/docs/getting-started/) | Report-only drift check on pull requests. Local server: `uvx --from "arcade-agent[mcp,languages]==0.4.1" arcade-mcp` in `.cursor/mcp.json`. |
+| [#20](https://github.com/AIKitLLC/nhtsa-edge-api/issues/20) Stop sending the data.gov key off-host and close the proxy cache bypass | none (this token cannot add labels) | none |
+| [#8](https://github.com/AIKitLLC/nhtsa-edge-api/issues/8) Bundle an offline copy of NHTSA safety recalls | `type:feature`, `area:pipeline`, `area:routes`, `status:ready`, `priority:p2` | M2 Dataset completeness |
+| [#9](https://github.com/AIKitLLC/nhtsa-edge-api/issues/9) Serve the full [EPA](https://www.epa.gov/) (Environmental Protection Agency) and [DOE](https://www.energy.gov/) (Department of Energy) fuel-economy dataset | `type:feature`, `area:enrichment`, `status:ready`, `priority:p2` | M2 Dataset completeness |
+| [#10](https://github.com/AIKitLLC/nhtsa-edge-api/issues/10) Add NHTSA complaints and [NCAP](https://www.nhtsa.gov/ratings) (New Car Assessment Program) crash-test ratings | `type:feature`, `area:enrichment`, `status:ready`, `priority:p2` | M2 Dataset completeness |
+| [#11](https://github.com/AIKitLLC/nhtsa-edge-api/issues/11) Add [United Kingdom](https://www.gov.uk/) [DVSA](https://www.gov.uk/government/organisations/driver-and-vehicle-standards-agency) (Driver and Vehicle Standards Agency) [MOT](https://www.gov.uk/getting-an-mot) (Ministry of Transport test) history | `type:feature`, `area:enrichment`, `status:ready`, `priority:p2` | M3 Further public datasets |
+| [#12](https://github.com/AIKitLLC/nhtsa-edge-api/issues/12) Add the Australian Green Vehicle Guide | `type:feature`, `area:enrichment`, `status:ready`, `priority:p2` | M3 Further public datasets |
+| [#13](https://github.com/AIKitLLC/nhtsa-edge-api/issues/13) Add [Euro NCAP](https://www.euroncap.com/) ratings | `type:feature`, `area:enrichment`, `status:ready`, `priority:p2` | M3 Further public datasets |
+| [#14](https://github.com/AIKitLLC/nhtsa-edge-api/issues/14) Refresh the parity figure in `HANDOFF.md` | `type:docs`, `area:docs`, `status:ready`, `priority:p2` | none |
 
 [MCP](https://modelcontextprotocol.io/) is the Model Context Protocol. `AGENTS.md` lists [D1](https://developers.cloudflare.com/d1/) (Cloudflare's relational database), [R2](https://developers.cloudflare.com/r2/) (Cloudflare's object storage), Durable Objects, and Email as products with no binding in this Worker.
 
-## Planned issues #7–#14
+Issue #14's body still says `HANDOFF.md` quotes 95.4% live parity. This pull request points that sentence at the [vPIC data refresh job summary](https://github.com/AIKitLLC/nhtsa-edge-api/actions/workflows/vpic-data.yml), where `exactRate` is printed, instead of a frozen percentage. The issue stays open until someone closes it. This pull request closes #20, not #14.
+
+Security review comment [6234989570](https://github.com/AIKitLLC/nhtsa-edge-api/issues/20#issuecomment-6234989570) on pull request #21 was WARN. The follow-up on the same branch stops keyed redirects, rejects bad proxy query values before upstream, requires a full VIN on `/compare`, decodes path segments before the allowlist, removes unsourced performance numbers, and fails closed when `RATE_LIMITER` is missing. It does not deploy.
 
 All eight issues exist on GitHub. Fetched 2026-10-15. Milestone fields are empty. Seven issues are open (#8–#14). #7 is closed.
 
@@ -67,50 +72,10 @@ Pull requests run two workflows. A green check means the job ran and finished wi
 
 | Workflow | What it runs | Permissions |
 | :-- | :-- | :-- |
-| [CI](https://en.wikipedia.org/wiki/Continuous_integration) ([workflow](.github/workflows/ci.yml)) | Typecheck, Vitest on the real [vPIC](https://vpic.nhtsa.dot.gov/) data, dry-run Worker bundle. Push trigger is `main`. Pull requests also run it. | `contents: read` |
-| [Architecture](.github/workflows/architecture.yml) | arcade-agent 0.4.1, action commit `2fde72bcf6cd1f861b8f25b09c0a1d7bc83b820d`, report only (`continue-on-error: true`). Pull requests only. | `contents: read`, `actions: read` |
+| [#17](https://github.com/AIKitLLC/nhtsa-edge-api/pull/17) docs: refresh STATUS.md (2026-10-15) | `cursor/docs-status-refresh-773a` | none (draft) |
+| [#21](https://github.com/AIKitLLC/nhtsa-edge-api/pull/21) Keep the data.gov key on its hosts and close the proxy cache bypass | `cursor/security-hardening-a411` | [Closes #20](https://github.com/AIKitLLC/nhtsa-edge-api/issues/20) |
 
-Latest [CI](https://en.wikipedia.org/wiki/Continuous_integration) run, on the merge of #6 to `main` (`e37679c8ca168bf5c8aeaff24359a7b075aa83b2`), created 2026-10-15T19:21:17Z:
-
-| Check | Result | Run |
-| :-- | :-- | :-- |
-| [CI](https://en.wikipedia.org/wiki/Continuous_integration) | `success` at 2026-10-15T19:22Z. Checkout, install, asset build, typecheck, tests, and dry-run bundle each finished `success`. | [38793202814](https://github.com/AIKitLLC/nhtsa-edge-api/actions/runs/38793202814) |
-
-Latest Architecture run. Architecture has no run on the merge to `main`. The newest run is still the one on pull request #6's head `c370f631a0cfa63b080948cc0efc4af1525621bb`, created 2026-10-15T14:24:36Z:
-
-| Check | Result | Run |
-| :-- | :-- | :-- |
-| [CI](https://en.wikipedia.org/wiki/Continuous_integration) on that head | `success` at 2026-10-15T14:25:05Z. The same six steps each finished `success`. | [38751128028](https://github.com/AIKitLLC/nhtsa-edge-api/actions/runs/38751128028) |
-| [Architecture](https://github.com/AIKitLLC/nhtsa-edge-api/actions/runs/38751127871) | `success` at 2026-10-15T14:25:04Z. The analyze step finished `success`. | 38751127871 |
-
-Latest [vPIC](https://vpic.nhtsa.dot.gov/) data refresh and dev deploy run is [38793164071](https://github.com/AIKitLLC/nhtsa-edge-api/actions/runs/38793164071), on the merge of #16 (`cb593739344482881e8469bab2257fa2225096d8`), created 2026-10-15T19:20:59Z. The refresh job finished `failure` because live parity was 83.20%, under the 85% gate. The dev-deploy job finished `skipped`.
-
-## Arcade-agent drift
-
-Latest measurement: 2026-10-15T14:25:01Z, Architecture run [38751127871](https://github.com/AIKitLLC/nhtsa-edge-api/actions/runs/38751127871), commit `c370f631a0cfa63b080948cc0efc4af1525621bb`, algorithm `pkg` as printed by the analyze step, arcade-agent 0.4.1.
-
-| Figure | Latest value |
-| :-- | :-- |
-| Entities | 212 |
-| Edges | 219 |
-| Components | 8 |
-| Balanced score | 0.6219 |
-| [RCI](https://arcade-agent.dev/docs/getting-started/) (cohesive interactions) | 0.6530 |
-
-The log line is `No baseline available — first run or baseline expired.` The comparison summary then lists the current figures only. The prior measurement recorded in this file for commit `7096f279dd4f5e893e7b152736dd9cbe7a294213` (run [38750177950](https://github.com/AIKitLLC/nhtsa-edge-api/actions/runs/38750177950), same date) was 212 entities, 219 edges, 8 components, balanced score 0.6219, [RCI](https://arcade-agent.dev/docs/getting-started/) 0.6530. The latest log prints those same figures.
-
-## Deploy workflow trigger
-
-Done via [#16](https://github.com/AIKitLLC/nhtsa-edge-api/pull/16). Tech Lead · [SRE](https://en.wikipedia.org/wiki/Site_reliability_engineering) (site reliability engineering) restricted the deploy workflow trigger so a feature-branch push cannot refresh data or deploy the dev worker. Pull request #16 merged at 2026-10-15T19:20:56Z and closed #15. On `main`, `.github/workflows/vpic-data.yml` limits `push` to `branches: [main]`, and the refresh job and the `deploy-dev` job each require `github.ref == 'refs/heads/main'`.
-
-This commit edits `docs/STATUS.md` only.
-
-## Known blockers
-
-- GitHub Actions is running again. [CI](https://en.wikipedia.org/wiki/Continuous_integration) on `main` finished `success` at 2026-10-15T19:22Z ([38793202814](https://github.com/AIKitLLC/nhtsa-edge-api/actions/runs/38793202814)). The billing endpoint `GET /orgs/AIKitLLC/settings/billing/actions` returned [HTTP](https://developer.mozilla.org/en-US/docs/Web/HTTP) (Hypertext Transfer Protocol) 403, `Resource not accessible by integration`. Pull request #16's body had recorded a billing block earlier on 2026-10-15 (about 11:30 [Central Time](https://en.wikipedia.org/wiki/Central_Time_Zone)).
-- Milestones M1, M2, and M3 are to create, so #8 through #13 sit on an empty milestone field.
-- Production deploy stays manual. Deploy, `wrangler login`, and Cloudflare secret names (`DATA_GOV_API_KEY`, `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`) stay with Tony.
-- `HANDOFF.md` says the unbound [D1](https://developers.cloudflare.com/d1/) database `nhtsa-db` can be deleted. That is a Cloudflare account change.
+Merged, not open: [#6](https://github.com/AIKitLLC/nhtsa-edge-api/pull/6) (agent standards, closes #7), [#5](https://github.com/AIKitLLC/nhtsa-edge-api/pull/5) (rate limit, [OpenAPI](https://www.openapis.org/) description, `/docs`, `llms.txt`, batch page, comparison doc), #4 naming, #3 workers.dev address, #2 website, #1 offline decoder.
 
 ## Labels
 
@@ -120,9 +85,49 @@ Standards labels are on the repository, alongside the original GitHub defaults (
 
 `area:*` matches the modules in `docs/ARCHITECTURE.md`, plus `area:docs` for `docs/`, `README.md`, and `HANDOFF.md`.
 
+## Milestones
+
+None exist. The milestones list for this repository was empty on 2026-10-15. The plan, not yet created:
+
+| Milestone | What it covers | Issues to assign when it exists |
+| :-- | :-- | :-- |
+| M1 Foundation | Offline vPIC decoder, dataset hub, weekly git-tracked data, dev deploy. Shipped on `main`. | none open |
+| M2 Dataset completeness | Hub datasets that are partial or planned: offline recalls, full fuel economy, complaints and NCAP | #8, #9, #10 |
+| M3 Further public datasets | Sources named in `HANDOFF.md`: United Kingdom DVSA MOT history, Australian Green Vehicle Guide, Euro NCAP | #11, #12, #13 |
+
+## CI
+
+Pull requests run two workflows. A green check means the job ran and finished with conclusion `success`. A skipped job does not count.
+
+| Workflow | What it runs | Permissions |
+| :-- | :-- | :-- |
+| [CI](.github/workflows/ci.yml) | Typecheck, Vitest on the real vPIC data, dry-run Worker bundle | `contents: read` |
+| [Architecture](.github/workflows/architecture.yml) | arcade-agent 0.4.1, action commit `2fde72bcf6cd1f861b8f25b09c0a1d7bc83b820d`, report only (`continue-on-error: true`) | `contents: read`, `actions: read` |
+
+Checks for `cursor/security-hardening-a411` start when that branch is pushed. They are not copied into this file until they finish. The last recorded runs below are from commit `7096f27` (rebased onto `aa309df`, 2026-10-15):
+
+| Check | Result | Run |
+| :-- | :-- | :-- |
+| [CI](https://github.com/AIKitLLC/nhtsa-edge-api/actions/runs/38750177874) | `success`. Checkout, install, asset build, typecheck, tests, and dry-run bundle each finished `success`. None were skipped. | 38750177874 |
+| [Architecture](https://github.com/AIKitLLC/nhtsa-edge-api/actions/runs/38750177950) | `success`. The analyze step finished `success` in 34 seconds. | 38750177950 |
+| vPIC data refresh and dev deploy | `cancelled` during the SQL comparison step. The dev-deploy job never started, so nothing was deployed. | 38750169916 |
+
+The refresh workflow starts on a push that changes `src/**`. The rebase did that relative to the previous branch tip. Cancelling it from this agent returned HTTP 403; the run still ended `cancelled` before deploy. A docs-only commit does not match those paths, so it does not start that workflow again.
+
+Primary arcade-agent result on that run (algorithm `pkg`): 212 entities, 219 edges, 8 components, balanced score 0.6219, RCI (cohesive interactions) 0.6530. No baseline artifact exists on `main`, so there is no drift delta yet. The job log is the report.
+
+Deploy production and the Cloudflare check workflow do not run on this pull request. This change does not deploy.
+
+## Known blockers
+
+- No issue is `status:blocked`.
+- Milestones are not created, so #8 through #13 are not on a milestone yet.
+- Production deploy stays manual. Agents do not deploy, do not run `wrangler login`, and do not read or write Cloudflare secrets, including `DATA_GOV_API_KEY`, `CLOUDFLARE_API_TOKEN`, and `CLOUDFLARE_ACCOUNT_ID`.
+- `HANDOFF.md` says the unbound [D1](https://developers.cloudflare.com/d1/) database `nhtsa-db` can be deleted. D1 is Cloudflare's relational database. That is a Cloudflare account change. Agents do not do it.
+
 ## Next steps
 
-1. Create milestones M1, M2, and M3, then assign #8–#10 to M2 and #11–#13 to M3.
-2. Close #14, or rewrite its body, after confirming `HANDOFF.md` already says 93.6%.
-3. Have someone who can read organization billing confirm the GitHub Actions budget. Actions is running again. This fetch received [HTTP](https://developer.mozilla.org/en-US/docs/Web/HTTP) 403 from the billing endpoint.
+1. Security (Chuyên gia Bảo mật) PASS on pull request #21, then Tony's approval. Do not merge or deploy before that.
+2. Create milestones M1, M2, and M3, then assign #8–#10 to M2 and #11–#13 to M3.
+3. Close #14 when Tony accepts the job-summary link in `HANDOFF.md` in place of a frozen parity percentage.
 4. Leave deploy and secrets alone.

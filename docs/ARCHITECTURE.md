@@ -46,7 +46,7 @@ Dependency direction is downward in that diagram. `src/vpic` does not import `sr
 | vpic | `src/vpic/` | Offline port of NHTSA `spVinDecode` and the response shapes | `ASSETS` only |
 | services | `src/services/` | Upstream fetch, Cache API / optional KV, unified profile assembly | `enrichment`, `vpic` types, `config`, `types` |
 | enrichment | `src/enrichment/` | Adapters for FuelEconomy.gov and RDW Open Data | those HTTP APIs |
-| validation | `src/validation/vin.ts` | VIN and model-year parsing at the trust boundary | Zod |
+| validation | `src/validation/vin.ts`, `src/validation/upstream-path.ts` | VIN and model-year parsing, the proxy path allowlist, and proxy query checks, at the trust boundary | Zod (VIN only) |
 | pipeline | `scripts/vpic/` | Ingest, asset build, live parity, SQL verification, errata audit | filesystem, NHTSA downloads, live vPIC API, PostgreSQL 17 |
 | data | `data/vpic/` | Git-tracked vPIC tables and `manifest.json` | read by the pipeline; the Worker reads the built assets |
 | docs | `docs/` | Data pipeline, NHTSA errata, comparison note, verbatim SQL reference, this map, status | none at runtime |
@@ -62,8 +62,8 @@ Dependency direction is downward in that diagram. `src/vpic` does not import `sr
 | `src/routes/openapi/` | `GET /openapi.json` and `GET /llms.txt`. `/docs` renders the same document |
 | `src/routes/v1/` | `/api/v1/vin/:vin`, `/unified`, `/compare`, `/makes`, `/models`, `/recalls/:vin` |
 | `src/routes/vpic-decode.ts` | Offline `DecodeVin`, `DecodeVinValues`, and `DecodeVINValuesBatch` |
-| `src/routes/vpic-proxy.ts` | Every other `/vehicles/*` call, proxied and cached. `*Extended` stays upstream |
-| `src/routes/recalls-proxy.ts` | `/recalls/*` drop-in proxy |
+| `src/routes/vpic-proxy.ts` | Allowlisted `/vehicles/*` calls, proxied and cached. `*Extended` stays upstream. Unknown paths are HTTP 400 |
+| `src/routes/recalls-proxy.ts` | Allowlisted `/recalls/*` drop-in proxy (`recallsByVehicle`, `recallsByVin`) |
 
 ### vpic
 
@@ -97,9 +97,9 @@ From `src/types/env.ts` and `wrangler.jsonc`:
 | Binding | State | Use |
 | :-- | :-- | :-- |
 | `ASSETS` | Required. `run_worker_first: true` | Decoder JSON built from `data/vpic` into `build/assets` |
-| `RATE_LIMITER` | Bound in `wrangler.jsonc` (`ratelimits`, 120 requests / 60 seconds). Production namespace `1001`, dev `1002` | `src/middleware/rate-limit.ts`. Pages, `/health`, docs, and CORS preflight are exempt. Fails open if the binding is missing |
+| `RATE_LIMITER` | Bound in `wrangler.jsonc` (`ratelimits`, 120 requests / 60 seconds). Production namespace `1001`, dev `1002` | `src/middleware/rate-limit.ts`. Pages, `/health`, docs, and CORS preflight are exempt. A missing binding or a throw is HTTP 503 with `Retry-After` (fail closed). 429 is only a real limit. The only bypass is `ALLOW_NO_RATE_LIMIT=true` while `ENVIRONMENT` is not `production`, set only in the test helper. `wrangler.jsonc` does not set it |
 | `NHTSA_CACHE_KV` | Unbound. `ENABLE_KV_CACHE` is `false` | Optional cache for proxied responses |
-| `DATA_GOV_API_KEY` | Optional Worker secret. Not in `wrangler.jsonc` | Sent as `api_key` to `api.nhtsa.gov` and as `X-Api-Key` on FuelEconomy.gov lookups. Health reports only whether it is set. Agents do not read or write it |
+| `DATA_GOV_API_KEY` | Optional Worker secret. Not in `wrangler.jsonc` | Sent only as the `X-Api-Key` header, and only to `api.data.gov` and `api.nhtsa.gov`. Not placed in the URL, not sent to vPIC, and not sent to FuelEconomy.gov. `/health` does not report whether it is set. Agents do not read or write it |
 | vars | `ENVIRONMENT`, `UPSTREAM_TIMEOUT_MS` | Health and upstream timeout |
 | routes | `data.ai-kit.net` on production; `env.dev` clears routes | Custom domain. `workers_dev` stays on |
 
@@ -129,9 +129,9 @@ flowchart LR
 | :-- | :-- | :-- |
 | `vpic.nhtsa.dot.gov` downloads | `scripts/vpic` | Weekly ingest |
 | `vpic.nhtsa.dot.gov/api` | `services/upstream.ts`, `scripts/vpic/parity.ts` | Proxied endpoints and the parity gate |
-| `api.nhtsa.gov` | recalls routes and `services/upstream.ts` | Recalls proxy, cached 6 hours. An `api.data.gov` key is attached when `DATA_GOV_API_KEY` is set |
-| `api.data.gov` | `services/upstream.ts` | Key host for the optional data.gov credential. The secret itself is not stored in git |
-| FuelEconomy.gov | `enrichment/epa.ts` | `/unified`. The same secret is sent as `X-Api-Key` when it is set |
+| `api.nhtsa.gov` | recalls routes and `services/upstream.ts` | Recalls proxy, cached 6 hours (errors cached 60 seconds). When `DATA_GOV_API_KEY` is set, it is sent as `X-Api-Key` and never in the URL |
+| `api.data.gov` | `services/upstream.ts` | The other host that may receive `X-Api-Key`. The secret itself is not stored in git |
+| FuelEconomy.gov | `enrichment/epa.ts` | `/unified`. The data.gov key is not sent |
 | RDW Open Data | `enrichment/rdw.ts` | `/unified` |
 | Cloudflare Workers | the Worker | Runtime, static assets, optional KV |
 | PostgreSQL 17 | `scripts/vpic/sql-verify` | CI and local verification only |

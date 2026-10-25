@@ -73,7 +73,6 @@ function healthJson(c: AppContext, snap: Snapshot): Response {
       edge: {
         location: snap.colo,
         country: snap.country,
-        dataGovApiKeyConfigured: Boolean(c.env?.DATA_GOV_API_KEY),
       },
       datasets: {
         vpic: "live (offline VIN decoding)",
@@ -84,15 +83,15 @@ function healthJson(c: AppContext, snap: Snapshot): Response {
       endpoints: {
         vinDecode: "GET /api/v1/vin/:vin[?modelyear=YYYY]",
         vinUnified: "GET /api/v1/vin/:vin/unified[?epa=false&eu=false] (decode + US EPA + EU RDW)",
-        vinParityCheck: "GET /api/v1/vin/:vin/compare",
+        vinParityCheck: "GET /api/v1/vin/:vin/compare (cached 24 h)",
         makes: "GET /api/v1/makes",
         models: "GET /api/v1/models?make=:make",
         recalls: "GET /api/v1/recalls/:vin",
         vpicDecodeVinValues: "GET /vehicles/DecodeVinValues/:vin?format=json[&modelyear=YYYY][&clean=true]",
         vpicDecodeVin: "GET /vehicles/DecodeVin/:vin?format=json[&clean=true]",
         vpicBatch: "POST /vehicles/DecodeVINValuesBatch/ (format=json, data=VIN[,year];...)",
-        vpicOther: "GET /vehicles/* (proxied to vpic.nhtsa.dot.gov, cached)",
-        recallsProxy: "GET /recalls/* (proxied to api.nhtsa.gov, cached)",
+        vpicOther: "GET /vehicles/* (allowlisted vPIC endpoints, proxied and cached)",
+        recallsProxy: "GET /recalls/* (allowlisted recalls endpoints, proxied and cached)",
       },
       timestamp: new Date().toISOString(),
     },

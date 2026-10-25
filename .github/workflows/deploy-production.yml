@@ -58,6 +58,11 @@ jobs:
       - name: Build assets
         run: bun scripts/vpic/build-assets.ts
 
+      - name: Dry-run and confirm RATE_LIMITER is bound
+        run: |
+          pnpm exec wrangler deploy --dry-run --outdir /tmp/nhtsa-dry-run 2>&1 | tee dry-run.log
+          grep -q 'RATE_LIMITER' dry-run.log || { echo "FAIL: RATE_LIMITER is not bound"; exit 1; }
+
       - name: Deploy nhtsa-edge-api (production)
         run: |
           pnpm exec wrangler deploy 2>&1 | tee deploy.log
@@ -76,6 +81,8 @@ jobs:
           grep -q 'id="datasets"' hub.html
           grep -qi "^content-security-policy:.*script-src 'nonce-" hub.headers
           curl -fsS "$SITE_URL/vpic" | grep -q 'id="vin-form"'
+          code=$(curl -sS -o /dev/null -w '%{http_code}' "$SITE_URL/api/v1/makes")
+          if [[ "$code" == "503" ]]; then echo "FAIL: /api/v1/makes returned 503 (rate limiter missing)"; exit 1; fi
           curl -fsS "$SITE_URL/api/v1/vin/1HGCM82633A004352" -o decode.json
           node -e 'const d=require("./decode.json").data; if (d.make!=="HONDA" || d.modelYear!==2003) { console.error("unexpected decode", d); process.exit(1) }'
           # The original workers.dev URL must keep working next to the custom domain

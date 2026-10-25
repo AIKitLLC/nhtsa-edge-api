@@ -19,7 +19,7 @@ its data is served from this Worker.
 
 - Decodes full and partial VINs **without calling NHTSA**: a TypeScript port of vPIC's
   own `spVinDecode` runs over the official monthly vPIC dump, bundled with the worker as
-  static assets. Median decode time is a few milliseconds.
+  static assets.
 - **Drop-in compatible** with `vpic.nhtsa.dot.gov/api`: `DecodeVinValues`, `DecodeVin`
   and `DecodeVINValuesBatch` return the same JSON shape; all other vPIC endpoints and the
   recalls API are proxied and cached.
@@ -35,6 +35,7 @@ its data is served from this Worker.
   [API reference](https://data.ai-kit.net/docs), a [batch page](https://data.ai-kit.net/batch)
   (paste or upload up to 500 VINs, download CSV) and `/llms.txt` for agents. API requests are
   limited to 120 per minute per client and location (HTTP 429 with `Retry-After`).
+  If the rate-limiter binding is missing or errors, the API fails closed with HTTP 503 and `Retry-After`.
 - **Honest comparison** with vPIC and with bundled-library approaches such as Corgi:
   [docs/COMPARISON.md](docs/COMPARISON.md).
 
@@ -111,10 +112,10 @@ Offline responses carry `X-Decode-Source: LOCAL_VPIC` and `X-Vpic-Data-Version`
 | `GET` | `/health` | Health JSON, always |
 | `GET` | `/vpic` | The live VIN decoder page |
 | `GET` | `/api/v1/vin/:vin/unified[?epa=false&eu=false]` | Offline decode + US EPA FuelEconomy.gov (EV range, MPGe, motor) + EU RDW (type approval, masses). Enrichments are model-level, not VIN-specific; a failed enrichment leaves its section `null` and the response uncached |
-| `GET` | `/api/v1/vin/:vin/compare` | Offline decode vs live vPIC, field by field (not cached) |
+| `GET` | `/api/v1/vin/:vin/compare` | Offline decode vs live vPIC, field by field (cached 24 h) |
 | `GET` | `/api/v1/recalls/:vin` | Recalls for a 17-character VIN (proxied to `api.nhtsa.gov`, cached 6 h) |
-| `GET` | `/vehicles/*` | Any other vPIC endpoint, including `*Extended` decodes (proxied, cached) |
-| `GET` | `/recalls/*` | Recalls API drop-in proxy (cached) |
+| `GET` | `/vehicles/*` | Allowlisted vPIC endpoints, including `*Extended` decodes (proxied, cached). Other paths are HTTP 400 |
+| `GET` | `/recalls/*` | Allowlisted recalls endpoints (`recallsByVehicle`, `recallsByVin`), cached. Other paths are HTTP 400 |
 
 Proxied endpoints forward only known query parameters, so extra parameters cannot bypass
 the cache. The Cache API is a no-op on `*.workers.dev`; attach a custom domain (or enable
@@ -127,25 +128,13 @@ depend on it.
 
 `scripts/vpic/parity.ts` decodes a deterministic set of 1,000 VINs (real VINs from the
 dump, VINs built from real model patterns, and error cases) and compares **every field**
-with the live `DecodeVINValuesBatch` API. The weekly workflow fails, and nothing is
-committed or deployed, when the share of fully identical VINs drops below the
-`VPIC_PARITY_MIN` threshold (default 85%).
+with the live `DecodeVINValuesBatch` API.
 
-The latest report is in the job summary of the `vPIC data refresh & dev deploy` workflow,
-and its parity rate is part of each data commit message. Most remaining differences
-are NHTSA data changes made after the dump was published (new patterns, re-cased names);
-they disappear with the next dump. Details: [docs/DATA.md](docs/DATA.md).
-
-### Performance
-
-Measured on 3,000 varied VINs (the parity corpus) with the production cache settings:
-
-| Metric | Value |
-| :-- | :-- |
-| Decode time p50 / p95 / p99 (including cold asset reads) | 1.4 ms / 6.2 ms / 10.9 ms |
-| Decode time, warm (asset already cached in the isolate) | ~1–3 ms |
-| Peak heap of the per-isolate data cache (4 MB JSON budget, LRU) | ~42 MB |
-| Worker script size | ~61 KB gzip (data ships as static assets) |
+The strict rate is the `exactRate` printed in the
+[vPIC data refresh job summary](https://github.com/AIKitLLC/nhtsa-edge-api/actions/workflows/vpic-data.yml)
+(and in that run's data commit message). The weekly gate passes when the strict matches
+plus the known-renames allowlist meet `VPIC_PARITY_MIN` (default 85%). The strict rate
+moves when NHTSA edits data after the dump is published. Details: [docs/DATA.md](docs/DATA.md).
 
 ---
 
@@ -210,8 +199,7 @@ Without them the deploy job is skipped with a warning; everything else still run
 
 ### Production (data.ai-kit.net)
 
-Production is served at **https://data.ai-kit.net** (the `nhtsa-edge-api.tuannx87.workers.dev`
-URL keeps working). It is deployed manually after the dev worker has been checked, so a data
+Production is served at **https://data.ai-kit.net**. It is deployed manually after the dev worker has been checked, so a data
 update never reaches production without a person looking at it:
 
 - **From GitHub:** Actions → *Deploy production* → Run workflow on `main`, type `deploy`.
