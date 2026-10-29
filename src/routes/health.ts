@@ -74,12 +74,14 @@ function healthJson(c: AppContext, snap: Snapshot): Response {
         location: snap.colo,
         country: snap.country,
         dataGovApiKeyConfigured: Boolean(c.env?.DATA_GOV_API_KEY),
+        leakEmailLookupConfigured: Boolean(c.env?.HIBP_API_KEY && c.env?.LEAK_API_TOKEN),
       },
       datasets: {
         vpic: "live (offline VIN decoding)",
         recalls: "partial (proxied to NHTSA, cached)",
         fuelEconomy: "partial (model-level data in /api/v1/vin/:vin/unified)",
         complaintsAndNcap: "planned",
+        leakCheck: "live (Have I Been Pwned: password k-anonymity range; email lookup needs a token)",
       },
       endpoints: {
         vinDecode: "GET /api/v1/vin/:vin[?modelyear=YYYY]",
@@ -88,6 +90,8 @@ function healthJson(c: AppContext, snap: Snapshot): Response {
         makes: "GET /api/v1/makes",
         models: "GET /api/v1/models?make=:make",
         recalls: "GET /api/v1/recalls/:vin",
+        leakPasswordRange: "GET /api/v1/leak/password/range/:sha1Prefix5 (HIBP Pwned Passwords, padded)",
+        leakEmail: "POST /api/v1/leak/email {email} (Authorization: Bearer token; source: haveibeenpwned.com)",
         vpicDecodeVinValues: "GET /vehicles/DecodeVinValues/:vin?format=json[&modelyear=YYYY][&clean=true]",
         vpicDecodeVin: "GET /vehicles/DecodeVin/:vin?format=json[&clean=true]",
         vpicBatch: "POST /vehicles/DecodeVINValuesBatch/ (format=json, data=VIN[,year];...)",

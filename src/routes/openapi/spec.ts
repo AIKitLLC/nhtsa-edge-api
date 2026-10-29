@@ -39,7 +39,7 @@ export const OPENAPI = {
     summary: "Offline NHTSA vPIC VIN decoding and related US vehicle data.",
     description:
       "Decodes VINs inside the Worker with a port of NHTSA's `spVinDecode` over the official vPIC dump, checked against NHTSA's SQL and the live API. " +
-      "No API key. Requests are limited to 120 per minute per client and location; over the limit the API answers 429 with `Retry-After`. " +
+      "No API key, except the email breach lookup (bearer token). Requests are limited to 120 per minute per client and location (email lookups: 10); over the limit the API answers 429 with `Retry-After`. " +
       "Independent project, not affiliated with any U.S. government agency.",
     license: { name: "MIT", url: "https://github.com/AIKitLLC/nhtsa-edge-api/blob/main/LICENSE" },
     contact: { name: "AI Kit LLC", url: "https://github.com/AIKitLLC/nhtsa-edge-api" },
@@ -50,6 +50,7 @@ export const OPENAPI = {
     { name: "Catalog", description: "Makes and models in the bundled dataset" },
     { name: "vPIC drop-in", description: "Same paths and JSON shape as vpic.nhtsa.dot.gov" },
     { name: "Recalls", description: "Proxied to NHTSA and cached" },
+    { name: "Leak check", description: "Breach data from Have I Been Pwned (CC BY 4.0, https://haveibeenpwned.com)" },
   ],
   paths: {
     "/api/v1/vin/{vin}": {
@@ -141,6 +142,44 @@ export const OPENAPI = {
           "200": { description: "Recalls as returned by NHTSA", content: { "application/json": { schema: { type: "object" } } } },
           "400": errorResponse("Invalid VIN"),
           "429": errorResponse("Rate limited"),
+        },
+      },
+    },
+    "/api/v1/leak/password/range/{prefix}": {
+      get: {
+        tags: ["Leak check"],
+        operationId: "pwnedPasswordRange",
+        summary: "Pwned Passwords k-anonymity range",
+        description:
+          "Send the first 5 hex characters of the SHA-1 of a password; compare the other 35 locally against the returned `SUFFIX:COUNT` lines. " +
+          "Responses are padded with zero-count lines so their size does not reveal the prefix. The password never leaves the client.",
+        parameters: [
+          { name: "prefix", in: "path", required: true, schema: { type: "string", pattern: "^[0-9A-Fa-f]{5}$" }, example: "21BD1" },
+        ],
+        responses: {
+          "200": { description: "One `SUFFIX:COUNT` line per hash", content: { "text/plain": { schema: { type: "string" } } } },
+          "400": errorResponse("Invalid prefix"),
+          "429": errorResponse("Rate limited"),
+        },
+      },
+    },
+    "/api/v1/leak/email": {
+      post: {
+        tags: ["Leak check"],
+        operationId: "breachesForEmail",
+        summary: "Breaches containing an email address",
+        description:
+          "Requires `Authorization: Bearer <token>`. Sensitive breaches are omitted. The email is not cached or logged. Source: Have I Been Pwned.",
+        requestBody: {
+          required: true,
+          content: { "application/json": { schema: { type: "object", required: ["email"], properties: { email: { type: "string", format: "email" } } } } },
+        },
+        responses: {
+          "200": { description: "`data.breached`, `data.breaches[]` and the `source` attribution", content: { "application/json": { schema: { type: "object" } } } },
+          "400": errorResponse("Invalid email"),
+          "401": errorResponse("Missing or wrong token"),
+          "429": errorResponse("Rate limited"),
+          "503": errorResponse("Not configured on this deployment"),
         },
       },
     },
