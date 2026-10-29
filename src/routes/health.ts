@@ -79,6 +79,7 @@ function healthJson(c: AppContext, snap: Snapshot): Response {
         recalls: "partial (proxied to NHTSA, cached)",
         fuelEconomy: "partial (model-level data in /api/v1/vin/:vin/unified)",
         complaintsAndNcap: "planned",
+        leakCheck: "partial (password k-anonymity range from Pwned Passwords; email lookup planned)",
       },
       endpoints: {
         vinDecode: "GET /api/v1/vin/:vin[?modelyear=YYYY]",
@@ -87,6 +88,7 @@ function healthJson(c: AppContext, snap: Snapshot): Response {
         makes: "GET /api/v1/makes",
         models: "GET /api/v1/models?make=:make",
         recalls: "GET /api/v1/recalls/:vin",
+        leakPasswordRange: "GET /api/v1/leak/password/range/:sha1Prefix5 (HIBP Pwned Passwords, padded)",
         vpicDecodeVinValues: "GET /vehicles/DecodeVinValues/:vin?format=json[&modelyear=YYYY][&clean=true]",
         vpicDecodeVin: "GET /vehicles/DecodeVin/:vin?format=json[&clean=true]",
         vpicBatch: "POST /vehicles/DecodeVINValuesBatch/ (format=json, data=VIN[,year];...)",

@@ -51,6 +51,7 @@ export const OPENAPI = {
     { name: "Catalog", description: "Makes and models in the bundled dataset" },
     { name: "vPIC drop-in", description: "Same paths and JSON shape as vpic.nhtsa.dot.gov" },
     { name: "Recalls", description: "Proxied to NHTSA and cached" },
+    { name: "Leak check", description: "Breach data from Have I Been Pwned (CC BY 4.0, https://haveibeenpwned.com)" },
   ],
   paths: {
     "/api/v1/vin/{vin}": {
@@ -141,6 +142,24 @@ export const OPENAPI = {
         responses: {
           "200": { description: "Recalls as returned by NHTSA", content: { "application/json": { schema: { type: "object" } } } },
           "400": errorResponse("Invalid VIN"),
+          "429": errorResponse("Rate limited"),
+        },
+      },
+    },
+    "/api/v1/leak/password/range/{prefix}": {
+      get: {
+        tags: ["Leak check"],
+        operationId: "pwnedPasswordRange",
+        summary: "Pwned Passwords k-anonymity range",
+        description:
+          "Send the first 5 hex characters of the SHA-1 of a password; compare the other 35 locally against the returned `SUFFIX:COUNT` lines. " +
+          "Responses are padded with zero-count lines so their size does not reveal the prefix. The password never leaves the client.",
+        parameters: [
+          { name: "prefix", in: "path", required: true, schema: { type: "string", pattern: "^[0-9A-Fa-f]{5}$" }, example: "21BD1" },
+        ],
+        responses: {
+          "200": { description: "One `SUFFIX:COUNT` line per hash", content: { "text/plain": { schema: { type: "string" } } } },
+          "400": errorResponse("Invalid prefix"),
           "429": errorResponse("Rate limited"),
         },
       },

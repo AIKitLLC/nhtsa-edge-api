@@ -45,6 +45,21 @@ export interface Env {
    * api.data.gov key. Sent only as `X-Api-Key` to api.data.gov and api.nhtsa.gov, never in a URL.
    */
   readonly DATA_GOV_API_KEY?: string;
+
+  /**
+   * Have I Been Pwned API key (secret) for POST /api/v1/leak/email; the route answers 503 without it.
+   */
+  readonly HIBP_API_KEY?: string;
+
+  /**
+   * Bearer token clients must send to POST /api/v1/leak/email (secret); the route answers 503 without it.
+   */
+  readonly LEAK_API_TOKEN?: string;
+
+  /**
+   * Stricter per-client limit for email lookups, which spend the paid HIBP quota.
+   */
+  readonly LEAK_RATE_LIMITER?: RateLimit;
 }
 
 export type AppVariables = {
