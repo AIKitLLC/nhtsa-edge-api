@@ -1,4 +1,4 @@
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, mkdirSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { afterAll, describe, expect, it } from "vitest";
@@ -6,7 +6,7 @@ import { buildShards } from "../scripts/epa/build-assets";
 import { parseCsv } from "../scripts/epa/csv";
 import { COLUMNS, selectColumns } from "../scripts/epa/ingest";
 import { app } from "../src/index";
-import { fsAssets } from "./helpers/assets";
+import { ASSETS_DIR, fsAssets, testEnv } from "./helpers/assets";
 
 // The header and first record of FuelEconomy.gov's vehicles.csv as served on 2026-10-15
 const HEADER =
@@ -92,5 +92,23 @@ describe("EPA assets and endpoint", () => {
     expect((await get("?year=2022&make=Honda&model=nothing")).status).toBe(404);
     expect((await get("?year=1900&make=Honda")).status).toBe(404);
     expect((await get("?year=2022&make=!!!")).status).toBe(404);
+  });
+});
+
+describe("EPA endpoint on the built data", () => {
+  it("serves electric-vehicle ranges for a real model year, make and model", async () => {
+    const res = await app.request("/api/v1/fuel-economy?year=2022&make=Tesla&model=Model%203", {}, testEnv());
+    expect(res.status).toBe(200);
+    const { count, data } = (await res.json()) as { count: number; data: { atvType: string; range: number; comb08: number }[] };
+    expect(count).toBeGreaterThan(0);
+    for (const v of data) expect(v).toMatchObject({ atvType: "EV", range: expect.any(Number) });
+    expect(Math.min(...data.map((v) => v.range))).toBeGreaterThan(150);
+  });
+
+  it("keeps every shard small enough to read within the Worker's CPU budget", () => {
+    const dir = join(ASSETS_DIR, "epa");
+    const sizes = readdirSync(dir).flatMap((y) => readdirSync(join(dir, y)).map((f) => statSync(join(dir, y, f)).size));
+    expect(sizes.length).toBeGreaterThan(1000);
+    expect(Math.max(...sizes)).toBeLessThan(250_000);
   });
 });
