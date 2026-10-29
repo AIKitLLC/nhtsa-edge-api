@@ -1,6 +1,6 @@
 # Status
 
-Updated in the same pull request as every code or docs change. Last updated: 2026-10-25.
+Updated in the same pull request as every code or docs change. Last updated: 2026-10-29.
 
 Figures are from the GitHub API (application programming interface) for `AIKitLLC/nhtsa-edge-api` on that date. Default branch: `main`. `main` is `851729d` (`data(vpic): vPICList_lite_2026_10`, live parity 93.90%). The strict parity rate is the `exactRate` in the [vPIC data refresh job summary](https://github.com/AIKitLLC/nhtsa-edge-api/actions/workflows/vpic-data.yml).
 
@@ -15,7 +15,7 @@ Nine issues are open. None use `status:blocked`. Milestone fields are empty beca
 | [#24](https://github.com/AIKitLLC/nhtsa-edge-api/issues/24) Mandatory CI/CD deploy; no deploys from a local machine | `priority:p0` | none |
 | [#22](https://github.com/AIKitLLC/nhtsa-edge-api/issues/22) Follow-ups from Security review of #21 (non-blocking) | none | none |
 | [#8](https://github.com/AIKitLLC/nhtsa-edge-api/issues/8) Bundle an offline copy of NHTSA safety recalls | `type:feature`, `area:pipeline`, `area:routes`, `status:ready`, `priority:p2` | M2 Dataset completeness |
-| [#9](https://github.com/AIKitLLC/nhtsa-edge-api/issues/9) Serve the full [EPA](https://www.epa.gov/) (Environmental Protection Agency) and [DOE](https://www.energy.gov/) (Department of Energy) fuel-economy dataset | `type:feature`, `area:enrichment`, `status:ready`, `priority:p2` | M2 Dataset completeness |
+| [#9](https://github.com/AIKitLLC/nhtsa-edge-api/issues/9) Serve the full [EPA](https://www.epa.gov/) (Environmental Protection Agency) and [DOE](https://www.energy.gov/) (Department of Energy) fuel-economy dataset. In review: [#26](https://github.com/AIKitLLC/nhtsa-edge-api/pull/26) | `type:feature`, `area:enrichment`, `status:ready`, `priority:p2` | M2 Dataset completeness |
 | [#10](https://github.com/AIKitLLC/nhtsa-edge-api/issues/10) Add NHTSA complaints and [NCAP](https://www.nhtsa.gov/ratings) (New Car Assessment Program) crash-test ratings | `type:feature`, `area:enrichment`, `status:ready`, `priority:p2` | M2 Dataset completeness |
 | [#11](https://github.com/AIKitLLC/nhtsa-edge-api/issues/11) Add [United Kingdom](https://www.gov.uk/) [DVSA](https://www.gov.uk/government/organisations/driver-and-vehicle-standards-agency) (Driver and Vehicle Standards Agency) [MOT](https://www.gov.uk/getting-an-mot) (Ministry of Transport test) history | `type:feature`, `area:enrichment`, `status:ready`, `priority:p2` | M3 Further public datasets |
 | [#12](https://github.com/AIKitLLC/nhtsa-edge-api/issues/12) Add the Australian Green Vehicle Guide | `type:feature`, `area:enrichment`, `status:ready`, `priority:p2` | M3 Further public datasets |
@@ -29,9 +29,9 @@ Euro NCAP in #13 is a separate program from NHTSA NCAP in #10.
 | Pull request | Branch | Linked issue |
 | :-- | :-- | :-- |
 | [#23](https://github.com/AIKitLLC/nhtsa-edge-api/pull/23) Add a RapidAPI proxy batch route | `cursor/rapidapi-proxy-route-d053` | draft |
-| [#17](https://github.com/AIKitLLC/nhtsa-edge-api/pull/17) docs: refresh STATUS.md | `cursor/docs-status-refresh-773a` | none (this change) |
+| [#26](https://github.com/AIKitLLC/nhtsa-edge-api/pull/26) Serve the full EPA / DOE fuel-economy dataset | `claude/exciting-pascal-8khdrj` | closes #9 |
 
-Merged, not open: [#21](https://github.com/AIKitLLC/nhtsa-edge-api/pull/21) (data.gov key stays on its hosts, proxy cache bypass closed; closes #20), #19 (drop personal workers.dev hostname), #18 (known-renames allowlist for the parity gate), [#6](https://github.com/AIKitLLC/nhtsa-edge-api/pull/6) (agent standards, closes #7), #16, #5, #4, #3, #2, #1.
+Merged, not open: [#17](https://github.com/AIKitLLC/nhtsa-edge-api/pull/17) (STATUS refresh), [#21](https://github.com/AIKitLLC/nhtsa-edge-api/pull/21) (data.gov key stays on its hosts, proxy cache bypass closed; closes #20), #19 (drop personal workers.dev hostname), #18 (known-renames allowlist for the parity gate), [#6](https://github.com/AIKitLLC/nhtsa-edge-api/pull/6) (agent standards, closes #7), #16, #5, #4, #3, #2, #1.
 
 ## Labels
 
