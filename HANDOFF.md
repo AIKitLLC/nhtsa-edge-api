@@ -56,7 +56,7 @@ runtime. The D1 database `nhtsa-db` is no longer bound and can be deleted.
 - `GET /api/v1/vin/:vin/compare` — offline vs live vPIC, field by field
 - `GET /vehicles/DecodeVinValues/:vin?format=json[&clean=true]`, `DecodeVin`, `POST DecodeVINValuesBatch`
 - `GET /api/v1/makes`, `/api/v1/models?make=`, `/api/v1/recalls/:vin`, `/vehicles/*`, `/recalls/*`
-- `GET /api/v1/leak/password/range/:prefix` (HIBP Pwned Passwords, padded), `POST /api/v1/leak/email` (HIBP, bearer `LEAK_API_TOKEN`; secrets `HIBP_API_KEY`, `LEAK_API_TOKEN`)
+- `GET /api/v1/leak/password/range/:prefix` (HIBP Pwned Passwords, padded), email lookup pending: `src/routes/v1/leak-email.ts` is written and tested but not mounted until an HIBP API key is bought (secrets `HIBP_API_KEY`, `LEAK_API_TOKEN`)
 
 Branding: `X-Powered-By` / `X-Repository` headers, `_meta` in v1 responses, landing page at `/`.
 

@@ -39,7 +39,7 @@ export const OPENAPI = {
     summary: "Offline NHTSA vPIC VIN decoding and related US vehicle data.",
     description:
       "Decodes VINs inside the Worker with a port of NHTSA's `spVinDecode` over the official vPIC dump, checked against NHTSA's SQL and the live API. " +
-      "No API key, except the email breach lookup (bearer token). Requests are limited to 120 per minute per client and location (email lookups: 10); over the limit the API answers 429 with `Retry-After`. " +
+      "No API key. Requests are limited to 120 per minute per client and location; over the limit the API answers 429 with `Retry-After`. " +
       "Independent project, not affiliated with any U.S. government agency.",
     license: { name: "MIT", url: "https://github.com/AIKitLLC/nhtsa-edge-api/blob/main/LICENSE" },
     contact: { name: "AI Kit LLC", url: "https://github.com/AIKitLLC/nhtsa-edge-api" },
@@ -160,26 +160,6 @@ export const OPENAPI = {
           "200": { description: "One `SUFFIX:COUNT` line per hash", content: { "text/plain": { schema: { type: "string" } } } },
           "400": errorResponse("Invalid prefix"),
           "429": errorResponse("Rate limited"),
-        },
-      },
-    },
-    "/api/v1/leak/email": {
-      post: {
-        tags: ["Leak check"],
-        operationId: "breachesForEmail",
-        summary: "Breaches containing an email address",
-        description:
-          "Requires `Authorization: Bearer <token>`. Sensitive breaches are omitted. The email is not cached or logged. Source: Have I Been Pwned.",
-        requestBody: {
-          required: true,
-          content: { "application/json": { schema: { type: "object", required: ["email"], properties: { email: { type: "string", format: "email" } } } } },
-        },
-        responses: {
-          "200": { description: "`data.breached`, `data.breaches[]` and the `source` attribution", content: { "application/json": { schema: { type: "object" } } } },
-          "400": errorResponse("Invalid email"),
-          "401": errorResponse("Missing or wrong token"),
-          "429": errorResponse("Rate limited"),
-          "503": errorResponse("Not configured on this deployment"),
         },
       },
     },

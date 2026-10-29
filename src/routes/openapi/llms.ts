@@ -6,7 +6,7 @@ const SITE = "https://data.ai-kit.net";
 
 export const LLMS_TXT = `# AI Kit Data
 
-> Offline NHTSA vPIC VIN decoding at the edge, plus related US vehicle data. No API key (except the email breach lookup). Independent project by AI Kit LLC, not affiliated with any U.S. government agency.
+> Offline NHTSA vPIC VIN decoding at the edge, plus related US vehicle data. No API key. Independent project by AI Kit LLC, not affiliated with any U.S. government agency.
 
 Decode a VIN with one GET request, for example:
 
@@ -23,7 +23,7 @@ The response has \`data.make\`, \`data.model\`, \`data.modelYear\`, \`data.isCle
 ## Leak check (Have I Been Pwned data)
 
 - \`GET /api/v1/leak/password/range/{first 5 hex of SHA-1}\`: k-anonymity password check, no key; match the remaining 35 characters locally
-- \`POST /api/v1/leak/email\` with \`{"email": "..."}\`: breaches for an email, needs \`Authorization: Bearer <token>\`, 10 per minute per client
+- Email breach lookup: planned
 
 ## Data and accuracy
 

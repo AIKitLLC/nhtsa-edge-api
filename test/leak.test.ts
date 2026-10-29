@@ -1,12 +1,16 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { Hono } from "hono";
 import { app } from "../src/index";
+import { leakEmailRouter } from "../src/routes/v1/leak-email";
 import { testEnv } from "./helpers/assets";
 
 const TOKEN = "test-token";
 const configured = () => ({ ...testEnv(), HIBP_API_KEY: "hibp-test-key", LEAK_API_TOKEN: TOKEN });
 
+// The email route is pending (not mounted in the app), so it is exercised on its own router.
+const emailApp = new Hono().route("/api/v1", leakEmailRouter);
 const lookup = (body: unknown, env: object = configured(), token = TOKEN) =>
-  app.request(
+  emailApp.request(
     "/api/v1/leak/email",
     { method: "POST", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }, body: JSON.stringify(body) },
     env
@@ -37,6 +41,11 @@ describe("leak check", () => {
     for (const bad of ["21BD", "21BD1A", "GGGGG"]) {
       expect((await app.request(`/api/v1/leak/password/range/${bad}`, undefined, testEnv())).status).toBe(400);
     }
+  });
+
+  it("does not expose the pending email lookup yet", async () => {
+    const res = await app.request("/api/v1/leak/email", { method: "POST", body: "{}" }, configured());
+    expect(res.status).toBe(404);
   });
 
   it("answers 503 for email lookups until both secrets are set, before calling anyone", async () => {
