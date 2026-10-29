@@ -1905,7 +1905,7 @@
 4577	Five Stars Trailers Trailer Schema for 1F9432 - 2014	f
 4579	Chrysler/Dodge/Jeep/Mitsubishi MPV Engine Schema (2008)	\N
 4580	Flaming Hacksaw Fabrication Trailer Schema for 1F9412 - 2012	f
-4581	Evolve Electric Motorcycles Schema for 552 for 2011	\N
+4581	Evolve Electric Motorcycles Schema for 552 (2011-2015)	\N
 4582	Flaming Hacksaw Fabrication Trailer Schema for 1F9412 - 2013	f
 4583	Electric Vehicles International Schema for 1E9486 - 2010	\N
 4584	Cadillac Passenger car schema for 1G6/LSG 2008	f
@@ -1916,7 +1916,7 @@
 4590	Volkswagen Routan Schema for 2V4 - 2010	f
 4591	Big Bear Choppers Schema for 1B9631 (2008 - )	\N
 4592	Volkswagen Jetta/Jetta SportsWagenSchema for 3VW- 2010	f
-4593	California Scooter Company, LLC dba CSC Motorcycles 52G 2013	f
+4593	California Scooter Company, LLC dba CSC Motorcycles 52G (2013-2026)	f
 4594	Fleet Equipment LLC Trailer Schema for 1F9415 - 2012	\N
 4595	Electrical Engineering schema for 1E9416 - 2006	\N
 4596	Fleet Masters, Inc. Trailer Schema for 1F9437 - 2014	f
@@ -2094,7 +2094,6 @@
 4779	Bintelli Schema for 4B9027 (2010 - )	\N
 4780	Dynamax Corporation Trailer Schema for 1D9358	\N
 4781	Bushtec Products Corporation Trailer Schema for 1B9939 - 2009	\N
-4782	CT&T America Inc. Schema for KLP (2010-2015)	\N
 4783	Friesen Welding Trailer Schema for 4WF (1995- )	\N
 4784	Dymanic Trailers, LLC Schema for 1D9755	f
 4785	GE Packaged Power Schema for 1G9461 (2012 - )	\N
@@ -2106,7 +2105,7 @@
 4793	GE Trailers Schema for 1G9442 (2010 - )	f
 4794	AFC Company Trailer Schema for 1A9844 - (2009 - )	f
 4795	Affordable Aluminum Trailer Schema for 1A9802 - (2008 - )	\N
-4796	Atec Aanhangwagens Schema for XMK for 2005	f
+4796	Atec Aanhangwagens Schema for XMK (2005-2012)	f
 4797	custom componets and structures inc schema for 4c9017-2005	\N
 4798	After Hours Bikes, Inc. Motorcycle Schema for 1A9762  - (2006 - 2007)	\N
 4800	After Hours Bikes, Inc. Motorcycle Schema for 1A9762 - (2008 - 2010)	\N
@@ -2220,7 +2219,7 @@
 4911	GM Commercial Professional Chassis Engine Schema for 1GE - (2006-2010)	\N
 4912	All American Manufacturing, LLC Motorcycle Schema for 1A9757 - (2006 - )	\N
 4913	Autocar, LLC Schema for 5V4 for 2007-2008	\N
-4914	Di Blasi Industriale Motorcycle Schema for ZCH - (2006 - )	\N
+4914	Di Blasi Industriale Motorcycle Schema for ZCH (2006-2010)	\N
 4915	Autocar, LLC Schema for 5VC for 2007-2008	\N
 4916	Eagle Trailer Manufacturing Schema for 184 - (1983 - )	\N
 4917	Di Blasi Industriale Motorcycle Schema for ZCH - (2011 - )	\N
@@ -2275,7 +2274,7 @@
 4973	CTM Customs Schema for 4C9169 - 2008	\N
 4974	Gravity Concepts Schema for 1G9356 - 2005	f
 4975	EFL Manufacturing, LLC Schema for 1E9441 for 2008-	\N
-4976	East Texas Trailers Schema for 1E9445	\N
+4976	East Texas Trailers Schema for 1E9445 (2008-2018)	\N
 4977	Blackrock Trailers Schema for 5P5 (1998-2000)	\N
 4978	Blacksmith Choppers Schema for 1B9818 (2005-)	\N
 4979	Blackstone Trailer Schema for 1B9946 (2009-2014)	f
@@ -2312,7 +2311,7 @@
 5013	Cusco Fabrication Inc. (Wastequip Cusco) Schema for 2C9005 - 2007	f
 5014	Direct Chassis Trailer Schema for 57V (2013-2019)	f
 5015	Daimler Chrysler Commercial Buses Schema (2006-2013)	\N
-5016	Electric City Motors, North America Inc. Schema for 5XB for (2008-2011)	\N
+5016	Electric City Motors, North America Inc. Schema for 5XB for (2008-2010)	\N
 5017	Chongqing Hi-Bird Motorcycle Schema for LSR - 2007	\N
 5018	Gear Gasm Schema for 1G9372 (2005 - )	\N
 5019	Electric Mobile Cars Schema for 1E9466 for 2009-	\N
@@ -2349,8 +2348,8 @@
 5063	Chevrolet Passenger Car Model & series schema for 2007	\N
 5064	Eclipse Recreational vehicles, INC. Schema for 5LZ for year 2008	f
 5065	Eclipse Recreational vehicles, INC. Schema for 5LZ for year 2010	f
-5066	Eclipse Recreational vehicles, INC. Schema for 5LZ (2011-2026)	f
-5067	Eco Motor Company Motorcycle Schema for 51D	\N
+5066	Eclipse Recreational vehicles, INC. Schema for 5LZ (2011-	f
+5067	Eco Motor Company Motorcycle Schema for 51D (2009-2010)	\N
 5068	Pontiac Passenger cars schema for 1G2/2G2/3G2/5Y2 for 2007	\N
 5069	Guangdong Qingxin Liantong MotorCycle Schema for LTB - 2011	\N
 5070	Ecojohn, INC. Trailer Schema for 1E9551	f
@@ -2425,7 +2424,7 @@
 5143	Chongqing Yinxiang Schema for LB4- (2014-2022) 	\N
 5144	custom fabrication and equipment for 4c9221-2009	f
 5145	Bohnenkamp's Schema for 1B9953 (2010- )	f
-5146	Avanti Motorcycles INC. Schema for 5SJ for 2005-	\N
+5146	Avanti Motorcycles INC. Schema for 5SJ (2005-2008)	\N
 5147	Guerdon Enterprises Trailor Schema for 1G9381 - 2007	\N
 5148	Dixie Hitch INC 1D9385 2008	f
 5149	Dixie Welding LLC 1D9585 2006	\N
@@ -2535,7 +2534,7 @@
 5267	Boxes Creek Fabricating Schema for 1B9859 (2006)	\N
 5268	Boydstun Metal Schema for 1B9275 (2010-2014)	\N
 5269	Dragon ESP, LTD 1D9661 2008	\N
-5270	Dragon ESP, LTD 1D9661 2011	\N
+5270	Dragon ESP, LTD 1D9661 (2011-2014)	\N
 5271	DLW Payless Transmissions LLC 1D9692 2011	\N
 5272	Awesome Rebuild Schema for 1A9873 - (2010 - )	\N
 5273	B & M Manufacturing Company Schema for 19B for 1980-	f
@@ -6840,7 +6839,7 @@
 10059	Holt Brothers Customs Schema for 1H9499 (2007-2008)	\N
 10060	DNM Teardrop Trailers Schema for 1D9756 (2014-)	f
 10061	Combat Support Products Schema for 4C9379 (2015-)	\N
-10062	J&J Trailers and Truck Equipment (Granite State Trailers) Schema for 1J9435 (2015-	\N
+10062	J&J Trailers and Truck Equipment (Granite State Trailers) Schema for 1J9435 (2015-2026)	\N
 10063	Power, Process & Industrial Schema for 1R9789 (2014-)	f
 10065	Freightliner Custom Chassis schema for 4UZ (1995-1997)	\N
 10066	Saxon Motorcycle schema for 5XS for (2005- 2006)	\N
@@ -7247,7 +7246,6 @@
 10520	Polaris Off-road Motorcycle Schema for 4XA - (1997-2001)	f
 10521	Suzuki Motorcycle Schema for JS1/LC6/MLC (2016)	\N
 10522	MINI Schema for WMW - 2016	\N
-10523	Diamond City Trailer Trailer Schema for ABT - (1993-2014)	\N
 10526	Toyota Scion IQ EV schema for JTN (2013 - 2015)	\N
 10531	Mosler Schema for 1M9682 - (2012 - )	\N
 10535	Suzuki ATV Plant Schema for KM4 (1985-2005)	\N
@@ -7410,7 +7408,7 @@
 10718	County Road Trailer Schema for 4C9411 (2015- )	f
 10719	Iron Craft Fabrication Trailer Schema for 50B (2015- )	f
 10720	Heat Design Equipment Trailer Schema for 2H9097 (2014- )	f
-10721	Terex Environmental Equipment Schema for 4T9206 (2015- )	\N
+10721	Terex Environmental Equipment Schema for 4T9206 (2015-2025)	\N
 10722	The HandleBar LSV Schema for 4T9203 (2014- )	\N
 10723	Enduraplas Schema for 1E9532 - 2016	\N
 10724	T.J. Clark International Trailer Schema for 4T9196 (2015- )	f
@@ -8001,7 +7999,7 @@
 11449	Indian Motorcycle Company Motorcycle Schema for 56K - 2016	\N
 11450	Yamaha ATV Schema for JY4/5Y4 - 2005 (NICB)	\N
 11451	Wolfpack Chassis, LLC Trailer Schema for 1W9586 - 2016	\N
-11452	Carts on 12, Inc. Low Speed Vehicle Schema for 4C9431 - 2016	f
+11452	Carts on 12, Inc. Low Speed Vehicle Schema for 4C9431 (2016-2026)	f
 11453	Impac Manufacturing, Inc Trailer Schema for 7FK - 2016	\N
 11455	Honda Motorcycle schema(NICB) 2013 	\N
 11456	Universal Trailer Corporation Horse/Livestock Group Trailer Schema for 4LA - 2016	f
@@ -8068,7 +8066,7 @@
 11517	Balzer Trailer Schema for 4B9090 - 2016	\N
 11518	Middle Georgia Trailers Trailer Schema for 4M9031 - 2016	f
 11519	Bimota Spirit LLC Motorcycle Schema for 4B9106 (2016-2017)	\N
-11520	Brazos Trailer Manufacturing LLC Trailer Schema for 4B9054 - 2016	\N
+11520	Brazos Trailer Manufacturing LLC Trailer Schema for 4B9054 (2016-2025)	\N
 11521	Fruehauf Trailer Schema 3AW - (2016-2024)	f
 11522	ATLAS Lift Trailers, Inc. Trailer Schema for 4A9021 - 2016	f
 11523	Maupin Welding Trailer Schema for 4M9030 - 2016	\N
@@ -12754,7 +12752,7 @@
 16635	Hercules Coach & Manufacturing Co Inc Schema for 1H9199 ( 1991 - ) 	\N
 16636	TNT JET TECH, INC SCHEMA FOR 1T9279 ( 1991 - ) 	f
 16637	Toy Dolly Trailer Schema for 4T9253 (2017- )	f
-16638	FLEETWOOD FOLDING TRAILER, INC. SCHEMA FOR 1EB ( 1989 - )	f
+16638	FLEETWOOD FOLDING TRAILER, INC. SCHEMA FOR 1EB (1989-2011)	f
 16639	Commercial Mobile Systems Trailer Schema for 1C9ACA (2017- )	f
 16640	VRV Trailer Schema for 1V9217 (2017- )	f
 16641	Ohio Steel Industries Trailer Schema for 55C (2017- )	\N
@@ -14140,7 +14138,7 @@
 18062	 Trailer Tech, Inc Schema for 1T9630 ( 2000 -  )	\N
 18063	Adams Equipment Trailer Schema for 1A9541 ( 2000 -  )	\N
 18064	Bob Gerena Fabricating Inc Schema for 1B9582  ( 2000 -  )	f
-18065	FLEETWOOD FOLDING TRAILER, INC. SCHEMA FOR 4CT ( 2001 - )	f
+18065	FLEETWOOD FOLDING TRAILER, INC. SCHEMA FOR 4CT (2001-2011)	f
 18066	Lake Forest Builders, Inc. Trailer Schema for 1L9284 - 2000	\N
 18067	Allco Trailer Manufacturing Schema for 1A9546 - 2000	f
 18068	S STAR S COMPANY  TRAILER SCHEMA FOR 1S9737 ( 2001 - )	\N
@@ -14803,7 +14801,7 @@
 18741	DGC Trailer Manufacturing Schema for 2D9071 - 2001	\N
 18742	Sellner Manufacturing Company Trailer Schema for 1S9766 (1992-1999)	\N
 18743	LCH Holding Corporation Trailer Schema for 1L9Y85 - 2001	\N
-18744	The Fab Shop Trailer Schema for 1T9713 - 2001	\N
+18744	The Fab Shop Trailer Schema for 1T9713 - 2001-2025	\N
 18745	Tiger Truck LLC LSV Schema for 1T9726 (2002-2007)	\N
 18746	John Peper Schema for 1J9210 (2001-2002)	f
 18747	Ingenieria en Transformaciones Metalicas, S.A. De C.V. Trailer Schema for 3A9080 - 2002	\N
@@ -14877,7 +14875,7 @@
 18815	Care Industries Ltd. Truck Schema for 2C9184 - 2017	\N
 18816	Care Industries Trailer Schema for 2C9169 - 2017	f
 18817	KIA Sorento schema for 5XY (2019)	\N
-18818	Mitsubish Fuso Truck and Bus Corporation Schema for 4UZ - 2019	\N
+18818	Mitsubish Fuso Truck and Bus Corporation Schema for 4UZ (2019-2020)	\N
 18819	Craftsmen Industries, Inc. Trailer Schema for 1C9691 - 2018	f
 18820	Rainier Truck & Chassis Schema for 58W - 2018	\N
 18821	Hongdu Electric Vehicle Hongkong Co., Limited Motorcycle Schema for R2L - 2018	\N
@@ -17162,7 +17160,7 @@
 21200	Freightliner Custom Chassis Corporation Schema for 4UZ (2019-2020)	\N
 21201	Daimler Freightliner Econic Vehicle Schema for WYB/W1H - 2019	\N
 21202	Triton Metals, Inc. dba Triton Defense Trailer Schema for 4T9336 - 2019	\N
-21203	Mitsubish Fuso Truck and Bus Corporation Schema for 4UZ - 2020	\N
+21203	Mitsubish Fuso Truck and Bus Corporation Schema for 4UZ (2021-2022)	\N
 21204	Navistar Complete/Incomplete Truck Schema for 1HP/2HP/1HT/2HT/3HT/3HR/4KA - 2019	\N
 21205	Navistar Complete/Incomplete Truck Tractor Schema for 1HS/2HS/3HC/3HS (2019-2020)	\N
 21206	Navistar Incomplete Bus/ Bus schema (2019-2020)	\N
@@ -17257,7 +17255,7 @@
 21298	Quality Cargo, LLC Trailer Schema for 50Z - 2019-2023	\N
 21299	Darkhorse Cargo, Inc. Trailer Schema for 7LZ (2019-2025)	\N
 21300	Freedom Trailers, Inc. Schema for 1F9511 - 2019	f
-21301	Kinney Manufacturing LLC Trailer Schema for 1K9392 - 2019	f
+21301	Kinney Manufacturing LLC Trailer Schema for 1K9392 (2019-2025)	f
 21302	Medical Structures Trailer Schema for 4M9131 - 2019	\N
 21303	Honda HR-V Schema - 2020	\N
 21304	Crane Carrier Company Truck Schema for 4C9541  (2019-2020)	\N
@@ -17395,7 +17393,7 @@
 21445	SPUDNIK EQUIPMENT COMPANY LLC Trailer schema for 4S9534-2020	\N
 21446	Honda FIT Schema - 2020	\N
 21448	Czinger Passenger Car Schema for 4C9561 - (2019 - 2022 )	\N
-21450	ICART EV LLC  LSV Schema for 1Z9591-2020	f
+21450	ICART EV LLC  LSV Schema for 1Z9591-2020-2025	f
 21452	Olympic Trailer MFG Trailer schema for 1H9726(2016-)	\N
 21453	Transportation Power,Inc. (DBA TransPower) Truck Schema for 4T9072 (2019-)	\N
 21454	The Trailer  Company INC. Trailer Schema for 1T9072 (2010-)	\N
@@ -17633,7 +17631,7 @@
 21734	MAC LTT Schema for Trailer 558 (MY2020-	f
 21735	PHOENIX USA RV, INC. - Schema for MPV 1P9843 (MY2020-	\N
 21736	RAC ENTERPRISES - Schema for LSV 1R9913 (MY2014-	\N
-21737	NEW EDGE TECHNOLOGY SOLUTIONS - LSV Schema for 1N9398 (MY2014-	\N
+21737	NEW EDGE TECHNOLOGY SOLUTIONS - LSV Schema for 1N9398 (MY2014-2025)	\N
 21738	US FIRE PUMP COMPANY, LLC - Schema for Trailer 1U9182 (MY2020-	\N
 21739	Triumph Motorcycles Schema for SMT (MY2021)	f
 21741	TINY HOMES OF MAINE LLC - Trailer Schema for 4T9344 (MY2020-	\N
@@ -17914,8 +17912,8 @@
 22074	ALBERTA FLARES ENERGY SERVICES LTD. - Schema for Trailer 2A9165 (MY2020-	\N
 22075	QUALITY TELECOM CONSULTANTS INC. - Schema for Trailer 1Z9616 (MY2020-	\N
 22077	REC BOAT HOLDINGS LLC - Schema for Trailer 566 (MY2021)	\N
-22078	\tBig John Manufacturing Co. Trailer Schema for 4B9184 - 2020	f
-22079	Big John Manufacturing Co. Inc. Tank Trailer Schema for 4B9184 - 2020	\N
+22078	Big John Manufacturing Co. Trailer Schema for 4B9184 (2020-2025)	f
+22079	Big John Manufacturing Co. Inc. Tank Trailer Schema for 4B9184 (2020-2025)	\N
 22080	BYD AUTO INDUSTRY COMPANY LIMITED - Schema for Truck LPE (MY2022-MY2023)	\N
 22081	Ford Super Duty F-450/F-550/F-600 Schema for 1FT - 2020	\N
 22082	Ford Probe Schema for 1ZV - 1997	\N
@@ -18636,7 +18634,7 @@
 22904	BRUDER EXPEDITION PTY LTD - Schema for Trailer 6K9314 (MY2021)	\N
 22905	Honda Civic Sedan Schema for 1HG/5KB/19X (MY2022)	\N
 22906	BRAVO TRAILERS - Schema for 4B9273 (MY2021-MY2022)	f
-22907	MV AGUSTA MOTOR S.P.A. - Motorcycle Schema for ZCG (MY2022-MY2023)	\N
+22907	MV Agusta Motorcycle Schema for ZCG (MY2022-MY2023)	\N
 22908	BG CUSTOM WELDING - Schema for Trailer 4B9275 (MY2021-MY2022)	\N
 22909	KICK AZZ SERVICES LLC - Schema for Trailer 1K9416 (MY2021-	f
 22910	Ford F-250 and F-350 Schema for 1FT - 2021	\N
@@ -20141,7 +20139,7 @@
 24441	TRAILER MANIA LLC - Schema for 4T9453 (MY2022)	f
 24442	ELECTRIC ELK LLC - Schema for MC 1E9693 (MY2022-	\N
 24443	HENAN WEHOPE SPECIAL EQUIPMENT CO. LTD - Schema for Trailer R6C (MY2019-	\N
-24444	AUDI A3 / S3 / RS3 Schema for TRU/WAU/WUA (MY2023)	f
+24444	AUDI A3/S3/RS 3 Schema for TRU/WAU/WUA (MY2023)	f
 24445	AUDI Plant Schema for PC (MY2023)	\N
 24446	AUDI A4 / S4 Schema for TRU/WAU/WUA (MY2023)	f
 24447	Yamaha Schema for JYA/9C6 - 1993	\N
@@ -20863,7 +20861,7 @@
 25190	HD Trailer Schema for 7LK MY(2021-	\N
 25191	PASQ, LLC - Schema for Trailer 1P9897 (MY2023-	f
 25193	HONG KONG RUNHORSE HOLDING CO., LIMITED - Schema for R3W (MY2017-	\N
-25194	HONG KONG RUNHORSE HOLDING CO., LIMITED - Schema for R8B (MY2022-	\N
+25194	Hong Kong Runhorse Holding LSV Schema for R8B (MY2022-MY2025)	\N
 25195	6186433 MB LTD / IRONMEN INDUSTRIES Trailer Schema for 2M9189 MY(2023-	f
 25196	HELI MOTORCYCLE TECHNOLOGY LIMITED - Schema for R8N (MY2023-	\N
 25197	PEE DEE FABRICATORS INC Trailer Schema for 1P9902 MY(2023-	f
@@ -21278,7 +21276,7 @@
 25616	TRAILERMAN TRAILERS LIMITED Schema for 2T9131 MY(2023-	f
 25617	ARKANSAS BOATS LLC Trailer Schema for 458 MY(2024-	\N
 25618	ZION OFF-ROAD LLC Schema for Trailer 1Z9634 MY(2023)	\N
-25619	AUDI A3 / S3 / RS3 Schema for WAU/WUA (MY2024)	f
+25619	AUDI A3/S3/RS 3 Schema for WAU/WUA (MY2024)	f
 25621	RYVID INC - Schema for Motorcycle 7UJ (MY2023)	\N
 25622	MAZDA Mazda3 Schema for JM1 (MY2024)	\N
 25623	MAZDA Mazda3 Schema for 3MZ (MY2024)	\N
@@ -21373,7 +21371,7 @@
 25713	TRUCKERS OF AMERICA LLC - Schema for Trailer 4T9506 (MY2023-	f
 25714	PRIME B.H. LLC - Schema for Trailer 1P9911 (MY2023-	f
 25715	ENVIROTECH DRIVE SYSTEMS INCORPORATED - Schema for LSV 1E9650 (MY2023-	\N
-25716	VEXAS CORP. LSV Schema for 7WS MY(2023-	\N
+25716	VEXAS CORP. LSV Schema for 7WS MY(2023-2025)	\N
 25717	LOGISTICA Y TRANSPORTES LOINEX S.A. DE C.V. - Schema for Trailer 3L9033 (MY2023-	f
 25718	CIRCLE W TRAILERS - Schema for 1C9140 (MY2023-	f
 25719	Maserati Grecale Schema for ZN6 (MY2024)	\N
@@ -22042,7 +22040,7 @@
 26418	CRUISER RV - Schema for Trailer 5RX MY(2024-	f
 26419	LULING IRON WORKS Trailer Schema for 1L9672 MY(2023-	f
 26420	NEW HEIGHTS, LLC Trailer Schema for 1N9253 MY(2019-	\N
-26421	A1 FOOD TRUCK DEPOT LLC Trailer Schema for 4A9164 MY(2023-	\N
+26421	A1 FOOD TRUCK DEPOT LLC Trailer Schema for 4A9164 MY(2023-2025)	\N
 26422	FUEL HOG TRAILERS LLC Schema for 7WG MY(2023-	\N
 26423	ZOOX, INC. PC Schema for 7Z0 MY(2024)	\N
 26424	SC AUTOSPORTS, LLC Trailer Schema for 7XP MY(2024-	\N
@@ -22996,7 +22994,7 @@
 27398	NANTONG RELIANCE MACHINERY MANUFACTURING TECHNOLOGY CO., LTD. - Schema for Trailer H09RLC (MY2024-	\N
 27399	KLINGER TRAILER, LLC Schema for 1K9447 MY(2024-	\N
 27400	Motor Coach Industries, Inc. Schema for 2MG MY(2022-2023)	\N
-27401	Audi A3/S3/RS3 Schema for WAU/WUA (MY2025)	f
+27401	Audi A3/S3/RS 3 Schema for WAU/WUA (MY2025)	f
 27402	Chevrolet Suburban HD Schema for 4W1 (MY2024)	\N
 27403	WEIFANG DREAM FLY INTELLIGENT TECHNOLOGY CO., LTD. - Schema for Trailer H3B (MY2024-	\N
 27404	C.E.I. EQUIPMENT COMPANY INC Trailer Schema for 1C9257 MY(2022-	\N
@@ -23017,7 +23015,7 @@
 27420	Morgan Motor Company Replica Vehicle Schema for SA9004 (MY2024-MY2025)	\N
 27421	R AND R MANUFACTURING Trailer Schema for 4R9057 MY(2024-	\N
 27422	WUXI SANRAIN VEHICLE TECH CO.,LTD. - Schema for H2D (MY2024-	\N
-27423	W D OUTDOOR WOOD FURNACES LLC Trailer Schema for 1W9625 MY(2025-	\N
+27423	W D OUTDOOR WOOD FURNACES LLC Trailer Schema for 1W9625 MY(2025)	\N
 27424	RIVERSIDE RV, INC. - Schema for Trailer 59C (MY2025-	\N
 27425	Volkswagen Atlas/Atlas 4Motion//Atlas Cross Sport/Atlas Cross Sport 4Motion Schema for 1V2 (MY2025)	f
 27426	Volkswagen Atlas/Atlas 4Motion//Atlas Cross Sport/Atlas Cross Sport 4Motion Schema for 3VV (MY2025)	f
@@ -23238,7 +23236,7 @@
 27647	Ford Super Duty F-450/F-550/F-600 Schema for 1FD (MY2025)	\N
 27648	E.D. ETNYRE & CO - Schema for Trailer 1E9007 (MY2026-	\N
 27649	E.D. ETNYRE & CO - Schema for Trailer 1E9111 (MY2026-	\N
-27650	Jaguar F-Pace Schema for SAD (MY2026-	\N
+27650	Jaguar F-Pace Schema for SAD (MY2026)	\N
 27651	Land Rover Range Rover Evoque Schema for SAL (MY2026-	\N
 27652	Land Rover Range Rover Velar Schema for SAL (MY2026-	\N
 27653	KYMCO Motorcycle Schema for RFB (MY2024-MY2025)	\N
@@ -23273,10 +23271,10 @@
 27682	Cadillac Celestiq Schema for 1G6 (MY2026)	\N
 27683	Buick Enclave Schema for 5GA (MY2026)	\N
 27684	Buick Encore GX Schema for KL4 (MY2026)	\N
-27685	Buick Envision Schema for LRB (MY2026-	\N
+27685	Buick Envision Schema for LRB (MY2026)	\N
 27686	Buick Envista Schema for KL4 (MY2026)	\N
 27687	Cadillac Escalade/ESV Schema for 1GY (MY2026)	\N
-27688	Chevrolet Colorado Schema for 1GC (MY2026-	\N
+27688	Chevrolet Colorado Schema for 1GC (MY2026)	\N
 27689	Chevrolet Equinox Schema for 3GN (MY2026)	\N
 27690	GOOD RV EQUIPMENT INC. Trailer Schema for 1G9641 MY(2025)	\N
 27691	Chevrolet Express Bus Schema for 1GA (MY2026)	\N
@@ -23285,13 +23283,13 @@
 27694	Macon Welding & Manufacturing Trailer Schema for 4M9229 (MY2024-MY2025)	\N
 27695	PRECISION TRAILERS LLC Schema for 7KL MY(2025)	\N
 27696	Chevrolet Silverado Schema for 3GB (MY2026-	\N
-27697	Chevrolet Silverado Schema for 1GC (MY2026-	\N
+27697	Chevrolet Silverado Schema for 1GC (MY2026)	\N
 27698	Mazda MX-5 Schema for JM1 MY(2025)	\N
-27699	Chevrolet Silverado Schema for 2GC (MY2026-	\N
-27700	Chevrolet Silverado Schema for 3GC (MY2026-	\N
-27701	Chevrolet Silverado HD Schema for 1GB (MY2026-	\N
-27702	Chevrolet Silverado HD Schema for 1GC (MY2026-	\N
-27703	Chevrolet Silverado HD Schema for 2GC (MY2026-	\N
+27699	Chevrolet Silverado Schema for 2GC (MY2026)	\N
+27700	Chevrolet Silverado Schema for 3GC (MY2026)	\N
+27701	Chevrolet Silverado HD Schema for 1GB (MY2026)	\N
+27702	Chevrolet Silverado HD Schema for 1GC (MY2026)	\N
+27703	Chevrolet Silverado HD Schema for 2GC (MY2026)	\N
 27704	SVENN LLC - Schema for Trailer 4S9729 (MY2024-	\N
 27705	Chevrolet Suburban Schema for 1GN (MY2026)	\N
 27706	Chevrolet Suburban HD Schema for 4W1 (MY2026)	\N
@@ -23300,7 +23298,7 @@
 27709	Chevrolet Traverse Schema for 1GN/1GB (MY2026)	\N
 27710	Chevrolet Trax Schema for KL7 (MY2026)	\N
 27711	GMC Acadia Schema for 1GK (MY2026)	\N
-27712	GMC Canyon Schema for 1GT (MY2026-	\N
+27712	GMC Canyon Schema for 1GT (MY2026)	\N
 27713	GMC Savana Bus Schema for 1GJ (MY2026)	\N
 27714	GMC Savana Truck Schema for 1GD/1GT (MY2026)	\N
 27715	Toyota bZ4X Schema for JTM (MY2025)	\N
@@ -23308,9 +23306,9 @@
 27717	Toyota Tacoma Schema for 3TM/3TY MY(2025)	\N
 27718	Bentley Flying Spur Speed (V8 Hybrid) Schema for SCB (MY2025)	\N
 27719	Bentley Continental GT Speed (V8) Schema for SCB (MY2025)	\N
-27720	GMC Sierra HD Schema for 1GT (MY2026-	\N
-27721	GMC Sierra HD Schema for 2GT (MY2026-	\N
-27722	GMC Sierra HD Schema for 1GD (MY2026-	\N
+27720	GMC Sierra HD Schema for 1GT (MY2026)	\N
+27721	GMC Sierra HD Schema for 2GT (MY2026)	\N
+27722	GMC Sierra HD Schema for 1GD (MY2026)	\N
 27723	GMC Terrain Schema for 3GK (MY2026)	\N
 27724	GMC Yukon/Yukon XL Schema for 1GK (MY2026)	\N
 27725	Cadillac Escalade IQ/IQL Schema for 1GY (MY2026)	\N
@@ -23321,16 +23319,16 @@
 27730	Chevrolet BrightDrop Schema for 2GC (MY2026-	\N
 27731	GMC Hummer EV Pickup Schema for 1GT (MY2026)	\N
 27732	GMC Hummer EV SUV Schema for 1GK (MY2026)	\N
-27733	GMC Sierra Schema for 1GT (MY2026-	\N
-27734	GMC Sierra Schema for 2GT (MY2026-	\N
-27735	GMC Sierra Schema for 3GT (MY2026-	\N
+27733	GMC Sierra Schema for 1GT (MY2026)	\N
+27734	GMC Sierra Schema for 2GT (MY2026)	\N
+27735	GMC Sierra Schema for 3GT (MY2026)	\N
 27736	B & B CAMPER INC Trailer Schema for 4B9384 MY(2024-	\N
 27737	GMC Sierra Schema for 1GD (MY2026-	\N
 27738	GMC Sierra Schema for 3GD (MY2026-	\N
 27739	GOLDEN ROAD TRAILERS LLC Schema for 1G9673 MY(2024	\N
 27740	TWH TRAILERS LLC Schema for 4T9552 MY(2024-	\N
 27741	Suzuki Motorcycle Schema for LC6 MY(2025-	\N
-27742	Kia EV9 Schema for 5XY (MY2026-	\N
+27742	Kia EV9 Schema for 5XY (MY2026)	\N
 27743	Ford Mustang GTD Schema for 2FA - 2025	\N
 27744	SIGNATURE AUTOSPORT, LLC MPV Schema for 4S9520 MY(2024-2025)	\N
 27745	SIGNATURE AUTOSPORT, LLC Truck Schema for 4S9712 MY(2024-2025)	\N
@@ -23443,7 +23441,7 @@
 27852	BROCKWAY MINI HOMES INC. Trailer Schema for 4B9386 MY(2025-	\N
 27853	BEARTRAILER L.L.C. - Schema for 4B9387 (MY2025-	\N
 27854	MOBILE COLD SOLUTIONS LLC Trailer Schema for 4M9275 MY(2025-	\N
-27855	Horizon Trailers Texas LLC - Schema for 713 (MY2025-	\N
+27855	Horizon Trailers Texas Schema for 713 (MY2025-MY2026)	\N
 27856	ZION HORSE LLC - Schema for Trailer 1Z9770 (MY2025-	\N
 27857	E-PAK MANUFACTURING, LLC - Schema for Trailer 1E9505 (MY2025-	\N
 27858	TRAILHAWK MANUFACTURING INC. - Schema for Trailer 4T9545 (MY2025-	\N
@@ -23484,7 +23482,7 @@
 27893	WIENS ENERGY LLC - Schema for Trailer 1W9704 (MY2025-	\N
 27894	CHONGQING QIULONG TECHNOLOGY CO., LTD - Schema for HU3 MY(2025-	\N
 27895	HENAN SHAOLIN BUS CO. LTD. Schema for LS8 MY(2024-	\N
-27896	Honda Passport Schema for 5FN (MY2026-	f
+27896	Honda Passport Schema for 5FN (MY2026)	f
 27897	DP PLATINUM STAR TRAILERS - Schema for 7XA (MY2023-	\N
 27898	HK ULEAD VEHICLE MANUFACTURING LIMITED - Schema for Trailer R8M (MY2025-	\N
 27899	POWERHOUSE SUPPLY Trailer Schema for 1P9958 MY(2025-	\N
@@ -23569,7 +23567,7 @@
 27978	STANDARD IRON & WIRE WORKS LLC - Schema for Trailer 71C (MY2025-	\N
 27979	Bugatti Mistral Schema for VF9795 (MY2025-	\N
 27980	COOL AMPHIBIOUS MANUFACTURER INTERNATIONAL LLC Bus Schema for 1C9971 MY(2025-	\N
-27981	Honda Motorcycle (ORG/NICB) Schema for JH2/LAL/1HF/9C2 (MY2026-	f
+27981	Honda Motorcycle (ORG/NICB) Schema for JH2/LAL/1HF/9C2 (MY2026)	f
 27982	Honda Motorcycle Schema for MLH MY(2026)	\N
 27983	Peterbilt Schema for 1XP/1NP/2XP/2NP/3WP/3BP/SBV (MY1985)	\N
 27984	Peterbilt Schema for 1XP/1NP/2XP/2NP/3WP/3BP/SBV (MY1986-MY1987)	\N
@@ -23677,7 +23675,7 @@
 28087	POLY-JOHN ENTERPRISES, INC. - Schema for Trailer 4GJ (MY2024)	\N
 28088	J & C SUPPLIERS Trailer Schema for 7U1 MY(2025-	\N
 28090	USA MOTORTOYS, LLC Off-Road Vehicle Schema for WMC A2B MY(2026)	\N
-28091	Toyota Crown Schema for JTD MY(2026-	\N
+28091	Toyota Crown Schema for JTD MY(2026)	\N
 28092	Kia Seltos MPV Schema for KND (MY2026)	\N
 28093	Hyundai Genesis G90 Schema for KMT (MY2026-	\N
 28094	Solana EV LSV Schema for 71L (MY2025)	\N
@@ -23720,7 +23718,7 @@
 28131	ROCKBUILT TRAILERS INC. Schema for 4R9068 MY(2025-	\N
 28132	CARROCERIAS CORPUS CHRISTI, S.A. DE C.V. Trailer Schema for 3F5 MY(2025-	\N
 28133	MATTUR HOLDINGS, INC. Trailer Schema for 4M9271 MY(2025-	\N
-28134	GEM WAEV LLC LSV Schema for 7SX MY(2025-	f
+28134	GEM WAEV LLC LSV Schema for 7SX MY(2025-2026)	f
 28135	TARA ELECTRIC VEHICLES CORP LSV Schema for 7YY MY(2025-	\N
 28136	Blazing Technologies Trailer Schema for 1B9825 MY(2015-	\N
 28137	Ducati Motorcycle Schema for ZDM (MY2026-	\N
@@ -23747,7 +23745,7 @@
 28159	ADVANCED AG CONCEPTS, INC. - Schema for Trailer 4A9331 (MY2025-	\N
 28160	Dura Trailers LLC Schema for 1D9951 MY(2025-	\N
 28161	321TRAILERS LLC - Schema for 1Z9777 (MY2025-	\N
-28162	 Aston Martin DBX Schema for SD7 (MY2026-	\N
+28162	 Aston Martin DBX Schema for SD7 (MY2026)	\N
 28163	MCS LOGISTICS INC - Schema for Trailer 4M9288 (MY2025-	\N
 28164	S OUTDOORS LLC Trailer Schema for 4S9742 MY(2025-	\N
 28165	CRYOLOR SA - Schema for Trailer VF9391 (MY2021-	\N
@@ -23848,7 +23846,7 @@
 28261	Hyundai Elantra Schema for KMH (MY2026-	\N
 28262	INTERNATIONAL RV MANUFACTURING LLC - Schema for Trailer 1Z9649 (MY2025-	\N
 28263	VINTAGE CAMPER COMPANY Trailer Schema for 1V9283 MY(2025-	\N
-28264	Honda Civic/Civic SI Sedan Schema for 2HG (MY2026-	\N
+28264	Honda Civic/Civic SI Sedan Schema for 2HG (MY2026)	\N
 28265	VALLEY VIEW WELDING LLC Trailer Schema for 1V9284 MY(2025-	\N
 28266	O.G. LIVING LLC Trailer Schema for 1Z9776 MY(2025-	\N
 28267	BLACK IRON PRODUCTS, LLC - Schema for Trailer 71F (MY2025-	\N
@@ -23934,8 +23932,8 @@
 28349	Mini PC Schema for WMW MY(2026)	f
 28350	SHERPA TRAILERS LLC - Schema for 4S9745 (MY2026-	\N
 28351	NEXGEN TRAILER MFG Schema for 1N9462 MY(2025-	\N
-28352	Honda Civic Hatchback Schema for 19X (MY2026-	\N
-28353	Honda Civic Hatchback Schema for JHM (MY2026-	\N
+28352	Honda Civic Hatchback Schema for 19X (MY2026)	\N
+28353	Honda Civic Hatchback Schema for JHM (MY2026)	\N
 28354	FEHR BROS. INDUSTRIES (Apex Trailers) - Schema for 3FX (MY2025-	\N
 28355	ABERDEEN POWER GROUP, LLC - Schema for Triler 4A9338 (MY2025-	\N
 28356	RAYSTAR MANUFACTURE LLC Trailer Schema for 4R0 MY(2025-	\N
@@ -23974,7 +23972,7 @@
 28389	Toyota Prius/Prius Prime (PHEV) Schema for JTD (MY2026)	\N
 28390	Kaxa Motos Motorcycle Schema for SF6 (MY2020-	\N
 28391	RJ Trailers Schema for 4R9072 (MY2025-	\N
-28392	Audi A3/S3/RS3 Schema for WAU/WUA (MY2026-	f
+28392	Audi A3/S3/RS 3 Schema for WAU/WUA (MY2026)	f
 28393	Hyundai Kia PC Schema for KNA - 2002	\N
 28394	Hyundai Kia PC Schema for KNA - 2003	\N
 28395	Kia Sephia Schema for KNA - 1998	\N
@@ -24056,7 +24054,7 @@
 28473	HEAVY EQUIPMENT SOLUTIONS, LLC. Trailer Schema for 1H9862 MY(2025-	\N
 28474	BRONTON, LLC Trailer Schema for 4B9405 MY(2025)	\N
 28475	T TOP MANUFACTURING Trailer Schema for 4T9499 MY(2025)	\N
-28476	Volkswagen Golf GTI / Golf-R Schema for WVW MY(2026-	f
+28476	Volkswagen Golf GTI / Golf-R Schema for WVW MY(2026)	f
 28477	UNITED MACHINE CORPORATION Trailer Schema for 1U9227 MY(2025-	\N
 28478	AMBER WAVES INC. Trailer Schema for 4A9224 MY(2025-	\N
 28479	Acura Integra/Integra Type S PC Schema for 19U (MY2026-	f
@@ -24094,7 +24092,7 @@
 28511	HEXAGON PURUS SYSTEMS USA LLC Truck Schema for 1H9773 MY(2024-2026)	\N
 28512	Nissan Ariya MPV Schema for JN8 (MY2026-	\N
 28513	Nissan Kicks MPV Schema for 3N8 (MY2026)	\N
-28514	Nissan Leaf Schema for JN1 (MY2026-	\N
+28514	Nissan Leaf Schema for JN1 (MY2026)	\N
 28515	Nissan Murano Schema for 5N1 (MY2026)	\N
 28516	Nissan Sentra Schema for 3N1 (MY2026)	\N
 28517	Nissan Z Schema for JN1 (MY2026)	\N
@@ -24104,7 +24102,7 @@
 28521	Volkswagen Taos/Taos 4Motion Schema for 3VV (MY2026)	\N
 28522	Volkswagen Taos/Taos 4Motion Schema for 1V2 (MY2026)	\N
 28523	Volkswagen Atlas/Atlas 4Motion//Atlas Cross Sport/Atlas Cross Sport 4Motion Schema for 3VV (MY2026)	\N
-28524	Volkswagen Golf GTI / Golf-R Schema for 3VW MY(2026-	f
+28524	Volkswagen Golf GTI / Golf-R Schema for 3VW MY(2026)	f
 28525	ZHEJIANG TIANYING LOCOMOTIVE CO., LTD Motorcycle Schema for LM0 MY(2025-	\N
 28526	EVELYN MONSERRATH SANCHEZ ZAPATA Schema for Trailer 3E9073 (MY2025-	\N
 28527	Club Car LSV Schema for 5J5 (MY2025-	\N
@@ -24133,8 +24131,8 @@
 28551	A&D Trailer Sales, LLC Schema for 4A9183 (MY2021-	\N
 28552	Teardrops NW Trailer Schema for 1P9750 (MY2025-	\N
 28553	Stainless Tank & Equipment Trailer Schema for 7ZK (MY2027-	\N
-28554	Volkswagen Tiguan/Tiguan 4Motion Schema for 1V2 (MY2026-	\N
-28555	Volkswagen Tiguan/Tiguan 4Motion Schema for 3VV (MY2026-	\N
+28554	Volkswagen Tiguan/Tiguan 4Motion Schema for 1V2 (MY2026)	\N
+28555	Volkswagen Tiguan/Tiguan 4Motion Schema for 3VV (MY2026)	\N
 28556	TRUVIE TRAILERS LLC Schema for 4T9439 MY(2025-	\N
 28557	Mount Up Texas LLC Trailer Schema for 4M9284 MY(2025-	\N
 28558	K. Z., INC. Trailer Schema for 4EZ (MY2026-	\N
@@ -24168,9 +24166,9 @@
 28586	KÄRCHER NORTH AMERICA Trailer Schema for 1L9041 MY(2025-	\N
 28587	Subaru Outback Schema for JF2 MY(2026)	\N
 28588	UNITED CONCRETE Trailer Schema for 1U9181 MY(2024-	\N
-28589	Subaru Impreza Schema for JF1 (MY2026-	\N
+28589	Subaru Impreza Schema for JF1 (MY2026)	\N
 28590	Subaru Crosstrek Schema for 4S4 (MY2026-	\N
-28591	Subaru Crosstrek Schema for JF2 (MY2026-	\N
+28591	Subaru Crosstrek Hybrid Schema for JF2 (MY2026)	\N
 28592	Subaru Ascent Schema for 4S4 (MY2026)	\N
 28593	Subaru BRZ Schema for JF1 (MY2026)	\N
 28594	Subaru Toyota GR86 Schema for JF1 (MY2026)	\N
@@ -24263,7 +24261,7 @@
 28682	Onyx Motors Inc Motorcycle Schema for 1Z9784 (MY2025-	\N
 28683	C Trailers LLC Schema for 71P (MY2025-	\N
 28684	PAGANI SPA PC Schema for 1Z9F76 MY(2024-	\N
-28685	ZHEJIANG CFMOTO POWER CO., LTD - Schema (On/Off Road) for LCE MY(2026-	\N
+28685	ZHEJIANG CFMOTO POWER CO., LTD - Schema (On/Off Road) for LCE MY(2026)	\N
 28686	Xuzhou Tianying Automobile Co., Ltd. Motorcycle Schema for H9X (MY2025-	\N
 28687	T & R SPECIALTIES LLC Trailer Schema for 4T9578 MY(2026-	\N
 28688	Toyota Lexus LX Schema for JTJ (MY2026-	f
@@ -24310,7 +24308,7 @@
 28729	JRS Food Trailers LLC Schema for 1J9584 MY(2025-	\N
 28730	Quickloadz Container Systems Truck Schema for 1Z9744 (MY2026-	\N
 28731	DNJ Trailers LLC Schema for 1D9870 (MY2026-	\N
-28732	Zhejiang Jianying Locomotive Motorcycle Schema for HT5 (MY2025)	\N
+28732	Zhejiang Jianying Locomotive Motorcycle Schema for HT5 (MY2025-MY2026)	\N
 28733	Toyota Sequoia Schema for 7SV (MY2026-	\N
 28734	Toyota Tacoma Schema for 3TM/3TY (MY2026-	\N
 28735	Toyota Sienna Schema for 5TD (MY2026-	\N
@@ -24380,7 +24378,7 @@
 28799	EPIC SOLUTIONS INC. Trailer Schema for 1E9747 MY(2025-	\N
 28800	Route17 Co. LSV Schema for KL9CGA (MY2025-	\N
 28801	Fast DMS, LLC Trailer Schema for 1F9608 MY(2025-	\N
-28802	Audi Q3 Schema for WA1/WU1 (MY2026-	f
+28802	Audi Q3 Schema for WA1/WU1 (MY2026)	f
 28803	BLACK HORSE FORESTRY TRAILERS, INC. Schema for 2B9301 MY(2025-	\N
 28804	TEL-STAR MFG LLC Trailer Schema for 4T9141 MY(2013-	\N
 28805	International Motors (Chevy Express) Schema for 1HA (MY2025)	\N
@@ -24439,7 +24437,7 @@
 28858	Kia Telluride Schema for 5XY MY(2027-	\N
 28859	Guarddawg Trailer Schema for 1G9683 (MY2025-	\N
 28860	Capstone Design And Fabrication INC. Trailer Schema for 4C9734 MY(2025-	\N
-28861	Honda Civic Hatchback Type R Schema for JHM MY(2026-	\N
+28861	Honda Civic Hatchback Type R Schema for JHM MY(2026)	\N
 28862	S3E LLC SERIES 2 Trailer Schema for 4S9692 (MY2026-	\N
 28863	Zoox, INC. PC Schema for 7Z0 MY(2027-	\N
 28864	Chongqing Liyang Jiayu Motorcycle Schema for LC4 (MY2025-	\N
@@ -24480,7 +24478,7 @@
 28900	Maserati McPura/McPura Cielo Schema for ZAM MY(2026)	\N
 28901	Maserati Granturismo / Grancabrio Schema for ZAM MY(2026)	\N
 28902	Maserati Grecale Schema for ZN6 MY(2026)	\N
-28903	FIAT 500 BEV Schema for ZFA MY(2026-	\N
+28903	FIAT 500 BEV Schema for ZFA MY(2026)	\N
 28904	T and Jr’s Trailers LLC Schema for 4T9586 MY(2026-	\N
 28905	Winding Creek Manufacturing LLC Trailer Schema for 1W9694 (MY2025-	\N
 28906	Gardner Cryogenics Trailer Schema for 1G9523 MY(2016-	\N
@@ -24542,7 +24540,7 @@
 28963	Rite-Way Fabrication Company Trailer Schema for 4R9087 MY(2026-	\N
 28964	Hexagon Purus Systems USA LLC Truck Schema for 1H9773 MY(2027-	\N
 28965	Shandong Ante Special Vehicles Manufacturing CO.,LTD Trailer Schema for H09SAT MY(2026-	\N
-28966	Audi A5/S5 Schema for WAU/WUA MY(2026-	\N
+28966	Audi A5/S5 Schema for WAU/WUA MY(2026)	\N
 28967	Audi Q5 / SQ5 Schema for WA1/WU1 MY(2026-	\N
 28968	Subaru Trailseeker Schema for JTM MY(2026)	\N
 28969	Toyota bZ Woodland Schema for JTM MY(2026)	\N
@@ -24560,13 +24558,13 @@
 28981	Izzy Metal CORP Trailer Schema for 1Z9787 MY(2026-	\N
 28982	Texas Trailer Ranch LLC Schema for 4T9563 MY(2026-	\N
 28983	Deer Valley Homebuilders, INC. Trailer Schema for 1D9960 MY(2026-	\N
-28984	Toyota Lexus ES Schema for JTH MY(2026-	\N
+28984	Toyota Lexus ES Schema for JTH MY(2026)	\N
 28985	Fuhltilt Industries LLC. Trailer Schema for 1F9612 MY(2026-	\N
 28986	Dynamite Manufacturing Trailer Schema for 72V MY(2026-	\N
 28987	Lil Smokey Motorcycles Schema for 1L9615 MY(2026-	\N
 28988	Kerfton PTY LTD Trailer Schema for 629460 MY(2026-	\N
 28989	Audi Q6/SQ6 Schema for WA1 MY(2027-	\N
-28990	Audi A6/S6 Schema for WAU MY(2027-	\N
+28990	Audi A6/S6 Schema for WAU/WUA MY(2027-	\N
 28991	Facil Now, INC. Trailer Schema for 1F9613 MY(2026-	\N
 28992	Gilroy Food Trucks Manufacturers Trailer Schema for 1G9686 MY(2026-	\N
 28993	Mazda MX-5 Schema for JM1 MY(2026-	\N
@@ -24704,7 +24702,7 @@
 29126	Qingdao MIC Industrial Machinery Trailer Schema for LB9MTN (MY2026-	\N
 29127	SunWize Power And Battery LLC Trailer Schema for 734 MY(2026-	\N
 29128	Kawasaki Motorcycle Schema for (NICB) JKA/RGS/MH4 (MY2026-	\N
-29129	JTC Manufacturing, LLC Trailer Schema for 1J9591 MY(2026-	\N
+29129	JTC Manufacturing, LLC Trailer Schema for 1J9591 MY(2025-	\N
 29130	Honda HR-V Schema for 3CZ MY(2027-	\N
 29131	Big Tex Trailer Manufacturing, LLC Trailer Schema for 16V MY(2026)	\N
 29132	Hyundai Genesis G80 Schema for KMT MY(2027-	\N
@@ -24981,7 +24979,7 @@
 29409	Kawasaki Motorcycle Schema for (ORG/NICB) JKB/JK1 (MY2026-	\N
 29410	Peak Cargo Trailer Schema for 1P9963 (MY2026-	\N
 29411	Lynx ApS Motorcycle Schema for UHN (MY2026-	\N
-29412	Audi A8 L/S8 Schema for WAU (MY2027-	\N
+29412	Audi A8 L/S8 Schema for WAU/WUA (MY2027-	\N
 29413	Audi Schema for Q8/SQ8/RS Q8 for WA1/WU1 (MY2027-	\N
 29414	BMW Schema for 3MF MY(2027-	\N
 29415	BMW Schema for 3MW MY(2027-	\N
@@ -25045,7 +25043,7 @@
 29473	Nissan Z Schema for JN1 MY(2027-	\N
 29474	Top-Line Industries LLC Trailer Schema for 4T9708 MY(2026-	\N
 29475	CAJAS Y REMOLQUES MUÑOZ, SA DE CV Schema for Trailer 3C9142 MY(2025-	\N
-29476	Silver Hill Cabins LLC Trailer Schema for 4S9785 MY(2026-	\N
+29476	Silver Hill Cabins Trailer Schema for 4S9785 MY(2026-	\N
 29477	Lucid Air Schema for 50E MY(2027-	\N
 29478	LiveWire (KYMCO) S4 Street Schema for RFB (MY2027-	\N
 29479	Toyota Prius/Prius Prime (PHEV) Schema for JTD MY(2027-	\N
@@ -25120,7 +25118,7 @@
 29548	NGC Manufacturing LSV Schema for 1N9481 (MY2026-	\N
 29549	Ford F-150 Schema for 1FT MY(2027-	\N
 29550	Norstar Industries (Haul-All) Trailer Schema for 2N9110 (MY2022-	\N
-29551	Halverson Wood Products, Inc. Trailer Schema for 1H9881 MY(2026-	\N
+29551	Halverson Wood Products Trailer Schema for 1H9881 MY(2026-	\N
 29552	Honda Odyssey Schema for 5FN (MY2027-	\N
 29553	Yozzy Industries Trailer Schema for 1Y9053 (MY2026-	\N
 29554	Henan Siristar Intelligent Technology Trailer Schema for H09SRD (MY2026-	\N
@@ -25211,7 +25209,7 @@
 29640	Easy Kleen Pressure Systems Trailer Schema for 2E9083 (MY2025-	\N
 29641	Timeless Today LLC Trailer Schema for 4T9609 MY(2026-	\N
 29642	Iron Peak Campers Trailer Schema for 1Z9795 (MY2026-	\N
-29643	Zhejiang Jianying Locomotive Motorcycle Schema for HT5 (MY2026-	\N
+29643	Zhejiang Jianying Locomotive Motorcycle Schema for HT5 (MY2027-	\N
 29644	Nissan Altima Schema for 1N4 MY(2027-	\N
 29645	Nissan Armada Schema for JN8 MY(2027-	\N
 29646	Nissan Rogue Schema for JN8 MY(2027-	\N
@@ -25228,3 +25226,75 @@
 29657	Angel Ruben Aguilar Enriquez Trailer Schema for 3R9233 MY(2026-	\N
 29658	Subaru Trailseeker Schema for JTM (MY2027-	\N
 29659	MV Agusta Motorcycle Schema for ZCG (MY2027-	\N
+29660	Audi Q3 Schema for WA1/WU1 (MY2027-	\N
+29661	Audi A5/S5 Schema for WAU/WUA MY(2027-	\N
+29662	Zhejiang CFMOTO Power Motorcycle Schema for LCE (MY2027-	\N
+29663	Noble Trailer Mfg. LLC Schema for 1N9381 MY(2026-	\N
+29664	2519580 Ontario Limited (BF Teams) Trailer Schema for 2B9306 (MY2026-	\N
+29665	Nissan Leaf Schema for JN1 (MY2027-	\N
+29666	A1 Food Truck Depot LLC Trailer Schema for 4A9164 MY(2026-	\N
+29667	Nissan Rogue Hybrid Schema for JN8 (MY2027-	\N
+29668	Toyota Crown Schema for JTD (MY2027-	\N
+29669	Stellantis Fiat 500e Schema for ZFA (MY2027-	\N
+29670	Volkswagen Tiguan/Tiguan 4Motion Schema for 3VV (MY2027-	\N
+29671	Volkswagen Tiguan/Tiguan 4Motion Schema for 1V2 (MY2027-	\N
+29672	Granite State Trailers Schema for 1J9435 (MY2027-	\N
+29673	Toyota Lexus ES Schema for JTH (MY2027-	\N
+29674	Florida Boyz Equipment (FBE) Trailer Schema for 1F9620 (MY2026-	\N
+29675	The Fab Shop, LLC Trailer Schema for 1T9713 MY(2026-	\N
+29676	Vexas Corp (Atlas) LSV Schema for 7WS (MY2026-	\N
+29677	Subaru Impreza Schema for JF1 (MY2027-	\N
+29678	Subaru Crosstrek Schema for 4S4 (MY2027-	\N
+29679	Subaru Crosstrek Hybrid Schema for JF2 (MY2027-	\N
+29680	E-Voltage Motorcycle Schema for 1E9757 (MY2027-	\N
+29681	Lake Region Trailer, LLC Schema for 1L9719 MY(2026-	\N
+29682	Toyota Lexus GX Schema for JTJ (MY2026-	\N
+29683	Silver Cloud Trailer Company Schema for 4S9789 (MY2026-	\N
+29684	Horizon Trailers Texas Schema for 713 (MY2027-	\N
+29685	Brazos Trailer Manufacturing Schema for 4B9054 (MY2026-	\N
+29686	Carts on 12 New Buffalo LSV Schema for 4C9765 (MY2026-	\N
+29687	Kia EV9 Schema for 5XY (MY2027-	\N
+29688	Volkswagen Golf GTI/Golf R Schema for 3VW (MY2027-	\N
+29689	Volkswagen Golf GTI/Golf R Schema for WVW (MY2027-	\N
+29690	Kinney Manufacturing Trailer Schema for 1K9392 (MY2026- 	\N
+29691	Temporary Climate Solutions Trailer Schema for 4T9567 (MY2026-	\N
+29692	Diamondback Manufacturing, LLC Trailer Schema for 1D9972 MY(2026-	\N
+29693	DK Trailers (Draken) Schema for 3D9037 (MY2026-	\N
+29694	Slontek S.A. DE C.V. Trailer Schema for 3S9140 MY(2026-	\N
+29695	Honda Passport Schema for 5FN (MY2027-	\N
+29696	Siedler Industries Trailer Schema for 4S9791 (MY2027-	\N
+29697	Solara EV LLC LSV Schema for 1Z9591 MY(2026-	\N
+29698	ECarriage Motor Company LSV Schema for 1E9760 (MY2026-	\N
+29699	Overwatch Solutions Trailer Schema for 1Z9796 (MY2026-	\N
+29700	Buick Envision Schema for LRB (MY2027-	\N
+29701	Chevrolet Colorado Schema for 1GC (MY2027-	\N
+29702	GMC Canyon Schema for 1GT (MY2027-	\N
+29703	Tuffneck Trailers LLC Schema for 4T9611 MY(2026-	\N
+29704	GMC Sierra Schema for 1GT (MY2027-	\N
+29705	GMC Sierra Schema for 3GT (MY2027-	\N
+29706	GMC Sierra HD Schema for 1GT (MY2027-	\N
+29707	GMC Sierra HD Schema for 1GD (MY2027-	\N
+29708	WD Trailer MFG Schema for 1W9625 MY(2026-	\N
+29709	GEM WAEV LLC LSV Schema for 7SX MY(2027-	\N
+29710	Honda Civic Hatchback Type R Schema for JHM MY(2027-	\N
+29711	Chevrolet Silverado Schema for 1GC (MY2027-	\N
+29712	Chevrolet Silverado Schema for 3GC (MY2027-	\N
+29713	Chevrolet Silverado HD Schema for 1GC (MY2027-	\N
+29714	Chevrolet Silverado HD Schema for 2GC (MY2027-	\N
+29715	Chevrolet Silverado HD Schema for 1GB (MY2027-	\N
+29716	Kaido Cargo Trailer Schema for 1K9467 (MY2026-	\N
+29717	New Edge Technology Solutions LSV Schema for 1N9398 MY(2026-	\N
+29718	Terex USA Trailer Schema for 4T9206 (MY2026-	\N
+29719	Terex GB Ltd Trailer Schema for SA9378 (MY2026-	\N
+29720	Old Soren LLC Motorcycle Schema for 1Z9799 MY(2026-	\N
+29721	American Waterworks (Alkota West) Trailer Schema for 4A9070 (MY2026-	\N
+29722	Honda Civic Sedan Schema for 2HG (MY2027-	\N
+29723	Big John Manufacturing Trailer Schema for 4B9184 (MY2026-	\N
+29724	Elite Trailers (Fang Trailers) Corporation Schema for 1E9727 (MY2026-	\N
+29725	Jaguar Type 01 Schema for SAJ (MY2028-	\N
+29726	Hong Kong Runhorse Holding LSV Schema for R8B (MY2026-	\N
+29727	 Aston Martin DBX Schema for SD7 (MY2027-	\N
+29728	Audi A3/S3/RS 3 Schema for WAU/WUA (MY2027-	\N
+29729	Honda Civic Hatchback Schema for 19X (MY2027-	\N
+29730	Kearney Trailers Inc. Schema for 5LC MY(2008-	\N
+29731	Legacy Forged Trailers LLC Schema for 742 MY(2026-	\N

@@ -126,10 +126,13 @@ export async function saveToCache(
   ttlSeconds: number,
   contentType: string = "application/json; charset=utf-8",
   env?: Env,
-  executionCtx?: ExecutionContextLike
+  executionCtx?: ExecutionContextLike,
+  storedStatus: number = 200
 ): Promise<void> {
   const swrSeconds = CONFIG.CACHE.SWR_TTL_SECONDS;
-  const cacheControl = `public, max-age=${ttlSeconds}, s-maxage=${ttlSeconds}, stale-while-revalidate=${swrSeconds}`;
+  // Errors stay fresh for ttlSeconds only. A day of stale-while-revalidate would pin a 500.
+  const swr = storedStatus === 200 ? `, stale-while-revalidate=${swrSeconds}` : "";
+  const cacheControl = `public, max-age=${ttlSeconds}, s-maxage=${ttlSeconds}${swr}`;
 
   const headers = new Headers({
     "Content-Type": contentType,
@@ -138,6 +141,8 @@ export async function saveToCache(
     [CONFIG.HEADERS.CACHE_STATUS]: "HIT",
     [CONFIG.HEADERS.CACHE_TIER]: "EDGE_CACHE",
   });
+  // Cache API only accepts status 200. The status the client should see is carried alongside.
+  if (storedStatus !== 200) headers.set(CONFIG.HEADERS.CACHED_STATUS, String(storedStatus));
 
   const responseToCache = new Response(bodyText, {
     status: 200,
@@ -155,6 +160,8 @@ export async function saveToCache(
   };
 
   const putKv = async () => {
+    // KV stores the body only, so an error would come back as 200. Keep errors on the edge cache.
+    if (storedStatus !== 200) return;
     if (env?.ENABLE_KV_CACHE === "true" && env.NHTSA_CACHE_KV) {
       try {
         // KV expiration in seconds (minimum 60s)

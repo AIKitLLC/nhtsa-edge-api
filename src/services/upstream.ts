@@ -1,4 +1,4 @@
-import { CONFIG } from "../config";
+import { CONFIG, dataGovKeyHeader, stripApiKeyQuery } from "../config";
 import type { Env } from "../types/env";
 
 export interface UpstreamFetchResult {
@@ -35,17 +35,18 @@ export async function fetchUpstream(
     apiKey?: string;
   }
 ): Promise<UpstreamFetchResult> {
-  // Check if an identical request is already currently in flight
-  const existing = inFlightRequests.get(url);
+  // The coalescing key must not contain the credential, and must not vary by it.
+  const targetUrl = stripApiKeyQuery(url);
+  const existing = inFlightRequests.get(targetUrl);
   if (existing) {
     return existing;
   }
 
-  const promise = executeFetchWithRetry(url, options).finally(() => {
-    inFlightRequests.delete(url);
+  const promise = executeFetchWithRetry(targetUrl, options).finally(() => {
+    inFlightRequests.delete(targetUrl);
   });
 
-  inFlightRequests.set(url, promise);
+  inFlightRequests.set(targetUrl, promise);
   return promise;
 }
 
@@ -63,30 +64,20 @@ async function executeFetchWithRetry(
 
   let attempt = 0;
   let lastError: Error | null = null;
-
-  // Build target URL (inject api_key for api.data.gov / api.nhtsa.gov if needed)
-  let targetUrl = url;
-  if (options?.apiKey && (url.includes("api.data.gov") || url.includes("api.nhtsa.gov"))) {
-    try {
-      const parsed = new URL(url);
-      if (!parsed.searchParams.has("api_key")) {
-        parsed.searchParams.set("api_key", options.apiKey);
-        targetUrl = parsed.toString();
-      }
-    } catch {
-      // Keep original url if parsing fails
-    }
-  }
+  const targetUrl = stripApiKeyQuery(url);
 
   const reqHeaders: Record<string, string> = {
     Accept: "application/json",
     "User-Agent": "NHTSA-Cloudflare-Edge-Proxy/1.0",
     ...options?.headers,
   };
-
-  if (options?.apiKey) {
-    reqHeaders["X-Api-Key"] = options.apiKey;
+  // Any casing: a caller-supplied header must not smuggle the key onto another host.
+  for (const name of Object.keys(reqHeaders)) {
+    if (name.toLowerCase() === "x-api-key") delete reqHeaders[name];
   }
+  const keyHeader = dataGovKeyHeader(targetUrl, options?.apiKey);
+  Object.assign(reqHeaders, keyHeader);
+  const sendsKey = Object.keys(keyHeader).length > 0;
 
   while (attempt <= maxRetries) {
     const startTime = performance.now();
@@ -98,10 +89,17 @@ async function executeFetchWithRetry(
         method: "GET",
         headers: reqHeaders,
         signal: controller.signal,
+        // manual: a 3xx must not carry X-Api-Key to a different host.
+        redirect: sendsKey ? "manual" : "follow",
       });
 
       clearTimeout(timeoutId);
       const latencyMs = Math.round(performance.now() - startTime);
+
+      if (sendsKey && response.status >= 300 && response.status < 400) {
+        await response.body?.cancel().catch(() => undefined);
+        return { status: 502, headers: new Headers(), bodyText: "", latencyMs };
+      }
 
       if (RETRYABLE_STATUSES.has(response.status) && attempt < maxRetries) {
         attempt++;

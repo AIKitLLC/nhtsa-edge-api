@@ -26,4 +26,9 @@ export function fsAssets(root: string = ASSETS_DIR): Fetcher {
   } as unknown as Fetcher;
 }
 
-export const testEnv = () => ({ ASSETS: fsAssets() });
+/** The only place ALLOW_NO_RATE_LIMIT is set. Production never gets this pair. */
+export const testEnv = () => ({
+  ASSETS: fsAssets(),
+  ALLOW_NO_RATE_LIMIT: "true",
+  ENVIRONMENT: "test",
+});

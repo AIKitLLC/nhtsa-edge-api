@@ -12,7 +12,7 @@ Decode a VIN with one GET request, for example:
 
     curl -s ${SITE}/api/v1/vin/${OPENAPI_EXAMPLE_VIN}
 
-The response has \`data.make\`, \`data.model\`, \`data.modelYear\`, \`data.isCleanDecode\` and \`data.attributes\` (every decoded vPIC variable). Check \`data.errorCodes\` before trusting a result: partial or invalid VINs are decoded as far as possible and flagged. Requests are limited to 120 per minute per client; a 429 carries Retry-After.
+The response has \`data.make\`, \`data.model\`, \`data.modelYear\`, \`data.isCleanDecode\` and \`data.attributes\` (every decoded vPIC variable). Check \`data.errorCodes\` before trusting a result: partial or invalid VINs are decoded as far as possible and flagged. Requests are limited to 120 per minute per client; a 429 carries Retry-After. If the limiter binding is missing or errors, the API answers 503.
 
 ## API
 
