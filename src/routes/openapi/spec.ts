@@ -49,6 +49,7 @@ export const OPENAPI = {
   tags: [
     { name: "VIN", description: "Offline decoding" },
     { name: "Catalog", description: "Makes and models in the bundled dataset" },
+    { name: "Fuel economy", description: "EPA and DOE FuelEconomy.gov vehicle records, bundled" },
     { name: "vPIC drop-in", description: "Same paths and JSON shape as vpic.nhtsa.dot.gov" },
     { name: "Recalls", description: "Proxied to NHTSA and cached" },
   ],
@@ -127,6 +128,26 @@ export const OPENAPI = {
           "200": { description: "Models grouped by matching make", content: { "application/json": { schema: { type: "object" } } } },
           "400": errorResponse("Missing make"),
           "404": errorResponse("Unknown make"),
+          "429": errorResponse("Rate limited"),
+        },
+      },
+    },
+    "/api/v1/fuel-economy": {
+      get: {
+        tags: ["Fuel economy"],
+        operationId: "fuelEconomy",
+        summary: "EPA fuel economy records for a model year and make",
+        description:
+          "Every EPA record of that year and make, with EPA's own column names (city08, highway08, comb08, range, cityE, atvType, ...). Blank values are omitted. Records are per configuration, not per VIN.",
+        parameters: [
+          { name: "year", in: "query", required: true, schema: { type: "string", pattern: "^\\d{4}$", example: "2022" } },
+          { name: "make", in: "query", required: true, schema: { type: "string" }, example: "Honda" },
+          { name: "model", in: "query", description: "Keeps models whose name contains this text, ignoring case.", schema: { type: "string" }, example: "Accord" },
+        ],
+        responses: {
+          "200": { description: "Matching records", content: { "application/json": { schema: { type: "object" } } } },
+          "400": errorResponse("Missing or invalid year or make"),
+          "404": errorResponse("No EPA vehicles match"),
           "429": errorResponse("Rate limited"),
         },
       },

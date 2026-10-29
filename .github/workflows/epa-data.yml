@@ -1,0 +1,66 @@
+name: EPA fuel-economy data refresh
+
+# Downloads FuelEconomy.gov's vehicles.csv, keeps the served columns in data/epa and commits the
+# change. It does not deploy: a deploy picks the data up through `pnpm build:data`.
+on:
+  schedule:
+    # Every Monday 07:23 UTC; EPA publishes a few times a year, so most runs change nothing
+    - cron: '23 7 * * 1'
+  workflow_dispatch:
+  push:
+    # The ingestion code, not data: also lets the first ingest of a new branch run on that branch
+    paths:
+      - 'scripts/epa/**'
+      - '.github/workflows/epa-data.yml'
+
+concurrency:
+  group: epa-data-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    name: Ingest and commit data/epa
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Download vehicles.csv
+        run: |
+          mkdir -p "$RUNNER_TEMP/epa"
+          curl -fsSL -m 300 -A "ai-kit-data (+https://github.com/AIKitLLC/nhtsa-edge-api)" \
+            -D "$RUNNER_TEMP/epa/headers.txt" -o "$RUNNER_TEMP/epa/vehicles.csv.zip" \
+            https://www.fueleconomy.gov/feg/epadata/vehicles.csv.zip
+          unzip -oq "$RUNNER_TEMP/epa/vehicles.csv.zip" vehicles.csv -d "$RUNNER_TEMP/epa"
+          LM=$(grep -i '^last-modified:' "$RUNNER_TEMP/epa/headers.txt" | tail -1 | cut -d' ' -f2- | tr -d '\r')
+          echo "SOURCE_DATE=$(date -u -d "$LM" +%F)" >> "$GITHUB_ENV"
+
+      - name: Ingest into data/epa
+        run: |
+          PREVIOUS=$(node -p 'try { require("./data/epa/manifest.json").rows } catch { 0 }')
+          bun scripts/epa/ingest.ts --csv="$RUNNER_TEMP/epa/vehicles.csv" --source-date="$SOURCE_DATE"
+          ROWS=$(node -p 'require("./data/epa/manifest.json").rows')
+          # A truncated or reshaped download must not replace good data
+          if [ "$ROWS" -lt 40000 ] || [ "$ROWS" -lt $((${PREVIOUS:-0} * 9 / 10)) ]; then
+            echo "::error::vehicles.csv has $ROWS rows (previously $PREVIOUS): refusing to commit"
+            exit 1
+          fi
+
+      - name: Commit the change
+        run: |
+          if [[ -z "$(git status --porcelain data/epa)" ]]; then
+            echo "data/epa is up to date (source $SOURCE_DATE)" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          ROWS=$(node -p 'require("./data/epa/manifest.json").rows')
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git add data/epa
+          git commit -m "data(epa): vehicles.csv of ${SOURCE_DATE} (${ROWS} vehicles)"
+          # Another run may have pushed meanwhile: replay this commit on top of it
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+          echo "Committed ${ROWS} vehicles (source ${SOURCE_DATE}). Revert with: \`git revert $(git rev-parse HEAD)\`" >> "$GITHUB_STEP_SUMMARY"

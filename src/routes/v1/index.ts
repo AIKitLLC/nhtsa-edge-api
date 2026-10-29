@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import type { Env } from "../../types/env";
 import { vinRouter } from "./vin";
 import { catalogRouter } from "./catalog";
+import { fuelEconomyRouter } from "./fuel-economy";
 import { recallsRouter } from "./recalls";
 import { unifiedRouter } from "./unified";
 
@@ -13,4 +14,5 @@ export const v1Router = new Hono<{ Bindings: Env }>();
 v1Router.route("/", vinRouter);
 v1Router.route("/", unifiedRouter);
 v1Router.route("/", catalogRouter);
+v1Router.route("/", fuelEconomyRouter);
 v1Router.route("/", recallsRouter);
