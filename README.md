@@ -11,6 +11,7 @@ The site is a hub of datasets; the first one is NHTSA's vehicle database (vPIC),
 | NHTSA safety recalls | Partial: proxied to NHTSA and cached |
 | EPA / DOE fuel economy and electric range | Live: every EPA record by year and make in `/api/v1/fuel-economy`; model-level data also in `/api/v1/vin/:vin/unified` |
 | NHTSA complaints and crash test ratings | Planned |
+| Leaked password check ([Have I Been Pwned](https://haveibeenpwned.com/Passwords)) | Partial: password range proxied to Pwned Passwords; email lookup planned |
 
 The status list of the site lives in `src/routes/landing/hub.ts`; a dataset is only "Live" when
 its data is served from this Worker.
@@ -117,6 +118,21 @@ Offline responses carry `X-Decode-Source: LOCAL_VPIC` and `X-Vpic-Data-Version`
 | `GET` | `/api/v1/recalls/:vin` | Recalls for a 17-character VIN (proxied to `api.nhtsa.gov`, cached 6 h) |
 | `GET` | `/vehicles/*` | Allowlisted vPIC endpoints, including `*Extended` decodes (proxied, cached). Other paths are HTTP 400 |
 | `GET` | `/recalls/*` | Allowlisted recalls endpoints (`recallsByVehicle`, `recallsByVin`), cached. Other paths are HTTP 400 |
+
+### Leak check
+
+| Method | Endpoint | Notes |
+| :-- | :-- | :-- |
+| `GET` | `/api/v1/leak/password/range/:prefix` | First 5 hex characters of a password's SHA-1. Returns HIBP's `SUFFIX:COUNT` lines as `text/plain`, padded with zero-count lines so the response size does not reveal the prefix (cached 24 h). No key; the password never leaves the client |
+
+```bash
+# Is "password" in a breach? SHA-1 = 5BAA61E4C9B93F3F0682250B6CF8331B7EE68FD8
+curl -s https://data.ai-kit.net/api/v1/leak/password/range/5BAA6 | grep -i 1E4C9B93F3F0682250B6CF8331B7EE68FD8
+# 1E4C9B93F3F0682250B6CF8331B7EE68FD8:52372427
+```
+
+An email breach lookup (`src/routes/v1/leak-email.ts`, paid HIBP API) is written and tested but not
+mounted until an HIBP API key is in place.
 
 Proxied endpoints forward only known query parameters, so extra parameters cannot bypass
 the cache. The Cache API is a no-op on `*.workers.dev`; attach a custom domain (or enable
@@ -247,6 +263,8 @@ pnpm deploy          # nhtsa-edge-api (production)
 - The data describes vehicle specifications only; it contains no personal or registration data.
 - Data source: National Highway Traffic Safety Administration (NHTSA), U.S. DOT. This
   project is independent and not affiliated with or endorsed by NHTSA.
+- Leaked password data comes from [Have I Been Pwned](https://haveibeenpwned.com)'s Pwned Passwords.
+  This project is not affiliated with Have I Been Pwned.
 
 ## License
 

@@ -8,11 +8,12 @@ Figures are from the GitHub API (application programming interface) for `AIKitLL
 
 ## Open issues
 
-Nine issues are open. None use `status:blocked`. Milestone fields are empty because no milestone exists on the repository yet. Issues #7 and #20 are closed (#20 by #21).
+Ten issues are open. None use `status:blocked`. Milestone fields are empty because no milestone exists on the repository yet. Issues #7 and #20 are closed (#20 by #21).
 
 | Issue | Labels | Proposed milestone |
 | :-- | :-- | :-- |
 | [#24](https://github.com/AIKitLLC/nhtsa-edge-api/issues/24) Mandatory CI/CD deploy; no deploys from a local machine | `priority:p0` | none |
+| [#27](https://github.com/AIKitLLC/nhtsa-edge-api/issues/27) List the leak check on the hub and in README | `type:docs`, `area:docs`, `priority:p2` | none |
 | [#22](https://github.com/AIKitLLC/nhtsa-edge-api/issues/22) Follow-ups from Security review of #21 (non-blocking) | none | none |
 | [#8](https://github.com/AIKitLLC/nhtsa-edge-api/issues/8) Bundle an offline copy of NHTSA safety recalls | `type:feature`, `area:pipeline`, `area:routes`, `status:ready`, `priority:p2` | M2 Dataset completeness |
 | [#9](https://github.com/AIKitLLC/nhtsa-edge-api/issues/9) Serve the full [EPA](https://www.epa.gov/) (Environmental Protection Agency) and [DOE](https://www.energy.gov/) (Department of Energy) fuel-economy dataset. In review: [#26](https://github.com/AIKitLLC/nhtsa-edge-api/pull/26) | `type:feature`, `area:enrichment`, `status:ready`, `priority:p2` | M2 Dataset completeness |
@@ -31,7 +32,7 @@ Euro NCAP in #13 is a separate program from NHTSA NCAP in #10.
 | [#23](https://github.com/AIKitLLC/nhtsa-edge-api/pull/23) Add a RapidAPI proxy batch route | `cursor/rapidapi-proxy-route-d053` | draft |
 | [#26](https://github.com/AIKitLLC/nhtsa-edge-api/pull/26) Serve the full EPA / DOE fuel-economy dataset | `claude/exciting-pascal-8khdrj` | closes #9 |
 
-Merged, not open: [#17](https://github.com/AIKitLLC/nhtsa-edge-api/pull/17) (STATUS refresh), [#21](https://github.com/AIKitLLC/nhtsa-edge-api/pull/21) (data.gov key stays on its hosts, proxy cache bypass closed; closes #20), #19 (drop personal workers.dev hostname), #18 (known-renames allowlist for the parity gate), [#6](https://github.com/AIKitLLC/nhtsa-edge-api/pull/6) (agent standards, closes #7), #16, #5, #4, #3, #2, #1.
+Merged, not open: [#28](https://github.com/AIKitLLC/nhtsa-edge-api/pull/28) (leak check on the hub and in README; #27), [#25](https://github.com/AIKitLLC/nhtsa-edge-api/pull/25) (Pwned Passwords range at `/api/v1/leak/password/range/{prefix}`; email lookup written but not mounted; deployed to production 2026-10-29), [#17](https://github.com/AIKitLLC/nhtsa-edge-api/pull/17) (STATUS refresh), [#21](https://github.com/AIKitLLC/nhtsa-edge-api/pull/21) (data.gov key stays on its hosts, proxy cache bypass closed; closes #20), #19 (drop personal workers.dev hostname), #18 (known-renames allowlist for the parity gate), [#6](https://github.com/AIKitLLC/nhtsa-edge-api/pull/6) (agent standards, closes #7), #16, #5, #4, #3, #2, #1.
 
 ## Labels
 
