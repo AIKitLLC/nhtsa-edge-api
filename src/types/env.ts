@@ -57,6 +57,21 @@ export interface Env {
    * The public batch endpoint stays at 50. Not a secret.
    */
   readonly RAPIDAPI_BATCH_MAX?: string;
+
+  /**
+   * Have I Been Pwned API key (secret) for POST /api/v1/leak/email; the route answers 503 without it.
+   */
+  readonly HIBP_API_KEY?: string;
+
+  /**
+   * Bearer token clients must send to POST /api/v1/leak/email (secret); the route answers 503 without it.
+   */
+  readonly LEAK_API_TOKEN?: string;
+
+  /**
+   * Stricter per-client limit for email lookups, which spend the paid HIBP quota.
+   */
+  readonly LEAK_RATE_LIMITER?: RateLimit;
 }
 
 export type AppVariables = {

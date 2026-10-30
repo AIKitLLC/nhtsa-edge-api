@@ -20,6 +20,11 @@ The response has \`data.make\`, \`data.model\`, \`data.modelYear\`, \`data.isCle
 - [API reference](${SITE}/docs): the same, as a web page
 - [VIN decoder](${SITE}/vpic): interactive decoder, single and batch
 
+## Leak check (Have I Been Pwned data)
+
+- \`GET /api/v1/leak/password/range/{first 5 hex of SHA-1}\`: k-anonymity password check, no key; match the remaining 35 characters locally
+- Email breach lookup: planned
+
 ## Data and accuracy
 
 - [Data pipeline and verification](https://github.com/AIKitLLC/nhtsa-edge-api/blob/main/docs/DATA.md): the decoder is compared with NHTSA's own SQL functions on the original dump, and with the live vPIC API

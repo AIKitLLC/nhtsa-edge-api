@@ -58,6 +58,14 @@ export const DATASETS: readonly Dataset[] = [
     summary: "Owner complaints and NCAP star ratings, keyed by make, model and year.",
     links: [],
   },
+  {
+    id: "leak-check",
+    name: "Leaked password check",
+    agency: "Have I Been Pwned",
+    status: "partial",
+    summary: "Check whether a password appeared in a data breach without sending it: send the first 5 characters of its SHA-1 hash and match the rest locally. Proxied to Pwned Passwords. Email breach lookup is planned.",
+    links: [["API", "/docs"]],
+  },
 ];
 
 function datasetCard(d: Dataset, stats: PageInfo["stats"], dataVersion: string | null): string {

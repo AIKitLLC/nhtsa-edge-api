@@ -1,14 +1,14 @@
 # Status
 
-Updated in the same pull request as every code or docs change. Last updated: 2026-10-25.
+Updated in the same pull request as every code or docs change. Last updated: 2026-10-30.
 
-Figures are from the GitHub API (application programming interface) for `AIKitLLC/nhtsa-edge-api` on that date. Default branch: `main`. `main` is `851729d` (`data(vpic): vPICList_lite_2026_10`, live parity 93.90%). The strict parity rate is the `exactRate` in the [vPIC data refresh job summary](https://github.com/AIKitLLC/nhtsa-edge-api/actions/workflows/vpic-data.yml).
+Figures are from the GitHub API (application programming interface) for `AIKitLLC/nhtsa-edge-api` on that date. Default branch: `main`. `main` is `d3d1c28`. The vPIC data commit on that history is `683b4f4` (`data(vpic): vPICList_lite_2026_10`, live parity 92.30%). The strict parity rate is the `exactRate` in the [vPIC data refresh job summary](https://github.com/AIKitLLC/nhtsa-edge-api/actions/workflows/vpic-data.yml).
 
 [NHTSA](https://www.nhtsa.gov/) is the National Highway Traffic Safety Administration. [vPIC](https://vpic.nhtsa.dot.gov/) is NHTSA's Product Information Catalog and Vehicle Listing. A [VIN](https://www.nhtsa.gov/vin-decoder) is a vehicle identification number.
 
 ## Open issues
 
-Nine issues are open. None use `status:blocked`. Milestone fields are empty because no milestone exists on the repository yet. Issues #7 and #20 are closed (#20 by #21).
+Nine issues are open. None use `status:blocked`. Milestone fields are empty because no milestone exists on the repository yet. Issues #7, #20, and #27 are closed (#20 by #21, #27 by #28).
 
 | Issue | Labels | Proposed milestone |
 | :-- | :-- | :-- |
@@ -31,9 +31,9 @@ No open issue tracks `POST /rapid/v1/batch`. Three ready-to-file issues (secret 
 | Pull request | Branch | Linked issue |
 | :-- | :-- | :-- |
 | [#23](https://github.com/AIKitLLC/nhtsa-edge-api/pull/23) Add a RapidAPI proxy batch route | `cursor/rapidapi-proxy-route-d053` | none (no matching open issue; draft) |
-| [#17](https://github.com/AIKitLLC/nhtsa-edge-api/pull/17) docs: refresh STATUS.md | `cursor/docs-status-refresh-773a` | none (this change) |
+| [#26](https://github.com/AIKitLLC/nhtsa-edge-api/pull/26) Serve the full EPA / DOE fuel-economy dataset | `claude/exciting-pascal-8khdrj` | #9 |
 
-Merged, not open: [#21](https://github.com/AIKitLLC/nhtsa-edge-api/pull/21) (data.gov key stays on its hosts, proxy cache bypass closed; closes #20), #19 (drop personal workers.dev hostname), #18 (known-renames allowlist for the parity gate), [#6](https://github.com/AIKitLLC/nhtsa-edge-api/pull/6) (agent standards, closes #7), #16, #5, #4, #3, #2, #1.
+Merged, not open: [#28](https://github.com/AIKitLLC/nhtsa-edge-api/pull/28) (leak check listed on the hub and in README; closes #27), [#25](https://github.com/AIKitLLC/nhtsa-edge-api/pull/25) (Pwned Passwords range at `/api/v1/leak/password/range/{prefix}`; email lookup written but not mounted; deployed to production 2026-10-29), #17 (STATUS refresh), [#21](https://github.com/AIKitLLC/nhtsa-edge-api/pull/21) (data.gov key stays on its hosts, proxy cache bypass closed; closes #20), #19 (drop personal workers.dev hostname), #18 (known-renames allowlist for the parity gate), [#6](https://github.com/AIKitLLC/nhtsa-edge-api/pull/6) (agent standards, closes #7), #16, #5, #4, #3, #2, #1.
 
 ## Labels
 
