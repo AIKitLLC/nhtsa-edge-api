@@ -138,6 +138,43 @@ the cache. The Cache API is a no-op on `*.workers.dev`; attach a custom domain (
 the optional KV cache) for caching of proxied responses. Offline decoding does not
 depend on it.
 
+### RapidAPI proxy
+
+`POST /rapid/v1/batch` is separate from the public endpoints above. A request is accepted
+only when the `X-RapidAPI-Proxy-Secret` header matches the Worker secret
+`RAPIDAPI_PROXY_SECRET`. A missing or wrong header is HTTP 403. The secret is not in
+`wrangler.jsonc` and has no default. `X-RapidAPI-User` and `X-RapidAPI-Subscription` are
+written to the Worker log and are not used for access control.
+
+The JSON body is `{ "vins": [{ "vin": "...", "modelYear": 2022 }] }`. The default limit
+is 100 VINs (the public batch endpoint stays at 50). Set the plain var `RAPIDAPI_BATCH_MAX`
+to another integer; values above 200 are clamped to 200. Each item is an offline decode.
+When `api.nhtsa.gov` returns campaigns for a 17-character VIN, they are included.
+When FuelEconomy.gov matches the decoded make, model, and year, those figures are included.
+If a source does not answer, that section is empty and the decode is still returned.
+
+The import file for the proxy routes is [`openapi/rapidapi.json`](openapi/rapidapi.json)
+(OpenAPI 3.0.3). It is not served at `/openapi.json`. Full integration steps, acceptance
+tests, and ready-to-file issues: [`docs/RAPIDAPI.md`](docs/RAPIDAPI.md).
+
+Local development reads gitignored `.dev.vars` (do not commit it):
+
+```
+RAPIDAPI_PROXY_SECRET=replace-with-the-proxy-secret
+RAPIDAPI_BATCH_MAX=100
+```
+
+On a deployed Worker the secret is set with Wrangler. `wrangler secret put` publishes a
+Worker version, so run it only when a deploy is intended:
+
+```bash
+npx wrangler secret put RAPIDAPI_PROXY_SECRET --env dev # dev worker first
+npx wrangler secret put RAPIDAPI_PROXY_SECRET           # production, separately approved
+```
+
+Use the same value RapidAPI is configured to send in `X-RapidAPI-Proxy-Secret`. This
+repository does not contain that value.
+
 ---
 
 ## Accuracy
@@ -181,7 +218,7 @@ src/
     conversions.ts      unit conversions, evaluated with tsql-decimal.ts
     store.ts            asset access (+ worker-store.ts for the ASSETS binding)
     format.ts           vPIC response shapes; v1-format.ts: clean v1 shape
-  routes/               v1 API, vPIC drop-in (vpic-decode.ts offline, vpic-proxy.ts), recalls
+  routes/               v1 API, vPIC drop-in (vpic-decode.ts offline, vpic-proxy.ts), recalls, rapid.ts
   services/             upstream fetch, cache, multi-source resolver, response helpers
   enrichment/           US EPA FuelEconomy.gov and EU RDW lookups for /unified
 scripts/vpic/           ingest-dump.ts, build-assets.ts, parity.ts (+ lib/)
@@ -247,6 +284,8 @@ pnpm deploy          # nhtsa-edge-api (production)
 | `ENVIRONMENT` | `production` / `dev` | Reported by the health endpoint |
 | `UPSTREAM_TIMEOUT_MS` | `5000` | Timeout per attempt for proxied NHTSA calls |
 | `ENABLE_KV_CACHE` | `false` | Optional KV cache for proxied responses (bind `NHTSA_CACHE_KV`) |
+| `RAPIDAPI_BATCH_MAX` | unset (code default 100, ceiling 200) | Max VINs on `POST /rapid/v1/batch`. Not set in `wrangler.jsonc` |
+| `RAPIDAPI_PROXY_SECRET` | unset | Worker secret, not a var. See [RapidAPI proxy](#rapidapi-proxy) |
 
 ### CI
 

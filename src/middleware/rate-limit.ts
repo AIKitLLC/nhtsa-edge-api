@@ -5,6 +5,14 @@ import type { Env } from "../types/env";
 const UNLIMITED_PATHS = new Set(["/", "/health", "/vpic", "/batch", "/docs", "/openapi.json", "/llms.txt"]);
 
 /**
+ * `/rapid` is gated by the proxy secret. The connecting IP is the RapidAPI proxy,
+ * so the per-IP limiter would count every caller as one. RapidAPI applies the quota.
+ */
+function isRapidPath(path: string): boolean {
+  return path === "/rapid" || path.startsWith("/rapid/");
+}
+
+/**
  * Per-client rate limit using the Workers Rate Limiting binding (RATE_LIMITER).
  *
  * Fail closed: HTTP 503, not 429, when the binding is missing or throws. The client is not over
@@ -30,7 +38,7 @@ function unavailable(c: Context<{ Bindings: Env }>): Response {
 
 export const rateLimitMiddleware = (): MiddlewareHandler<{ Bindings: Env }> => {
   return async (c, next) => {
-    if (c.req.method === "OPTIONS" || UNLIMITED_PATHS.has(c.req.path)) return next();
+    if (c.req.method === "OPTIONS" || UNLIMITED_PATHS.has(c.req.path) || isRapidPath(c.req.path)) return next();
 
     const limiter = c.env?.RATE_LIMITER;
     const allowMissing = c.env?.ALLOW_NO_RATE_LIMIT === "true" && c.env?.ENVIRONMENT !== "production";

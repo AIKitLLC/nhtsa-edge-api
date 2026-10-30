@@ -64,6 +64,7 @@ Dependency direction is downward in that diagram. `src/vpic` does not import `sr
 | `src/routes/vpic-decode.ts` | Offline `DecodeVin`, `DecodeVinValues`, and `DecodeVINValuesBatch` |
 | `src/routes/vpic-proxy.ts` | Allowlisted `/vehicles/*` calls, proxied and cached. `*Extended` stays upstream. Unknown paths are HTTP 400 |
 | `src/routes/recalls-proxy.ts` | Allowlisted `/recalls/*` drop-in proxy (`recallsByVehicle`, `recallsByVin`) |
+| `src/routes/rapid.ts` | `POST /rapid/v1/batch`. Requires `X-RapidAPI-Proxy-Secret`. Offline decode, then NHTSA recalls and FuelEconomy.gov when those sources return data |
 
 ### vpic
 
@@ -84,7 +85,7 @@ One file per step of the port. Outside the module, callers use:
 | :-- | :-- | :-- |
 | `fetchUpstream` | `services/upstream.ts` | NHTSA HTTP with timeout and retries |
 | `serveCachedUpstream` | `services/cached-upstream.ts` | Cache API, then optional KV |
-| `resolveUnifiedVehicle` | `services/multi-source-resolver.ts` | Offline spec plus EPA and RDW |
+| `resolveUnifiedVehicle`, `lookupFuelEconomy` | `services/multi-source-resolver.ts` | Offline spec plus EPA and RDW; fuel lookup for `/rapid` |
 | `fetchEpaEnergySpecs` | `enrichment/epa.ts` | https://www.fueleconomy.gov/ws/rest |
 | `fetchRdwEuropeanSpecs` | `enrichment/rdw.ts` | https://opendata.rdw.nl/resource/m9d7-ebf2.json |
 
@@ -97,9 +98,11 @@ From `src/types/env.ts` and `wrangler.jsonc`:
 | Binding | State | Use |
 | :-- | :-- | :-- |
 | `ASSETS` | Required. `run_worker_first: true` | Decoder JSON built from `data/vpic` into `build/assets` |
-| `RATE_LIMITER` | Bound in `wrangler.jsonc` (`ratelimits`, 120 requests / 60 seconds). Production namespace `1001`, dev `1002` | `src/middleware/rate-limit.ts`. Pages, `/health`, docs, and CORS preflight are exempt. A missing binding or a throw is HTTP 503 with `Retry-After` (fail closed). 429 is only a real limit. The only bypass is `ALLOW_NO_RATE_LIMIT=true` while `ENVIRONMENT` is not `production`, set only in the test helper. `wrangler.jsonc` does not set it |
+| `RATE_LIMITER` | Bound in `wrangler.jsonc` (`ratelimits`, 120 requests / 60 seconds). Production namespace `1001`, dev `1002` | `src/middleware/rate-limit.ts`. Pages, `/health`, docs, CORS preflight, and `/rapid` are exempt. `/rapid` is gated by the proxy secret; the connecting IP is the proxy, and RapidAPI applies the quota. A missing binding or a throw is HTTP 503 with `Retry-After` (fail closed) on every other API path. 429 is only a real limit. The only bypass is `ALLOW_NO_RATE_LIMIT=true` while `ENVIRONMENT` is not `production`, set only in the test helper. `wrangler.jsonc` does not set it |
 | `NHTSA_CACHE_KV` | Unbound. `ENABLE_KV_CACHE` is `false` | Optional cache for proxied responses |
 | `DATA_GOV_API_KEY` | Optional Worker secret. Not in `wrangler.jsonc` | Sent only as the `X-Api-Key` header, and only to `api.data.gov` and `api.nhtsa.gov`. Not placed in the URL, not sent to vPIC, and not sent to FuelEconomy.gov. `/health` does not report whether it is set. Agents do not read or write it |
+| `RAPIDAPI_PROXY_SECRET` | Optional Worker secret. Not in `wrangler.jsonc` | Compared with `X-RapidAPI-Proxy-Secret` on `/rapid`. Unset or mismatched is HTTP 403. `/health` does not report whether it is set |
+| `RAPIDAPI_BATCH_MAX` | Optional plain var. Unset in `wrangler.jsonc` | Max VINs on `POST /rapid/v1/batch`. Default 100, ceiling 200. The public batch endpoint stays at 50 |
 | vars | `ENVIRONMENT`, `UPSTREAM_TIMEOUT_MS` | Health and upstream timeout |
 | routes | `data.ai-kit.net` on production; `env.dev` clears routes | Custom domain. `workers_dev` stays on |
 

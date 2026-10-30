@@ -25,6 +25,9 @@
   // Per-client API limit (src/middleware/rate-limit.ts). namespace_id is any string unique in the account.
   // LEAK_RATE_LIMITER: email breach lookups (src/routes/v1/leak-email.ts, pending, not mounted yet), which spend the paid HIBP quota.
   // Secrets for that route: `wrangler secret put HIBP_API_KEY` and `wrangler secret put LEAK_API_TOKEN`.
+  // RAPIDAPI_PROXY_SECRET is a Worker secret (`wrangler secret put`), not a var.
+  // Do not put the value here. Optional plain var RAPIDAPI_BATCH_MAX (default 100,
+  // ceiling 200) sizes POST /rapid/v1/batch. Leave it unset to use the default.
   "ratelimits": [
     { "name": "RATE_LIMITER", "namespace_id": "1001", "simple": { "limit": 120, "period": 60 } },
     { "name": "LEAK_RATE_LIMITER", "namespace_id": "1003", "simple": { "limit": 10, "period": 60 } }
