@@ -46,6 +46,7 @@ Dependency direction is downward in that diagram. `src/vpic` does not import `sr
 | vpic | `src/vpic/` | Offline port of NHTSA `spVinDecode` and the response shapes | `ASSETS` only |
 | services | `src/services/` | Upstream fetch, Cache API / optional KV, unified profile assembly | `enrichment`, `vpic` types, `config`, `types` |
 | enrichment | `src/enrichment/` | Adapters for FuelEconomy.gov and RDW Open Data | those HTTP APIs |
+| epa | `src/epa/`, `scripts/epa/`, `data/epa/` | Bundled EPA / DOE FuelEconomy.gov vehicle records: weekly ingest into git, one asset per model year and make, read by `/api/v1/fuel-economy`. Same shape as vPIC, smaller | `ASSETS` only |
 | validation | `src/validation/vin.ts`, `src/validation/upstream-path.ts` | VIN and model-year parsing, the proxy path allowlist, and proxy query checks, at the trust boundary | Zod (VIN only) |
 | pipeline | `scripts/vpic/` | Ingest, asset build, live parity, SQL verification, errata audit | filesystem, NHTSA downloads, live vPIC API, PostgreSQL 17 |
 | data | `data/vpic/` | Git-tracked vPIC tables and `manifest.json` | read by the pipeline; the Worker reads the built assets |
@@ -60,7 +61,7 @@ Dependency direction is downward in that diagram. `src/vpic` does not import `sr
 | `src/routes/health.ts` | `GET /` (HTML hub for browsers, health JSON for API clients), `GET /health`, `GET /vpic`, `GET /batch`, `GET /docs` |
 | `src/routes/landing/` | Hub (`hub.ts`), VIN page (`vpic.ts`), batch page (`batch.ts`), docs page (`docs.ts`). Public exports are `landing/index.ts` |
 | `src/routes/openapi/` | `GET /openapi.json` and `GET /llms.txt`. `/docs` renders the same document |
-| `src/routes/v1/` | `/api/v1/vin/:vin`, `/unified`, `/compare`, `/makes`, `/models`, `/recalls/:vin` |
+| `src/routes/v1/` | `/api/v1/vin/:vin`, `/unified`, `/compare`, `/makes`, `/models`, `/fuel-economy`, `/recalls/:vin` |
 | `src/routes/vpic-decode.ts` | Offline `DecodeVin`, `DecodeVinValues`, and `DecodeVINValuesBatch` |
 | `src/routes/vpic-proxy.ts` | Allowlisted `/vehicles/*` calls, proxied and cached. `*Extended` stays upstream. Unknown paths are HTTP 400 |
 | `src/routes/recalls-proxy.ts` | Allowlisted `/recalls/*` drop-in proxy (`recallsByVehicle`, `recallsByVin`) |
@@ -131,7 +132,7 @@ flowchart LR
 | `vpic.nhtsa.dot.gov/api` | `services/upstream.ts`, `scripts/vpic/parity.ts` | Proxied endpoints and the parity gate |
 | `api.nhtsa.gov` | recalls routes and `services/upstream.ts` | Recalls proxy, cached 6 hours (errors cached 60 seconds). When `DATA_GOV_API_KEY` is set, it is sent as `X-Api-Key` and never in the URL |
 | `api.data.gov` | `services/upstream.ts` | The other host that may receive `X-Api-Key`. The secret itself is not stored in git |
-| FuelEconomy.gov | `enrichment/epa.ts` | `/unified`. The data.gov key is not sent |
+| FuelEconomy.gov | `enrichment/epa.ts`, `scripts/epa` | `/unified` model lookups at request time; the weekly `vehicles.csv` ingest (`.github/workflows/epa-data.yml`). The data.gov key is not sent |
 | RDW Open Data | `enrichment/rdw.ts` | `/unified` |
 | Cloudflare Workers | the Worker | Runtime, static assets, optional KV |
 | PostgreSQL 17 | `scripts/vpic/sql-verify` | CI and local verification only |
@@ -157,6 +158,6 @@ Planned datasets (hub and `HANDOFF.md`), still without a module:
 | Dataset | Where it is named | Likely home once built |
 | :-- | :-- | :-- |
 | Offline safety recalls | hub status `partial` | domain module plus `scripts/` pipeline, same shape as vPIC |
-| Full EPA / DOE fuel economy | hub status `partial` | extend `enrichment` if it stays a lookup; own module if the tables are bundled |
+| Full EPA / DOE fuel economy | built: `src/epa`, hub status `live` (issue #9). `/unified` still calls FuelEconomy.gov at request time | switching `/unified` to the bundled data is a separate change |
 | Complaints and NCAP ratings | hub status `planned` | same choice as fuel economy |
 | UK DVSA MOT, Australian Green Vehicle Guide, Euro NCAP | `HANDOFF.md` | `enrichment` adapters |

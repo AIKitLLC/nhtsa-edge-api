@@ -56,7 +56,7 @@ jobs:
           pnpm test
 
       - name: Build assets
-        run: bun scripts/vpic/build-assets.ts
+        run: pnpm build:data
 
       - name: Dry-run and confirm RATE_LIMITER is bound
         run: |

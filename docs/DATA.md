@@ -64,6 +64,19 @@ git push                   # the workflow redeploys the dev worker with the old 
 `wrangler rollback` also works for an immediate rollback of a deployed version,
 because data (assets) and code are deployed together as one version.
 
+## data/epa (git)
+
+FuelEconomy.gov's `vehicles.csv` (EPA and DOE, public domain), reduced to the 35 columns the API serves
+(`scripts/epa/ingest.ts`), sorted so an unchanged source gives no diff. `manifest.json` records the source
+URL, its last-modified date, the SHA-256 of the CSV and the row count. `.github/workflows/epa-data.yml`
+runs every Monday and on a push that changes `scripts/epa/**`; it commits only when the data changed and
+refuses a download under 40,000 rows or more than 10% smaller than the committed data. It does not deploy.
+`scripts/epa/build-assets.ts` writes `build/assets/epa/<year>/<make>.json` (about 2,100 files, 30 MB).
+Revert a bad update with `git revert` of its `data(epa)` commit.
+
+Records are EPA configurations, not VINs: matching a VIN to one needs the trim and powertrain, which the
+unified profile does not do yet.
+
 ## Parity with the live API
 
 `scripts/vpic/parity.ts` builds a deterministic corpus (seeded) of:
