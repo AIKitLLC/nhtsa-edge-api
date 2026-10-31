@@ -182,11 +182,16 @@ src/
     conversions.ts      unit conversions, evaluated with tsql-decimal.ts
     store.ts            asset access (+ worker-store.ts for the ASSETS binding)
     format.ts           vPIC response shapes; v1-format.ts: clean v1 shape
-  routes/               v1 API, vPIC drop-in (vpic-decode.ts offline, vpic-proxy.ts), recalls
+  epa/                  bundled EPA / DOE fuel-economy data: reads one asset per model year and make
+  routes/               v1 API (incl. fuel-economy), vPIC drop-in (vpic-decode.ts offline, vpic-proxy.ts), recalls
+    landing/            site pages: hub, VIN decoder, batch, API docs
+    openapi/            openapi.json and llms.txt
   services/             upstream fetch, cache, multi-source resolver, response helpers
   enrichment/           US EPA FuelEconomy.gov and EU RDW lookups for /unified
 scripts/vpic/           ingest-dump.ts, build-assets.ts, parity.ts (+ lib/)
+scripts/epa/            ingest.ts (vehicles.csv into data/epa), build-assets.ts, csv.ts
 data/vpic/              the vPIC tables used by the decoder (git-tracked)
+data/epa/               FuelEconomy.gov vehicles.tsv and manifest.json (git-tracked, refreshed weekly)
 docs/vpic-reference/    NHTSA's decode functions, verbatim, as the porting reference
 ```
 
