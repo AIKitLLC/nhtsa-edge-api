@@ -9,7 +9,7 @@ The site is a hub of datasets; the first one is NHTSA's vehicle database (vPIC),
 | :-- | :-- |
 | NHTSA vehicle identification (vPIC) | Live, served from bundled data |
 | NHTSA safety recalls | Partial: proxied to NHTSA and cached |
-| EPA / DOE fuel economy and electric range | Partial: model-level data in `/api/v1/vin/:vin/unified` |
+| EPA / DOE fuel economy and electric range | Live: every EPA record by year and make in `/api/v1/fuel-economy`; model-level data also in `/api/v1/vin/:vin/unified` |
 | NHTSA complaints and crash test ratings | Planned |
 | Leaked password check ([Have I Been Pwned](https://haveibeenpwned.com/Passwords)) | Partial: password range proxied to Pwned Passwords; email lookup planned |
 
@@ -112,6 +112,7 @@ Offline responses carry `X-Decode-Source: LOCAL_VPIC` and `X-Vpic-Data-Version`
 | `GET` | `/` | Browsers: the datasets hub. API clients: health JSON (`status`, `dataVersion`; 503 if the data assets are unreadable) |
 | `GET` | `/health` | Health JSON, always |
 | `GET` | `/vpic` | The live VIN decoder page |
+| `GET` | `/api/v1/fuel-economy?year=&make=[&model=]` | EPA / DOE FuelEconomy.gov records (MPG, MPGe, electric range, CO2, fuel cost) from a bundled copy of `vehicles.csv`; no call to FuelEconomy.gov. 404 when nothing matches |
 | `GET` | `/api/v1/vin/:vin/unified[?epa=false&eu=false]` | Offline decode + US EPA FuelEconomy.gov (EV range, MPGe, motor) + EU RDW (type approval, masses). Enrichments are model-level, not VIN-specific; a failed enrichment leaves its section `null` and the response uncached |
 | `GET` | `/api/v1/vin/:vin/compare` | Offline decode vs live vPIC, field by field (cached 24 h) |
 | `GET` | `/api/v1/recalls/:vin` | Recalls for a 17-character VIN (proxied to `api.nhtsa.gov`, cached 6 h) |
@@ -218,11 +219,16 @@ src/
     conversions.ts      unit conversions, evaluated with tsql-decimal.ts
     store.ts            asset access (+ worker-store.ts for the ASSETS binding)
     format.ts           vPIC response shapes; v1-format.ts: clean v1 shape
-  routes/               v1 API, vPIC drop-in (vpic-decode.ts offline, vpic-proxy.ts), recalls, rapid.ts
+  epa/                  bundled EPA / DOE fuel-economy data: reads one asset per model year and make
+  routes/               v1 API (incl. fuel-economy), vPIC drop-in (vpic-decode.ts offline, vpic-proxy.ts), recalls, rapid.ts
+    landing/            site pages: hub, VIN decoder, batch, API docs
+    openapi/            openapi.json and llms.txt
   services/             upstream fetch, cache, multi-source resolver, response helpers
   enrichment/           US EPA FuelEconomy.gov and EU RDW lookups for /unified
 scripts/vpic/           ingest-dump.ts, build-assets.ts, parity.ts (+ lib/)
+scripts/epa/            ingest.ts (vehicles.csv into data/epa), build-assets.ts, csv.ts
 data/vpic/              the vPIC tables used by the decoder (git-tracked)
+data/epa/               FuelEconomy.gov vehicles.tsv and manifest.json (git-tracked, refreshed weekly)
 docs/vpic-reference/    NHTSA's decode functions, verbatim, as the porting reference
 ```
 

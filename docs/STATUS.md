@@ -1,21 +1,20 @@
 # Status
 
-Updated in the same pull request as every code or docs change. Last updated: 2026-10-30.
+Updated in the same pull request as every code or docs change. Last updated: 2026-10-31.
 
-Figures are from the GitHub API (application programming interface) for `AIKitLLC/nhtsa-edge-api` on that date. Default branch: `main`. `main` is `d3d1c28`. The vPIC data commit on that history is `683b4f4` (`data(vpic): vPICList_lite_2026_10`, live parity 92.30%). The strict parity rate is the `exactRate` in the [vPIC data refresh job summary](https://github.com/AIKitLLC/nhtsa-edge-api/actions/workflows/vpic-data.yml).
+Figures are from the GitHub API (application programming interface) for `AIKitLLC/nhtsa-edge-api` on that date. Default branch: `main`. `main` is `ec9b1e1` (merge of #26, the EPA fuel-economy dataset). The last vPIC data commit is `683b4f4` (`vPICList_lite_2026_10`, live parity 92.30%). The strict parity rate is the `exactRate` in the [vPIC data refresh job summary](https://github.com/AIKitLLC/nhtsa-edge-api/actions/workflows/vpic-data.yml).
 
 [NHTSA](https://www.nhtsa.gov/) is the National Highway Traffic Safety Administration. [vPIC](https://vpic.nhtsa.dot.gov/) is NHTSA's Product Information Catalog and Vehicle Listing. A [VIN](https://www.nhtsa.gov/vin-decoder) is a vehicle identification number.
 
 ## Open issues
 
-Nine issues are open. None use `status:blocked`. Milestone fields are empty because no milestone exists on the repository yet. Issues #7, #20, and #27 are closed (#20 by #21, #27 by #28).
+Eight issues are open. None use `status:blocked`. Milestone fields are empty because no milestone exists on the repository yet. Issues #7, #9, #20, #27, and #29 are closed (#9 by #26, #20 by #21, #27 by #28, #29 by #30).
 
 | Issue | Labels | Proposed milestone |
 | :-- | :-- | :-- |
 | [#24](https://github.com/AIKitLLC/nhtsa-edge-api/issues/24) Mandatory CI/CD deploy; no deploys from a local machine | `priority:p0` | none |
 | [#22](https://github.com/AIKitLLC/nhtsa-edge-api/issues/22) Follow-ups from Security review of #21 (non-blocking) | none | none |
 | [#8](https://github.com/AIKitLLC/nhtsa-edge-api/issues/8) Bundle an offline copy of NHTSA safety recalls | `type:feature`, `area:pipeline`, `area:routes`, `status:ready`, `priority:p2` | M2 Dataset completeness |
-| [#9](https://github.com/AIKitLLC/nhtsa-edge-api/issues/9) Serve the full [EPA](https://www.epa.gov/) (Environmental Protection Agency) and [DOE](https://www.energy.gov/) (Department of Energy) fuel-economy dataset | `type:feature`, `area:enrichment`, `status:ready`, `priority:p2` | M2 Dataset completeness |
 | [#10](https://github.com/AIKitLLC/nhtsa-edge-api/issues/10) Add NHTSA complaints and [NCAP](https://www.nhtsa.gov/ratings) (New Car Assessment Program) crash-test ratings | `type:feature`, `area:enrichment`, `status:ready`, `priority:p2` | M2 Dataset completeness |
 | [#11](https://github.com/AIKitLLC/nhtsa-edge-api/issues/11) Add [United Kingdom](https://www.gov.uk/) [DVSA](https://www.gov.uk/government/organisations/driver-and-vehicle-standards-agency) (Driver and Vehicle Standards Agency) [MOT](https://www.gov.uk/getting-an-mot) (Ministry of Transport test) history | `type:feature`, `area:enrichment`, `status:ready`, `priority:p2` | M3 Further public datasets |
 | [#12](https://github.com/AIKitLLC/nhtsa-edge-api/issues/12) Add the Australian Green Vehicle Guide | `type:feature`, `area:enrichment`, `status:ready`, `priority:p2` | M3 Further public datasets |
@@ -31,9 +30,8 @@ No open issue tracks `POST /rapid/v1/batch`. Three ready-to-file issues (secret 
 | Pull request | Branch | Linked issue |
 | :-- | :-- | :-- |
 | [#23](https://github.com/AIKitLLC/nhtsa-edge-api/pull/23) Add a RapidAPI proxy batch route | `cursor/rapidapi-proxy-route-d053` | none (no matching open issue; draft) |
-| [#26](https://github.com/AIKitLLC/nhtsa-edge-api/pull/26) Serve the full EPA / DOE fuel-economy dataset | `claude/exciting-pascal-8khdrj` | #9 |
 
-Merged, not open: [#28](https://github.com/AIKitLLC/nhtsa-edge-api/pull/28) (leak check listed on the hub and in README; closes #27), [#25](https://github.com/AIKitLLC/nhtsa-edge-api/pull/25) (Pwned Passwords range at `/api/v1/leak/password/range/{prefix}`; email lookup written but not mounted; deployed to production 2026-10-29), #17 (STATUS refresh), [#21](https://github.com/AIKitLLC/nhtsa-edge-api/pull/21) (data.gov key stays on its hosts, proxy cache bypass closed; closes #20), #19 (drop personal workers.dev hostname), #18 (known-renames allowlist for the parity gate), [#6](https://github.com/AIKitLLC/nhtsa-edge-api/pull/6) (agent standards, closes #7), #16, #5, #4, #3, #2, #1.
+Merged, not open: [#30](https://github.com/AIKitLLC/nhtsa-edge-api/pull/30) (STATUS and README layout after the EPA dataset; closes #29), [#26](https://github.com/AIKitLLC/nhtsa-edge-api/pull/26) (full EPA / DOE fuel-economy dataset at `/api/v1/fuel-economy`; closes #9; not on production yet: the last production deploy was `d3d1c28`, 2026-10-29), [#28](https://github.com/AIKitLLC/nhtsa-edge-api/pull/28) (leak check on the hub and in README; #27), [#25](https://github.com/AIKitLLC/nhtsa-edge-api/pull/25) (Pwned Passwords range at `/api/v1/leak/password/range/{prefix}`; email lookup written but not mounted; deployed to production 2026-10-29), [#17](https://github.com/AIKitLLC/nhtsa-edge-api/pull/17) (STATUS refresh), [#21](https://github.com/AIKitLLC/nhtsa-edge-api/pull/21) (data.gov key stays on its hosts, proxy cache bypass closed; closes #20), #19 (drop personal workers.dev hostname), #18 (known-renames allowlist for the parity gate), [#6](https://github.com/AIKitLLC/nhtsa-edge-api/pull/6) (agent standards, closes #7), #16, #5, #4, #3, #2, #1.
 
 ## Labels
 
@@ -50,7 +48,7 @@ None exist. The milestones list for this repository was empty on 2026-10-15. The
 | Milestone | What it covers | Issues to assign when it exists |
 | :-- | :-- | :-- |
 | M1 Foundation | Offline vPIC decoder, dataset hub, weekly git-tracked data, dev deploy. Shipped on `main`. | none open |
-| M2 Dataset completeness | Hub datasets that are partial or planned: offline recalls, full fuel economy, complaints and NCAP | #8, #9, #10 |
+| M2 Dataset completeness | Hub datasets that are partial or planned: offline recalls, complaints and NCAP (full fuel economy shipped in #26) | #8, #10 |
 | M3 Further public datasets | Sources named in `HANDOFF.md`: United Kingdom DVSA MOT history, Australian Green Vehicle Guide, Euro NCAP | #11, #12, #13 |
 
 ## CI

@@ -46,9 +46,12 @@ export const DATASETS: readonly Dataset[] = [
     id: "fuel-economy",
     name: "Fuel economy and electric range",
     agency: "EPA and DOE",
-    status: "partial",
-    summary: "Electric range, MPGe and motor data by model year and model are added to the unified VIN profile. The full dataset is planned.",
-    links: [["Unified profile", "/vpic#api"]],
+    status: "live",
+    summary: "Every EPA and DOE FuelEconomy.gov vehicle record by model year and make: MPG, MPGe, electric range, CO2 and annual fuel cost. Model-level EPA and RDW data is also added to the unified VIN profile.",
+    links: [
+      ["API", "/docs#t-Fuel-economy"],
+      ["Unified profile", "/vpic#api"],
+    ],
   },
   {
     id: "complaints-ncap",
