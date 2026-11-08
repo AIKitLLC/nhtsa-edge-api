@@ -8,12 +8,11 @@ Figures are from the GitHub API (application programming interface) for `AIKitLL
 
 ## Open issues
 
-Nine issues are open. None use `status:blocked`. Milestone fields are empty because no milestone exists on the repository yet. Issues #7 and #20 are closed (#20 by #21).
+Eight issues are open. None use `status:blocked`. Milestone fields are empty because no milestone exists on the repository yet. Issues #7, #9, #20, #27, and #29 are closed (#9 by #26, #20 by #21, #27 by #28, #29 by #30).
 
 | Issue | Labels | Proposed milestone |
 | :-- | :-- | :-- |
 | [#24](https://github.com/AIKitLLC/nhtsa-edge-api/issues/24) Mandatory CI/CD deploy; no deploys from a local machine | `priority:p0` | none |
-| [#29](https://github.com/AIKitLLC/nhtsa-edge-api/issues/29) Refresh STATUS and the README project layout after the EPA dataset (#26) | `type:docs`, `area:docs`, `priority:p2` | none |
 | [#22](https://github.com/AIKitLLC/nhtsa-edge-api/issues/22) Follow-ups from Security review of #21 (non-blocking) | none | none |
 | [#8](https://github.com/AIKitLLC/nhtsa-edge-api/issues/8) Bundle an offline copy of NHTSA safety recalls | `type:feature`, `area:pipeline`, `area:routes`, `status:ready`, `priority:p2` | M2 Dataset completeness |
 | [#10](https://github.com/AIKitLLC/nhtsa-edge-api/issues/10) Add NHTSA complaints and [NCAP](https://www.nhtsa.gov/ratings) (New Car Assessment Program) crash-test ratings | `type:feature`, `area:enrichment`, `status:ready`, `priority:p2` | M2 Dataset completeness |
@@ -24,14 +23,15 @@ Nine issues are open. None use `status:blocked`. Milestone fields are empty beca
 
 Euro NCAP in #13 is a separate program from NHTSA NCAP in #10.
 
+No open issue tracks `POST /rapid/v1/batch`. Three ready-to-file issues (secret configuration, console import, acceptance tests) are written verbatim in `docs/RAPIDAPI.md`; this agent has no GitHub issue write access, so they are not filed yet. This pull request does not close #8 or #9: recalls and fuel on that route are still live lookups, not bundled datasets.
+
 ## Open pull requests
 
 | Pull request | Branch | Linked issue |
 | :-- | :-- | :-- |
-| [#23](https://github.com/AIKitLLC/nhtsa-edge-api/pull/23) Add a RapidAPI proxy batch route | `cursor/rapidapi-proxy-route-d053` | draft |
-| This change | `claude/exciting-pascal-8khdrj` | closes #29 |
+| [#23](https://github.com/AIKitLLC/nhtsa-edge-api/pull/23) Add a RapidAPI proxy batch route | `cursor/rapidapi-proxy-route-d053` | none (no matching open issue; draft) |
 
-Merged, not open: [#26](https://github.com/AIKitLLC/nhtsa-edge-api/pull/26) (full EPA / DOE fuel-economy dataset at `/api/v1/fuel-economy`; closes #9; not on production yet: the last production deploy was `d3d1c28`, 2026-10-29), [#28](https://github.com/AIKitLLC/nhtsa-edge-api/pull/28) (leak check on the hub and in README; #27), [#25](https://github.com/AIKitLLC/nhtsa-edge-api/pull/25) (Pwned Passwords range at `/api/v1/leak/password/range/{prefix}`; email lookup written but not mounted; deployed to production 2026-10-29), [#17](https://github.com/AIKitLLC/nhtsa-edge-api/pull/17) (STATUS refresh), [#21](https://github.com/AIKitLLC/nhtsa-edge-api/pull/21) (data.gov key stays on its hosts, proxy cache bypass closed; closes #20), #19 (drop personal workers.dev hostname), #18 (known-renames allowlist for the parity gate), [#6](https://github.com/AIKitLLC/nhtsa-edge-api/pull/6) (agent standards, closes #7), #16, #5, #4, #3, #2, #1.
+Merged, not open: [#30](https://github.com/AIKitLLC/nhtsa-edge-api/pull/30) (STATUS and README layout after the EPA dataset; closes #29), [#26](https://github.com/AIKitLLC/nhtsa-edge-api/pull/26) (full EPA / DOE fuel-economy dataset at `/api/v1/fuel-economy`; closes #9; not on production yet: the last production deploy was `d3d1c28`, 2026-10-29), [#28](https://github.com/AIKitLLC/nhtsa-edge-api/pull/28) (leak check on the hub and in README; #27), [#25](https://github.com/AIKitLLC/nhtsa-edge-api/pull/25) (Pwned Passwords range at `/api/v1/leak/password/range/{prefix}`; email lookup written but not mounted; deployed to production 2026-10-29), [#17](https://github.com/AIKitLLC/nhtsa-edge-api/pull/17) (STATUS refresh), [#21](https://github.com/AIKitLLC/nhtsa-edge-api/pull/21) (data.gov key stays on its hosts, proxy cache bypass closed; closes #20), #19 (drop personal workers.dev hostname), #18 (known-renames allowlist for the parity gate), [#6](https://github.com/AIKitLLC/nhtsa-edge-api/pull/6) (agent standards, closes #7), #16, #5, #4, #3, #2, #1.
 
 ## Labels
 
@@ -72,18 +72,21 @@ The refresh workflow starts on a push that changes `src/**`. The rebase did that
 
 Primary arcade-agent result on that run (algorithm `pkg`): 212 entities, 219 edges, 8 components, balanced score 0.6219, RCI (cohesive interactions) 0.6530. No baseline artifact exists on `main`, so there is no drift delta yet. The job log is the report.
 
-Deploy production and the Cloudflare check workflow do not run on this pull request. This change does not deploy.
+Checks on the first push of `cursor/rapidapi-proxy-route-d053` (2026-10-22): CI `success` (typecheck, tests, dry-run bundle) and Architecture `success`. Checks for later pushes are not copied into this file until they finish.
+
+Deploy production and the Cloudflare check workflow do not run on this pull request. This change does not deploy and does not set `RAPIDAPI_PROXY_SECRET`.
 
 ## Known blockers
 
 - No issue is `status:blocked`.
 - Milestones are not created, so #8 through #13 are not on a milestone yet.
-- Production deploy stays manual. Agents do not deploy, do not run `wrangler login`, and do not read or write Cloudflare secrets, including `DATA_GOV_API_KEY`, `CLOUDFLARE_API_TOKEN`, and `CLOUDFLARE_ACCOUNT_ID`.
+- Production deploy stays manual. Agents do not deploy, do not run `wrangler login`, and do not read or write Cloudflare secrets, including `DATA_GOV_API_KEY`, `RAPIDAPI_PROXY_SECRET`, `CLOUDFLARE_API_TOKEN`, and `CLOUDFLARE_ACCOUNT_ID`.
 - `HANDOFF.md` says the unbound [D1](https://developers.cloudflare.com/d1/) database `nhtsa-db` can be deleted. D1 is Cloudflare's relational database. That is a Cloudflare account change. Agents do not do it.
 
 ## Next steps
 
-1. Security review of draft #23 before it leaves draft. #21 is merged; its follow-ups are in #22.
-2. Create milestones M1, M2, and M3, then assign #8–#10 to M2 and #11–#13 to M3.
-3. Close #14 when Tony accepts the job-summary link in `HANDOFF.md` in place of a frozen parity percentage.
-4. Leave deploy and secrets alone.
+1. Security review of draft #23 before it leaves draft. Do not merge or deploy before that. `RAPIDAPI_PROXY_SECRET` stays unset until a person sets it. #21 is merged; its follow-ups are in #22.
+2. File the three ready-to-file issues in `docs/RAPIDAPI.md` (secret configuration, console import, acceptance tests).
+3. Create milestones M1, M2, and M3, then assign #8–#10 to M2 and #11–#13 to M3.
+4. Close #14 when Tony accepts the job-summary link in `HANDOFF.md` in place of a frozen parity percentage.
+5. Leave deploy and secrets alone.

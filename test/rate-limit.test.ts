@@ -40,6 +40,20 @@ describe("Rate limit", () => {
     expect(res.headers.get("Access-Control-Allow-Origin")).toBe("*");
   });
 
+  it("does not count /rapid against the per-IP limiter", async () => {
+    const lim = limiter(0);
+    const env = { ...testEnv(), RATE_LIMITER: lim };
+    const blocked = await call(`/api/v1/vin/${VIN}`, env);
+    expect(blocked.status).toBe(429);
+    const rapid = await call("/rapid/v1/batch", env, "203.0.113.7", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: "{}",
+    });
+    expect(rapid.status).toBe(403);
+    expect(lim.limit).toHaveBeenCalledTimes(1);
+  });
+
   it("never limits the pages, /health or CORS preflights", async () => {
     const lim = limiter(0);
     const env = { ...testEnv(), RATE_LIMITER: lim };

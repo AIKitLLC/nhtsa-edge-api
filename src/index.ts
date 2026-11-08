@@ -10,6 +10,7 @@ import { openapiRouter } from "./routes/openapi";
 import { v1Router } from "./routes/v1";
 import { vpicProxyRouter } from "./routes/vpic-proxy";
 import { recallsProxyRouter } from "./routes/recalls-proxy";
+import { rapidRouter } from "./routes/rapid";
 
 const app = new Hono<{ Bindings: Env; Variables: AppVariables }>();
 
@@ -31,6 +32,9 @@ app.route("/", openapiRouter);
 
 // Clean v1 API: offline VIN decode, catalog, recalls
 app.route("/api/v1", v1Router);
+
+// RapidAPI proxy only. The public routes above do not read the proxy secret.
+app.route("/rapid", rapidRouter);
 
 // Drop-in vPIC API (/vehicles/* and /api/vehicles/*): decode endpoints offline, the rest proxied
 app.route("/api", vpicProxyRouter);

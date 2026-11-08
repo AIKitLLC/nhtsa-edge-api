@@ -40,6 +40,11 @@ describe("wrangler.jsonc", () => {
     expect(config.env.dev.vars.ENVIRONMENT).toBe("dev");
   });
 
+  it("does not store the RapidAPI proxy secret in config", () => {
+    const text = readFileSync(resolve(__dirname, "../wrangler.jsonc"), "utf-8");
+    expect(text).not.toMatch(/"RAPIDAPI_PROXY_SECRET"\s*:/);
+  });
+
   it("never sets ALLOW_NO_RATE_LIMIT", () => {
     const text = readFileSync(resolve(__dirname, "../wrangler.jsonc"), "utf-8");
     expect(text).not.toContain("ALLOW_NO_RATE_LIMIT");

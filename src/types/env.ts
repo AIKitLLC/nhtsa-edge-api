@@ -47,6 +47,18 @@ export interface Env {
   readonly DATA_GOV_API_KEY?: string;
 
   /**
+   * Shared with the RapidAPI proxy (`X-RapidAPI-Proxy-Secret`).
+   * Set with `wrangler secret put`. Never commit the value. Unset fails closed on `/rapid`.
+   */
+  readonly RAPIDAPI_PROXY_SECRET?: string;
+
+  /**
+   * Max VINs on POST /rapid/v1/batch. Digits only. Default 100, ceiling 200.
+   * The public batch endpoint stays at 50. Not a secret.
+   */
+  readonly RAPIDAPI_BATCH_MAX?: string;
+
+  /**
    * Have I Been Pwned API key (secret) for POST /api/v1/leak/email; the route answers 503 without it.
    */
   readonly HIBP_API_KEY?: string;
