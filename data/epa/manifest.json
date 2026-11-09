@@ -1,8 +1,8 @@
 {
   "source": "https://www.fueleconomy.gov/feg/epadata/vehicles.csv.zip",
-  "sourceDate": "2026-09-29",
-  "sourceSha256": "b1ff0e3071c46cdc1c99e0015878b98a01851462d7e447237ce2fc1294ccf303",
-  "rows": 50407,
+  "sourceDate": "2026-11-04",
+  "sourceSha256": "e840f1532db12a92a5f57228f137ee08704dd070aa201d02fc5d6d8a5ebe8b74",
+  "rows": 50647,
   "columns": [
     "id",
     "year",
