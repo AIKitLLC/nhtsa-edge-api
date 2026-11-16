@@ -1,6 +1,6 @@
 {
-  "dumpVersion": "vPICList_lite_2026_10",
-  "source": "https://vpic.nhtsa.dot.gov/downloads/vPICList_lite_2026_10.plain.zip",
+  "dumpVersion": "vPICList_lite_2026_11",
+  "source": "https://vpic.nhtsa.dot.gov/downloads/vPICList_lite_2026_11.plain.zip",
   "tables": {
     "abs": {
       "rows": 3,
@@ -411,66 +411,66 @@
       }
     },
     "make": {
-      "rows": 12387,
+      "rows": 12426,
       "files": {
-        "make.tsv": "28745e3db1dcf6938c68f0f319d8632f1840a135ad773cc7f8cfeb0b64d69b6f"
+        "make.tsv": "68937610db1d4c9033b54ada7808b4296f162926c5cecc72a6ac27b37ed3b61d"
       }
     },
     "model": {
-      "rows": 32070,
+      "rows": 32444,
       "files": {
-        "model.tsv": "1bdbe27354a4f14d3d81706a140094c9f7085143745bc9affc0b24cc00bfe665"
+        "model.tsv": "c638d36727d14c71b413fa27dfc0b6a2594a1e0e2fb3942c6636496824e95e28"
       }
     },
     "manufacturer": {
-      "rows": 23098,
+      "rows": 23203,
       "files": {
-        "manufacturer.tsv": "8f59da3a47b31e360c54f5944c488c9f4b8754a2c199d4f914e951299f8f4e8e"
+        "manufacturer.tsv": "583516b0a5a0d5cc49fb439880535343b7adbe98954869c9539f87fe9616066c"
       }
     },
     "wmi": {
-      "rows": 13014,
+      "rows": 13048,
       "files": {
-        "wmi.tsv": "ccfd91512ffded7f57d3af73d5695dcf1673fe869274683991a37fadb4583e00"
+        "wmi.tsv": "d6c56ad833117164812116cc5f3745b9118d67378ee4e4479a63abe4b56ebd94"
       }
     },
     "wmi_make": {
-      "rows": 14191,
+      "rows": 14237,
       "files": {
-        "wmi_make.tsv": "1deb2a28475f4329bab4ac9178404d3d169dd45e1c06f27a1df01a3654a3f2c6"
+        "wmi_make.tsv": "3111c97db0827766047efffcb888fd8d47762fcbf6b3718b598520c69ecc7211"
       }
     },
     "wmi_vinschema": {
-      "rows": 41810,
+      "rows": 41885,
       "files": {
-        "wmi_vinschema.tsv": "c0beb1fa88d892c42a8fc4f292158cadb2d9ecccfcaac44ccf6549b8dc72fb83"
+        "wmi_vinschema.tsv": "62122a507f04f059d0be73f647f7c5d10735ed637861cf932d366d54e92f7023"
       }
     },
     "vinschema": {
-      "rows": 25299,
+      "rows": 25374,
       "files": {
-        "vinschema.tsv": "b47cae23be245133eac42595c7af284a414a97097ffe2eb372fa4f163f7d78ad"
+        "vinschema.tsv": "25a87c3b17dc3e0fee33799e93c399bf437b3f09d2e36f15b00148001aeb9f7c"
       }
     },
     "pattern": {
-      "rows": 1682444,
+      "rows": 1685489,
       "files": {
-        "pattern/00.tsv": "3f33e36b65c31e77beee2064831b25f14583eeafcd633712301a116248d3b9cb",
-        "pattern/01.tsv": "27fb1b4bd4aa04f2c4390a9da8ed58f9c686c8e3d9051701b2392d57635fd782",
-        "pattern/02.tsv": "c0b3f57c91de2fb93c9137b7a6d508dd5788f0ebd5e679d8cb777496018c1fb7",
-        "pattern/03.tsv": "c51a9f546a30005715f553b7c8b2050a1d6b2927b96fc6f1be34495339ea8e0e",
-        "pattern/04.tsv": "c701977ffc948b45e241020282a32f5523eefe902cb28e0ea2f0e6d6078575cd",
-        "pattern/05.tsv": "e29cb5d3569f0fcd80530a1a6fe693bf0a5aaaba1f41a9a81ba79e1301a17f20",
-        "pattern/06.tsv": "95c42bc544a71e629ab777233668ab2d8baeca120df49d19b4be3c5d8ec8ef92",
-        "pattern/07.tsv": "6a5762550118e3908f2d9bc83137d3a4c4ea8271521f24f0b1a424c9915d7159",
-        "pattern/08.tsv": "db8f12faef5707d1a8d4909f2a545d0b71cd8e28d08de15e0cbf1dc2c8f57150",
-        "pattern/09.tsv": "072bf0a4b17120fb7a1550a36ee0c3ab74bdee1d771e86b72eeb7dfb53ca3a72",
-        "pattern/10.tsv": "555ecc8d571c32e120e5ef2a7fd3fb0a992b91b4207cbbcc66f220eb791bf7db",
-        "pattern/11.tsv": "35a84728c8fa804e9b5f56bb7109888a03cbbbeb4eaa409323bb2aaa0cd4caae",
-        "pattern/12.tsv": "54204fb82834e8ac134b869d9f3d848e034fdbf0478e1594c9ec933cc3c515c0",
-        "pattern/13.tsv": "9f8afa91a10fac46040fb589652fa27165471100ea410ab9f50898bfd31dfb71",
-        "pattern/14.tsv": "2b87ddaa514228f7c01e10c4413f5741e046b6d72a3deb0725d47096eba2bf55",
-        "pattern/15.tsv": "651ccef3301d6b1e7c3de1990770f77fa2f3d5d15c92e63b1e19adce73c3482a"
+        "pattern/00.tsv": "9f1cfddacb4777ec42e663f4378c84f85acdb9d581d71bff61db5f7447cfffb6",
+        "pattern/01.tsv": "b112c8c17dccc69426362bcd2ae724fe208a6b4a28a68d267703b2da098caa82",
+        "pattern/02.tsv": "8eff22c0b8472e1c81dd942474afd0c003fd1cecb3deb4948b8c9f85b50e3ed7",
+        "pattern/03.tsv": "8530ec438a1402f14c895765d3ea5910d8c3eedae147cadd342e72e1398b9d23",
+        "pattern/04.tsv": "34bec74c1d1c6a1ba4008ca8c041ebd927a39ba8b9f924345e8e48c0c9d03d35",
+        "pattern/05.tsv": "bd4ad7063762677565e23a4d17861d4663d6860992b28c061a4ec5a1cf05ed5a",
+        "pattern/06.tsv": "5c8b6a853a77ae37a78ed8667a27c8261bd08430050d9e72aa7bca34c3c1b86d",
+        "pattern/07.tsv": "a67b9e09aa3da4e857f4bd62836449878712cc508b361a28f06cd05f1b6ef51f",
+        "pattern/08.tsv": "34c20c853df796b49a7dbcc66efed7ddfc60dc842345cda587d66cd180b25191",
+        "pattern/09.tsv": "5aeb9eaae40861fbd8f45939e55232eafc574333827e780d0c05a005369f3a83",
+        "pattern/10.tsv": "9a59c33808fbaf4785e5fe46de1942f62a76192d6bfb6b412aa4e0447b992393",
+        "pattern/11.tsv": "e2e80f2f6f5709c543548cafe644030da1dbb2a2823adef21478b75e572e5f05",
+        "pattern/12.tsv": "1a84f3dadd5f77b4860bc0a8861a4658c5c0004b807cca80a2287d5ccede16bc",
+        "pattern/13.tsv": "5a0b6764d9a512f8180979e82f79ff27d9f2687a1ef6f17486b6c3f9f3775384",
+        "pattern/14.tsv": "b78f13d59ace3525d6834fbfa40f9bab1dc735d250a2d0597e9a4b07aca714f9",
+        "pattern/15.tsv": "0abcc5f3e8b77e78d98e526cc501538318268d5bc992eb5286e3a2c3f993523c"
       }
     },
     "element": {
@@ -480,9 +480,9 @@
       }
     },
     "make_model": {
-      "rows": 32070,
+      "rows": 32444,
       "files": {
-        "make_model.tsv": "318c6947616973729c8ff6b8ea37290bb84117a31f6bcc70bde131dc92ba9ed7"
+        "make_model.tsv": "d4e83b0bc531269b82b06bb6a7fd08958da84c597fc574999878c933bcf3e774"
       }
     },
     "enginemodel": {
@@ -528,46 +528,46 @@
       }
     },
     "vehiclespecschema": {
-      "rows": 6619,
+      "rows": 6639,
       "files": {
-        "vehiclespecschema.tsv": "3597130b98c993848d9ec2e83812e72098e2b3727d55c09ae73f3f49ff7e426c"
+        "vehiclespecschema.tsv": "4c2c8256645fbec4dcda2e7a82709d3514f587659bfccf64525d88c2019eba4d"
       }
     },
     "vspecschemapattern": {
-      "rows": 17722,
+      "rows": 17774,
       "files": {
-        "vspecschemapattern.tsv": "96ae9ebeff24017bb1d512048316e448713d0bbf148d3515f757854d4865d75f"
+        "vspecschemapattern.tsv": "df23616d25767cbeb6815d0c2d644d180e4fcbbed82b7f1875eea20b25a8c8b0"
       }
     },
     "vehiclespecpattern": {
-      "rows": 231867,
+      "rows": 232703,
       "files": {
-        "vehiclespecpattern.tsv": "5933cbc5f2151a274634d16a10e9564d79d6cccfa2cff08c506171f3e7321e21"
+        "vehiclespecpattern.tsv": "b304abf6ceb43d652a990ccd7ab1dbe510afaba3cb869263a99354508ff1b57e"
       }
     },
     "vehiclespecschema_model": {
-      "rows": 7508,
+      "rows": 7531,
       "files": {
-        "vehiclespecschema_model.tsv": "fb2d06dc1139b592610566400e093b1b3f9aeecdae41d7ae45030c221bef3008"
+        "vehiclespecschema_model.tsv": "b4b2e214da5425327434c2c2f4121c2eff3bd4c226875e60c6a2e753183f6e9a"
       }
     },
     "vehiclespecschema_year": {
-      "rows": 12347,
+      "rows": 12367,
       "files": {
-        "vehiclespecschema_year.tsv": "bffdf7801aefe25d03c8db509b24b0846370ad3a08f6bf1883b840a90a7fa8d9"
+        "vehiclespecschema_year.tsv": "ad363f88887f76a571879c3532c664507fe16e8204001491cf071bba82a985ea"
       }
     },
     "wmiyearvalidchars": {
-      "rows": 241345,
+      "rows": 241290,
       "files": {
-        "wmiyearvalidchars/00.tsv": "988f4c869c157b592c7b445383d495d4ff287ecbbe0ea3b24fa8846f29a25f33",
-        "wmiyearvalidchars/01.tsv": "690c265e0f356d41102153775da994cd34cde04a7dcf923442c4675a0b2ab324",
-        "wmiyearvalidchars/02.tsv": "a8ddae934f5b233c381109520b1c09d4270c21b9ad80fbe91dbbdf8e5c5a27e9",
-        "wmiyearvalidchars/03.tsv": "33c3c88f3c868afd0c89f8d0097599caf387e483fc05d61e76ae52688acdadd2",
-        "wmiyearvalidchars/04.tsv": "83c7da2f182e8ec581863df269494bbd2cc85880ed60dee1442d576e9a0d8b88",
-        "wmiyearvalidchars/05.tsv": "162260ef6376b59597c175043491bf75e2736b5df12b496975632347f71d3876",
-        "wmiyearvalidchars/06.tsv": "b440bfb3207eadc71e3373b654f8e66a10ebf39d9aad98ae7c6e00f9553684a9",
-        "wmiyearvalidchars/07.tsv": "0e6922564b7174c1873143007cc50fe4b33e717bd047bab5a10fe493e01ecdb7"
+        "wmiyearvalidchars/00.tsv": "c949934fd05f93e5cbb2c537ac266dd6387161c175c542eb0574aa54ab7a7427",
+        "wmiyearvalidchars/01.tsv": "5476d0399322f1475a11d0518e0326e1223f7c0fa1c60dcba0474b00f0ba55f5",
+        "wmiyearvalidchars/02.tsv": "c3904a1a386937689b6b4beb421abebe57ca216336aab3287d3cfd08214e21e7",
+        "wmiyearvalidchars/03.tsv": "a31710bb6d4b6a2ba98dc40c153f3b929d1e3e5e7c3b9fdd5e74b89fba614b09",
+        "wmiyearvalidchars/04.tsv": "9aaf3b75f0428c1ac9ad56ce3c1d3fe5d2e4ce0d3ccd7035a41f3856dc333beb",
+        "wmiyearvalidchars/05.tsv": "acd685f0aabef24ff5f1339c9f9562334a4b5d9ab5522a50bbf90777c30e6b84",
+        "wmiyearvalidchars/06.tsv": "4ac2800fe01e03bdd89d1899123f0208c42dffc1a098b8d2acd76f3b79de6662",
+        "wmiyearvalidchars/07.tsv": "b589d9863567917fea3ef5e14cdc9bde96c7bb6077344ef203b19a2bad761727"
       }
     }
   }
