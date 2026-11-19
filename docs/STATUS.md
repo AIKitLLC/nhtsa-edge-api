@@ -31,6 +31,7 @@ No open issue tracks `POST /rapid/v1/batch`. Three ready-to-file issues (secret 
 | Pull request | Branch | Linked issue |
 | :-- | :-- | :-- |
 | [#23](https://github.com/AIKitLLC/nhtsa-edge-api/pull/23) Add a RapidAPI proxy batch route | `cursor/rapidapi-proxy-route-d053` | none (no matching open issue; draft) |
+| [#32](https://github.com/AIKitLLC/nhtsa-edge-api/pull/32) Add SEC Form 144 insider sale notices dataset | `feat/form144-insider-sale-notices` | #31 |
 
 Merged, not open: [#30](https://github.com/AIKitLLC/nhtsa-edge-api/pull/30) (STATUS and README layout after the EPA dataset; closes #29), [#26](https://github.com/AIKitLLC/nhtsa-edge-api/pull/26) (full EPA / DOE fuel-economy dataset at `/api/v1/fuel-economy`; closes #9; not on production yet: the last production deploy was `d3d1c28`, 2026-10-29), [#28](https://github.com/AIKitLLC/nhtsa-edge-api/pull/28) (leak check on the hub and in README; #27), [#25](https://github.com/AIKitLLC/nhtsa-edge-api/pull/25) (Pwned Passwords range at `/api/v1/leak/password/range/{prefix}`; email lookup written but not mounted; deployed to production 2026-10-29), [#17](https://github.com/AIKitLLC/nhtsa-edge-api/pull/17) (STATUS refresh), [#21](https://github.com/AIKitLLC/nhtsa-edge-api/pull/21) (data.gov key stays on its hosts, proxy cache bypass closed; closes #20), #19 (drop personal workers.dev hostname), #18 (known-renames allowlist for the parity gate), [#6](https://github.com/AIKitLLC/nhtsa-edge-api/pull/6) (agent standards, closes #7), #16, #5, #4, #3, #2, #1.
 
