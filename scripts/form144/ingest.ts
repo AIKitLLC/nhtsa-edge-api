@@ -219,14 +219,17 @@ async function ingestDay(date: string, outDir: string, tickers: ReadonlyMap<numb
     return;
   }
   const idxRes = await pacedFetch(indexUrl(date));
-  // SEC Archives answers 403 (not 404) for objects that do not exist, which is what a
-  // weekend or holiday index is. Retry once after a pause so a transient block is not
-  // mistaken for a missing day.
-  if (idxRes.status === 404 || idxRes.status === 403) {
-    if (idxRes.status === 403) await sleep(5000);
+  // SEC Archives answers 403, 404 or 503 for objects that do not exist, which is what a
+  // weekend or holiday index is (the status varies). Retry once after a pause so a
+  // transient block is not mistaken for a missing day; the skip is logged, and loudly
+  // for a weekday, so a masked outage stays visible in the run log.
+  if (idxRes.status === 404 || idxRes.status === 403 || idxRes.status === 503) {
+    await sleep(5000);
     const retry = await pacedFetch(indexUrl(date));
-    if (retry.status === 404 || retry.status === 403) {
-      console.log(`form144: ${date} has no daily index (HTTP ${retry.status}; weekend or holiday), skipping`);
+    if (retry.status === 404 || retry.status === 403 || retry.status === 503) {
+      const weekday = new Date(`${date}T00:00:00Z`).getUTCDay();
+      const warn = weekday >= 1 && weekday <= 5 ? " WARNING: this is a weekday" : "";
+      console.log(`form144: ${date} has no daily index (HTTP ${retry.status}; weekend or holiday), skipping${warn}`);
       return;
     }
     if (!retry.ok) throw new Error(`index for ${date}: HTTP ${retry.status}`);
