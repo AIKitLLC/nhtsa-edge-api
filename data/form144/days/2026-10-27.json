@@ -1,0 +1,1896 @@
+{
+ "date": "2026-10-27",
+ "indexCount": 71,
+ "failed": [],
+ "notices": [
+  {
+   "ticker": "GS",
+   "cik": "886982",
+   "issuer": "GOLDMAN SACHS GROUP INC",
+   "name": "SOLOMON DAVID M",
+   "relationships": [
+    "Managing Director"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0000891836-26-000067",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "Common Stock, par value $0.01 per Share",
+     "shares_to_sell": 12000,
+     "market_value": 10719360,
+     "shares_outstanding": 291171408,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NYSE",
+     "broker": "Goldman Sachs & Co. LLC"
+    }
+   ]
+  },
+  {
+   "ticker": "DCOM",
+   "cik": "846617",
+   "issuer": "Dime Community Bancshares, Inc. /NY/",
+   "name": "BASSWOOD CAPITAL MANAGEMENT, LLC",
+   "relationships": [
+    "Director"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0000899140-26-001155",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "Common Stock, par value $0.10 (\"Common Stock\")",
+     "shares_to_sell": 25871,
+     "market_value": 1110642,
+     "shares_outstanding": 44156595,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NYSE",
+     "broker": "KEEFE, BRUYETTE & WOODS, INC."
+    }
+   ]
+  },
+  {
+   "ticker": "DCOM",
+   "cik": "846617",
+   "issuer": "Dime Community Bancshares, Inc. /NY/",
+   "name": "Basswood Financial Fund, Ltd.",
+   "relationships": [
+    "Director"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0000899140-26-001156",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "Common Stock, par value $0.10 (\"Common Stock\")",
+     "shares_to_sell": 267,
+     "market_value": 11462,
+     "shares_outstanding": 44156595,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NYSE",
+     "broker": "KEEFE, BRUYETTE & WOODS, INC."
+    }
+   ]
+  },
+  {
+   "ticker": "DCOM",
+   "cik": "846617",
+   "issuer": "Dime Community Bancshares, Inc. /NY/",
+   "name": "BASSWOOD FINANCIAL FUND, L.P.",
+   "relationships": [
+    "Director"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0000899140-26-001157",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "Common Stock, par value $0.10 (\"Common Stock\")",
+     "shares_to_sell": 5686,
+     "market_value": 244100,
+     "shares_outstanding": 44156595,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NYSE",
+     "broker": "KEEFE, BRUYETTE & WOODS, INC."
+    }
+   ]
+  },
+  {
+   "ticker": "DCOM",
+   "cik": "846617",
+   "issuer": "Dime Community Bancshares, Inc.",
+   "name": "Basswood Financial Long Only Fund, LP",
+   "relationships": [
+    "Director"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0000899140-26-001158",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "Common Stock, par value $0.10 (\"Common Stock\")",
+     "shares_to_sell": 992,
+     "market_value": 42587,
+     "shares_outstanding": 44156595,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NYSE",
+     "broker": "KEEFE, BRUYETTE & WOODS, INC."
+    }
+   ]
+  },
+  {
+   "ticker": "DCOM",
+   "cik": "846617",
+   "issuer": "Dime Community Bancshares, Inc. /NY/",
+   "name": "BASSWOOD OPPORTUNITY PARTNERS, L.P.",
+   "relationships": [
+    "Director"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0000899140-26-001159",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "Common Stock, par value $0.10 (\"Common Stock\")",
+     "shares_to_sell": 14294,
+     "market_value": 613641,
+     "shares_outstanding": 44156595,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NYSE",
+     "broker": "KEEFE, BRUYETTE & WOODS, INC."
+    }
+   ]
+  },
+  {
+   "ticker": "NTRA",
+   "cik": "1604821",
+   "issuer": "NATERA, INC.",
+   "name": "MICHAEL BROPHY",
+   "relationships": [
+    "OFFICER"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001604821-26-000025",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "Common Stock",
+     "shares_to_sell": 771,
+     "market_value": 312177.9,
+     "shares_outstanding": 144144170,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NASDAQ",
+     "broker": "ETrade Corporation"
+    }
+   ]
+  },
+  {
+   "ticker": "NTRA",
+   "cik": "1604821",
+   "issuer": "NATERA, INC.",
+   "name": "STEVEN CHAPMAN",
+   "relationships": [
+    "OFFICER",
+    "DIRECTOR"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001604821-26-000026",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "Common Stock",
+     "shares_to_sell": 2236,
+     "market_value": 905356.4,
+     "shares_outstanding": 144144170,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NASDAQ",
+     "broker": "ETrade Corporation"
+    }
+   ]
+  },
+  {
+   "ticker": "KRC",
+   "cik": "1025996",
+   "issuer": "KRC",
+   "name": "Robert Paratte",
+   "relationships": [
+    "officer"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001628280-26-067523",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "RESTRICTED STOCK UNIT",
+     "shares_to_sell": 9163,
+     "market_value": 333533,
+     "shares_outstanding": 0,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "MERRILL LYNCH",
+     "broker": "MERRILL LYNCH"
+    }
+   ]
+  },
+  {
+   "ticker": "ENVA",
+   "cik": "1529864",
+   "issuer": "Enova International, Inc.",
+   "name": "KIRK L CHARTIER",
+   "relationships": [
+    "OFFICER"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001628280-26-067535",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "Restricted Stock",
+     "shares_to_sell": 27977,
+     "market_value": 4795388.04,
+     "shares_outstanding": 24898371,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NYSE",
+     "broker": "MERRILL LYNCH & CO., INC."
+    }
+   ]
+  },
+  {
+   "ticker": "PAYX",
+   "cik": "723531",
+   "issuer": "Paychex, Inc.",
+   "name": "Golisano B Thomas",
+   "relationships": [
+    "10% Shareholder"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001628280-26-067612",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "Common",
+     "shares_to_sell": 8850,
+     "market_value": 1026866,
+     "shares_outstanding": 357600000,
+     "approximate_sale_date": "2026-10-26",
+     "exchange": "NASD",
+     "broker": "Merrill Lynch, Pierce, Fenner & Smith Incorporated"
+    }
+   ]
+  },
+  {
+   "ticker": "ENVA",
+   "cik": "1529864",
+   "issuer": "Enova International",
+   "name": "David Fisher",
+   "relationships": [
+    "Officer"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001628280-26-067647",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [
+    "2026-01-30"
+   ],
+   "securities": [
+    {
+     "security_title": "Common",
+     "shares_to_sell": 35723,
+     "market_value": 6108633,
+     "shares_outstanding": 24898371,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NYSE",
+     "broker": "Merrill Lynch"
+    }
+   ]
+  },
+  {
+   "ticker": "PINS",
+   "cik": "1506293",
+   "issuer": "Pinterest",
+   "name": "Paul Sciarra",
+   "relationships": [
+    "co-founder"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001628280-26-067659",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "Common",
+     "shares_to_sell": 500000,
+     "market_value": 10339300,
+     "shares_outstanding": 492198008,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NASDAQ",
+     "broker": "Merrill Lynch"
+    }
+   ]
+  },
+  {
+   "ticker": "NTRA",
+   "cik": "1604821",
+   "issuer": "NATERA, INC.",
+   "name": "MATTHEW RABINOWITZ",
+   "relationships": [
+    "DIRECTOR"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001646382-26-000025",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "Common Stock",
+     "shares_to_sell": 1697,
+     "market_value": 687115.3,
+     "shares_outstanding": 144144170,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NASDAQ",
+     "broker": "ETrade Corporation"
+    }
+   ]
+  },
+  {
+   "ticker": "NTRA",
+   "cik": "1604821",
+   "issuer": "NATERA, INC.",
+   "name": "JONATHAN SHEENA",
+   "relationships": [
+    "DIRECTOR"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001646649-26-000037",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "Common Stock",
+     "shares_to_sell": 287,
+     "market_value": 116206.3,
+     "shares_outstanding": 144144170,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NASDAQ",
+     "broker": "ETrade Corporation"
+    }
+   ]
+  },
+  {
+   "ticker": "HZEN",
+   "cik": "1748945",
+   "issuer": "GRAYSCALE HORIZEN TRUST (ZEN)",
+   "name": "Digital Currency Group, Inc.",
+   "relationships": [
+    "Affiliate"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001652536-26-000044",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "Common",
+     "shares_to_sell": 6992,
+     "market_value": 4076.34,
+     "shares_outstanding": 11425100,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "OTCQX",
+     "broker": "Canaccord Genuity Inc"
+    }
+   ]
+  },
+  {
+   "ticker": "NTRA",
+   "cik": "1604821",
+   "issuer": "NATERA, INC.",
+   "name": "DANIEL RABINOWITZ",
+   "relationships": [
+    "OFFICER"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001857843-26-000027",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "Common Stock",
+     "shares_to_sell": 873,
+     "market_value": 353477.7,
+     "shares_outstanding": 144144170,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NASDAQ",
+     "broker": "ETrade Corporation"
+    }
+   ]
+  },
+  {
+   "ticker": "RS",
+   "cik": "861884",
+   "issuer": "RELIANCE, INC.",
+   "name": "Koch Stephen Paul",
+   "relationships": [
+    "Officer"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001921094-26-001120",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "Common",
+     "shares_to_sell": 8344,
+     "market_value": 3590875,
+     "shares_outstanding": 51054555,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NYSE",
+     "broker": "Charles Schwab & Co., Inc."
+    }
+   ]
+  },
+  {
+   "ticker": "OPHI",
+   "cik": "1631487",
+   "issuer": "CollPlant Biotechnologies Ltd",
+   "name": "Loewenbaum Lilian S.",
+   "relationships": [
+    "10% Stockholder"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001949846-26-000621",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "Common",
+     "shares_to_sell": 15550,
+     "market_value": 58934,
+     "shares_outstanding": 12803006,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "Nasdaq",
+     "broker": "Charles Schwab Corp"
+    }
+   ]
+  },
+  {
+   "ticker": "SYM",
+   "cik": "1837240",
+   "issuer": "Symbotic Inc.",
+   "name": "BRIAN D ALEXANDER",
+   "relationships": [
+    "Officer"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001950047-26-010423",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "Class A Common",
+     "shares_to_sell": 89,
+     "market_value": 3406.86,
+     "shares_outstanding": 129873000,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NASDAQ",
+     "broker": "Morgan Stanley Smith Barney LLC Executive Financial Services"
+    }
+   ]
+  },
+  {
+   "ticker": "VCYT",
+   "cik": "1384101",
+   "issuer": "VERACYTE, INC.",
+   "name": "JENS HOLSTEIN",
+   "relationships": [
+    "Director"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001950047-26-010424",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [
+    "2026-06-12"
+   ],
+   "securities": [
+    {
+     "security_title": "Common",
+     "shares_to_sell": 7500,
+     "market_value": 375000,
+     "shares_outstanding": 80390731,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NASDAQ",
+     "broker": "Morgan Stanley Smith Barney LLC Executive Financial Services"
+    }
+   ]
+  },
+  {
+   "ticker": "SYM",
+   "cik": "1837240",
+   "issuer": "Symbotic Inc.",
+   "name": "MICHAEL D DUNN",
+   "relationships": [
+    "Officer"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001950047-26-010425",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "Class A Common",
+     "shares_to_sell": 31,
+     "market_value": 1188.54,
+     "shares_outstanding": 129873000,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NASDAQ",
+     "broker": "Morgan Stanley Smith Barney LLC Executive Financial Services"
+    }
+   ]
+  },
+  {
+   "ticker": "SYM",
+   "cik": "1837240",
+   "issuer": "Symbotic Inc.",
+   "name": "MARIA G FREVE",
+   "relationships": [
+    "Officer"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001950047-26-010426",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "Class A Common",
+     "shares_to_sell": 23,
+     "market_value": 881.82,
+     "shares_outstanding": 129873000,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NASDAQ",
+     "broker": "Morgan Stanley Smith Barney LLC Executive Financial Services"
+    }
+   ]
+  },
+  {
+   "ticker": "DXCM",
+   "cik": "1093557",
+   "issuer": "DEXCOM, INC.",
+   "name": "SADIE STERN",
+   "relationships": [
+    "Officer"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001950047-26-010427",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [
+    "2026-05-28"
+   ],
+   "securities": [
+    {
+     "security_title": "Common",
+     "shares_to_sell": 2565,
+     "market_value": 201660.3,
+     "shares_outstanding": 377360765,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NASDAQ",
+     "broker": "Morgan Stanley Smith Barney LLC Executive Financial Services"
+    }
+   ]
+  },
+  {
+   "ticker": "XYZ",
+   "cik": "1512673",
+   "issuer": "BLOCK, INC.",
+   "name": "ANTHONY M EISEN",
+   "relationships": [
+    "Director"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001950047-26-010428",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [
+    "2026-03-02"
+   ],
+   "securities": [
+    {
+     "security_title": "Common",
+     "shares_to_sell": 6000,
+     "market_value": 448740,
+     "shares_outstanding": 540816000,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NYSE",
+     "broker": "Morgan Stanley Smith Barney LLC Executive Financial Services"
+    }
+   ]
+  },
+  {
+   "ticker": "NDAQ",
+   "cik": "1120193",
+   "issuer": "NASDAQ, INC.",
+   "name": "BRADLEY J PETERSON",
+   "relationships": [
+    "Officer"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001950047-26-010429",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "Common",
+     "shares_to_sell": 3987,
+     "market_value": 417638.25,
+     "shares_outstanding": 554962751,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NASDAQ",
+     "broker": "Morgan Stanley Smith Barney LLC Executive Financial Services"
+    }
+   ]
+  },
+  {
+   "ticker": "CME",
+   "cik": "1156375",
+   "issuer": "CME GROUP INC.",
+   "name": "SUNIL CUTINHO",
+   "relationships": [
+    "Officer"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001950047-26-010430",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "Common",
+     "shares_to_sell": 5000,
+     "market_value": 1493500.5,
+     "shares_outstanding": 357930746,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NASDAQ",
+     "broker": "Morgan Stanley Smith Barney LLC Executive Financial Services"
+    }
+   ]
+  },
+  {
+   "ticker": "ENVA",
+   "cik": "1529864",
+   "issuer": "ENOVA INTERNATIONAL, INC.",
+   "name": "STEVEN E CUNNINGHAM",
+   "relationships": [
+    "Officer",
+    "Director"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001950047-26-010431",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "Common",
+     "shares_to_sell": 15305,
+     "market_value": 2632460,
+     "shares_outstanding": 24460078,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NYSE",
+     "broker": "Morgan Stanley Smith Barney LLC Executive Financial Services"
+    }
+   ]
+  },
+  {
+   "ticker": "SYM",
+   "cik": "1837240",
+   "issuer": "Symbotic Inc.",
+   "name": "JAMES J KUFFNER JR.",
+   "relationships": [
+    "Officer"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001950047-26-010432",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "Class A Common",
+     "shares_to_sell": 198,
+     "market_value": 7591.32,
+     "shares_outstanding": 129873000,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NASDAQ",
+     "broker": "Morgan Stanley Smith Barney LLC Executive Financial Services"
+    }
+   ]
+  },
+  {
+   "ticker": "SYM",
+   "cik": "1837240",
+   "issuer": "Symbotic Inc.",
+   "name": "MIRIAM ORT",
+   "relationships": [
+    "Officer"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001950047-26-010433",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "Class A Common",
+     "shares_to_sell": 42,
+     "market_value": 1610.11,
+     "shares_outstanding": 129873000,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NASDAQ",
+     "broker": "Morgan Stanley Smith Barney LLC Executive Financial Services"
+    }
+   ]
+  },
+  {
+   "ticker": "ABG",
+   "cik": "1144980",
+   "issuer": "ASBURY AUTOMOTIVE GROUP, INC.",
+   "name": "JED MATTHEW MILSTEIN",
+   "relationships": [
+    "Former Officer"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001950047-26-010434",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "Common",
+     "shares_to_sell": 1000,
+     "market_value": 189665,
+     "shares_outstanding": 17951917,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NYSE",
+     "broker": "Morgan Stanley Smith Barney LLC Executive Financial Services"
+    }
+   ]
+  },
+  {
+   "ticker": "WCN",
+   "cik": "1318220",
+   "issuer": "WASTE CONNECTIONS, INC.",
+   "name": "JAMES AND MICHELLE LITTLE REV LIV T",
+   "relationships": [
+    "Officer"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001950047-26-010435",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "Common",
+     "shares_to_sell": 2000,
+     "market_value": 370440,
+     "shares_outstanding": 250175523,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "TSX",
+     "broker": "Morgan Stanley Smith Barney LLC Executive Financial Services"
+    }
+   ]
+  },
+  {
+   "ticker": "SAIL",
+   "cik": "2030781",
+   "issuer": "SailPoint, Inc.",
+   "name": "JAMES HAGAN",
+   "relationships": [
+    "Director"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001950047-26-010436",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [
+    "2026-01-15"
+   ],
+   "securities": [
+    {
+     "security_title": "Common",
+     "shares_to_sell": 4205,
+     "market_value": 91458.75,
+     "shares_outstanding": 570911633,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NASDAQ",
+     "broker": "Morgan Stanley Smith Barney LLC Executive Financial Services"
+    }
+   ]
+  },
+  {
+   "ticker": "TNDM",
+   "cik": "1438133",
+   "issuer": "Tandem Diabetes Care, Inc.",
+   "name": "CHRISTOPHER TWOMEY",
+   "relationships": [
+    "Director"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001950047-26-010437",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [
+    "2026-05-19"
+   ],
+   "securities": [
+    {
+     "security_title": "Common",
+     "shares_to_sell": 1700,
+     "market_value": 32130,
+     "shares_outstanding": 69578707,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NASDAQ",
+     "broker": "Morgan Stanley Smith Barney LLC Executive Financial Services"
+    }
+   ]
+  },
+  {
+   "ticker": "CBRS",
+   "cik": "2021728",
+   "issuer": "Cerebras Systems Inc.",
+   "name": "SEAN LIE",
+   "relationships": [
+    "Officer"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001950047-26-010438",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [
+    "2026-05-20"
+   ],
+   "securities": [
+    {
+     "security_title": "Common",
+     "shares_to_sell": 60000,
+     "market_value": 6502200,
+     "shares_outstanding": 112247109,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NASDAQ",
+     "broker": "Morgan Stanley Smith Barney LLC Executive Financial Services"
+    }
+   ]
+  },
+  {
+   "ticker": "VCYT",
+   "cik": "1384101",
+   "issuer": "VERACYTE, INC.",
+   "name": "KARIN EASTHAM",
+   "relationships": [
+    "Director"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001950047-26-010439",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [
+    "2026-05-28"
+   ],
+   "securities": [
+    {
+     "security_title": "Common",
+     "shares_to_sell": 14850,
+     "market_value": 715770,
+     "shares_outstanding": 80390731,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NASDAQ",
+     "broker": "Morgan Stanley Smith Barney LLC Executive Financial Services"
+    }
+   ]
+  },
+  {
+   "ticker": "SYM",
+   "cik": "1837240",
+   "issuer": "SYMBOTIC INC.",
+   "name": "WILLIAM BOYD III",
+   "relationships": [
+    "Officer"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001950047-26-010440",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [
+    "2025-08-19"
+   ],
+   "securities": [
+    {
+     "security_title": "COMMON",
+     "shares_to_sell": 9194,
+     "market_value": 348452.6,
+     "shares_outstanding": 129873381,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NASDAQ",
+     "broker": "Morgan Stanley Smith Barney LLC Executive Financial Services"
+    }
+   ]
+  },
+  {
+   "ticker": "KRC",
+   "cik": "1025996",
+   "issuer": "KILROY REALTY CORPORATION",
+   "name": "ROBERT PARATTE",
+   "relationships": [
+    "Officer"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001950047-26-010441",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "Common",
+     "shares_to_sell": 8000,
+     "market_value": 291177.6,
+     "shares_outstanding": 116308988,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NYSE",
+     "broker": "Morgan Stanley Smith Barney LLC Executive Financial Services"
+    }
+   ]
+  },
+  {
+   "ticker": "COF",
+   "cik": "927628",
+   "issuer": "CAPITAL ONE FINANCIAL CORPORATION",
+   "name": "RICHARD D FAIRBANK",
+   "relationships": [
+    "Officer",
+    "Director"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001950047-26-010442",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [
+    "2025-05-13"
+   ],
+   "securities": [
+    {
+     "security_title": "Common",
+     "shares_to_sell": 90743,
+     "market_value": 18407809.46,
+     "shares_outstanding": 613484836,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NYSE",
+     "broker": "Morgan Stanley Smith Barney LLC Executive Financial Services"
+    }
+   ]
+  },
+  {
+   "ticker": "VZ",
+   "cik": "732712",
+   "issuer": "VERIZON COMMUNICATIONS INC",
+   "name": "Malady Kyle",
+   "relationships": [
+    "Officer"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001959173-26-007501",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [
+    "2026-05-18"
+   ],
+   "securities": [
+    {
+     "security_title": "Common",
+     "shares_to_sell": 1100,
+     "market_value": 47300,
+     "shares_outstanding": 4154775202,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NYSE",
+     "broker": "Fidelity Brokerage Services LLC"
+    }
+   ]
+  },
+  {
+   "ticker": "AGNC",
+   "cik": "1423689",
+   "issuer": "AGNC Investment Corp.",
+   "name": "Federico Peter J",
+   "relationships": [
+    "Officer",
+    "Director"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001959173-26-007502",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [
+    "2026-06-01"
+   ],
+   "securities": [
+    {
+     "security_title": "Common",
+     "shares_to_sell": 67794,
+     "market_value": 594334.79,
+     "shares_outstanding": 1185481447,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NASDAQ",
+     "broker": "Fidelity Brokerage Services LLC"
+    }
+   ]
+  },
+  {
+   "ticker": "MEDP",
+   "cik": "1668397",
+   "issuer": "Medpace Holdings, Inc.",
+   "name": "BURWIG SUSAN E",
+   "relationships": [
+    "Officer"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001959173-26-007503",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "Common",
+     "shares_to_sell": 3940,
+     "market_value": 2667380,
+     "shares_outstanding": 27971686,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NASDAQ",
+     "broker": "Fidelity Brokerage Services LLC"
+    }
+   ]
+  },
+  {
+   "ticker": "FITB",
+   "cik": "35527",
+   "issuer": "FIFTH THIRD BANCORP",
+   "name": "Schramm Jude",
+   "relationships": [
+    "Officer"
+   ],
+   "form_type": "144/A",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001959173-26-007504",
+   "replaces_accession_number": "0001959173-26-007495",
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "Common",
+     "shares_to_sell": 20000,
+     "market_value": 1062847.49,
+     "shares_outstanding": 906892564,
+     "approximate_sale_date": "2026-10-26",
+     "exchange": "NYSE",
+     "broker": "Fidelity Brokerage Services LLC"
+    }
+   ]
+  },
+  {
+   "ticker": "TRV",
+   "cik": "86312",
+   "issuer": "TRAVELERS COMPANIES, INC.",
+   "name": "Lefebvre Mojgan M",
+   "relationships": [
+    "Officer"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001959173-26-007505",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "Common",
+     "shares_to_sell": 11000,
+     "market_value": 4332284.23,
+     "shares_outstanding": 204946347,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NYSE",
+     "broker": "Fidelity Brokerage Services LLC"
+    }
+   ]
+  },
+  {
+   "ticker": "JBLU",
+   "cik": "1158463",
+   "issuer": "JETBLUE AIRWAYS CORP",
+   "name": "LYNN JESSE",
+   "relationships": [
+    "Former Director"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001959173-26-007506",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "Common",
+     "shares_to_sell": 22094,
+     "market_value": 61973.67,
+     "shares_outstanding": 377351854,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NASDAQ",
+     "broker": "Fidelity Brokerage Services LLC"
+    }
+   ]
+  },
+  {
+   "ticker": "APOG",
+   "cik": "6845",
+   "issuer": "APOGEE ENTERPRISES, INC.",
+   "name": "Christian Matthew Sean",
+   "relationships": [
+    "Officer"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001959173-26-007507",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "Common",
+     "shares_to_sell": 153,
+     "market_value": 6875.06,
+     "shares_outstanding": 20895599,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NASDAQ",
+     "broker": "Fidelity Brokerage Services LLC"
+    }
+   ]
+  },
+  {
+   "ticker": "APOG",
+   "cik": "6845",
+   "issuer": "APOGEE ENTERPRISES, INC.",
+   "name": "Christian Matthew Sean",
+   "relationships": [
+    "Officer"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001959173-26-007508",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "Common",
+     "shares_to_sell": 869,
+     "market_value": 39048.52,
+     "shares_outstanding": 20895599,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NASDAQ",
+     "broker": "Fidelity Brokerage Services LLC"
+    }
+   ]
+  },
+  {
+   "ticker": "APOG",
+   "cik": "6845",
+   "issuer": "APOGEE ENTERPRISES, INC.",
+   "name": "Christian Matthew Sean",
+   "relationships": [
+    "Officer"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001959173-26-007509",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "Common",
+     "shares_to_sell": 178,
+     "market_value": 7998.43,
+     "shares_outstanding": 20895599,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NASDAQ",
+     "broker": "Fidelity Brokerage Services LLC"
+    }
+   ]
+  },
+  {
+   "ticker": "BETA",
+   "cik": "1784570",
+   "issuer": "BETA Technologies, Inc.",
+   "name": "Clark Kyle",
+   "relationships": [
+    "Officer"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001959173-26-007510",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [
+    "2026-06-25"
+   ],
+   "securities": [
+    {
+     "security_title": "Common",
+     "shares_to_sell": 10000,
+     "market_value": 207706.34,
+     "shares_outstanding": 225439576,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NYSE",
+     "broker": "Fidelity Brokerage Services LLC"
+    }
+   ]
+  },
+  {
+   "ticker": "R",
+   "cik": "85961",
+   "issuer": "RYDER SYSTEM INC",
+   "name": "SANCHEZ ROBERT E",
+   "relationships": [
+    "Director"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001959173-26-007511",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "Common",
+     "shares_to_sell": 26350,
+     "market_value": 7412082.46,
+     "shares_outstanding": 38218715,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NYSE",
+     "broker": "Fidelity Brokerage Services LLC"
+    }
+   ]
+  },
+  {
+   "ticker": "SLB",
+   "cik": "87347",
+   "issuer": "SLB LIMITED/NV",
+   "name": "Le Peuch Olivier",
+   "relationships": [
+    "Officer",
+    "Director"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001959173-26-007512",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [
+    "2026-05-27"
+   ],
+   "securities": [
+    {
+     "security_title": "Common",
+     "shares_to_sell": 25000,
+     "market_value": 1329250,
+     "shares_outstanding": 1484143231,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NYSE",
+     "broker": "Fidelity Brokerage Services LLC"
+    }
+   ]
+  },
+  {
+   "ticker": "FET",
+   "cik": "1401257",
+   "issuer": "FORUM ENERGY TECHNOLOGIES, INC.",
+   "name": "IVASCU JOHN C",
+   "relationships": [
+    "Officer"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001959173-26-007513",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [
+    "2026-02-24"
+   ],
+   "securities": [
+    {
+     "security_title": "Common",
+     "shares_to_sell": 4300,
+     "market_value": 387623.66,
+     "shares_outstanding": 11246295,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NYSE",
+     "broker": "Fidelity Brokerage Services LLC"
+    }
+   ]
+  },
+  {
+   "ticker": "KMTS",
+   "cik": "1877184",
+   "issuer": "KESTRA MEDICAL TECHNOLOGIES, LTD.",
+   "name": "Umberger Traci S",
+   "relationships": [
+    "Officer"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001964306-26-000476",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [
+    "2026-07-21"
+   ],
+   "securities": [
+    {
+     "security_title": "Common Stock",
+     "shares_to_sell": 30000,
+     "market_value": 900880.51,
+     "shares_outstanding": 59561795,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NASDAQ",
+     "broker": "Merrill Lynch"
+    }
+   ]
+  },
+  {
+   "ticker": "KMTS",
+   "cik": "1877184",
+   "issuer": "KESTRA MEDICAL TECHNOLOGIES, LTD.",
+   "name": "Mahboob Vaseem",
+   "relationships": [
+    "Officer"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001964306-26-000477",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [
+    "2025-11-05"
+   ],
+   "securities": [
+    {
+     "security_title": "Common Stock",
+     "shares_to_sell": 34809,
+     "market_value": 1045784.87,
+     "shares_outstanding": 59561795,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NASDAQ",
+     "broker": "Merrill Lynch"
+    }
+   ]
+  },
+  {
+   "ticker": "AYI",
+   "cik": "1144215",
+   "issuer": "ACUITY INC. (DE)",
+   "name": "GOLDMAN BARRY R",
+   "relationships": [
+    "Officer"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001964306-26-000478",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "Common Stock",
+     "shares_to_sell": 3800,
+     "market_value": 1221608.04,
+     "shares_outstanding": 29695521,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NYSE",
+     "broker": "Merrill Lynch"
+    }
+   ]
+  },
+  {
+   "ticker": "TEM",
+   "cik": "1717115",
+   "issuer": "Tempus AI, Inc.",
+   "name": "Eric Lefkofsky",
+   "relationships": [
+    "Officer",
+    "Director",
+    "10% Stockholder"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001968582-26-001077",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [
+    "2026-03-08"
+   ],
+   "securities": [
+    {
+     "security_title": "Class A Common Stock",
+     "shares_to_sell": 250000,
+     "market_value": 16790000,
+     "shares_outstanding": 175390967,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NASDAQ",
+     "broker": "J.P. Morgan Securities LLC"
+    }
+   ]
+  },
+  {
+   "ticker": "CCI",
+   "cik": "1051470",
+   "issuer": "CROWN CASTLE INC.",
+   "name": "Piche Catherine",
+   "relationships": [
+    "Officer"
+   ],
+   "form_type": "144/A",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001969223-26-001089",
+   "replaces_accession_number": "0001969223-26-001088",
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "Common",
+     "shares_to_sell": 7505,
+     "market_value": 645500,
+     "shares_outstanding": 425455439,
+     "approximate_sale_date": "2026-10-26",
+     "exchange": "NYSE",
+     "broker": "UBS FINANCIAL SERVICES INC."
+    }
+   ]
+  },
+  {
+   "ticker": "TXN",
+   "cik": "97476",
+   "issuer": "TEXAS INSTRUMENTS INCORPORATED",
+   "name": "JANET CLARK",
+   "relationships": [
+    "Director"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001969223-26-001090",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "common",
+     "shares_to_sell": 4306,
+     "market_value": 1302318.95,
+     "shares_outstanding": 913770316,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NASDAQ",
+     "broker": "UBS Financial Services Inc"
+    }
+   ]
+  },
+  {
+   "ticker": "TXN",
+   "cik": "97476",
+   "issuer": "TEXAS INSTRUMENTS INCORPORATED",
+   "name": "ROBERT SANCHEZ",
+   "relationships": [
+    "Director"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001969223-26-001091",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "common",
+     "shares_to_sell": 6065,
+     "market_value": 1832828.52,
+     "shares_outstanding": 913770316,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NASDAQ",
+     "broker": "UBS Financial Services Inc"
+    }
+   ]
+  },
+  {
+   "ticker": "TXN",
+   "cik": "97476",
+   "issuer": "TEXAS INSTRUMENTS INCORPORATED",
+   "name": "PAMELA PATSLEY",
+   "relationships": [
+    "Director"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001969223-26-001092",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "common",
+     "shares_to_sell": 4532,
+     "market_value": 1366590.19,
+     "shares_outstanding": 913770316,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NASDAQ",
+     "broker": "UBS Financial Services Inc"
+    }
+   ]
+  },
+  {
+   "ticker": "CSX",
+   "cik": "277948",
+   "issuer": "CSX CORP",
+   "name": "ZILLMER JOHN J",
+   "relationships": [
+    "Director"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-26",
+   "accession_number": "0001974078-26-000388",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "common",
+     "shares_to_sell": 19500,
+     "market_value": 999206.83,
+     "shares_outstanding": 1843398210,
+     "approximate_sale_date": "2026-10-26",
+     "exchange": "NASDAQ",
+     "broker": "Raymond James & Associates, Inc."
+    }
+   ]
+  },
+  {
+   "ticker": "RDWR",
+   "cik": "1094366",
+   "issuer": "RADWARE LTD",
+   "name": "David Aviv",
+   "relationships": [
+    "Officer"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-26",
+   "accession_number": "0001976408-26-000908",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "Ordinary shares",
+     "shares_to_sell": 12500,
+     "market_value": 388375,
+     "shares_outstanding": 43145971,
+     "approximate_sale_date": "2026-10-26",
+     "exchange": "Nasdaq",
+     "broker": "Oppenheimer & Co. Inc."
+    }
+   ]
+  },
+  {
+   "ticker": "GTAO",
+   "cik": "2029297",
+   "issuer": "Grayscale Bittensor Trust (TAO)",
+   "name": "DCG International Investments Ltd",
+   "relationships": [
+    "Affiliate"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001977454-26-000270",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "Common",
+     "shares_to_sell": 1400,
+     "market_value": 8499.54,
+     "shares_outstanding": 3342000,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "OTCQX",
+     "broker": "Canaccord Genuity Corp"
+    }
+   ]
+  },
+  {
+   "ticker": "STCK",
+   "cik": "2024996",
+   "issuer": "Grayscale Stacks Trust (STX)",
+   "name": "DCG International Investments Ltd",
+   "relationships": [
+    "Affiliate"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001977454-26-000271",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "Common",
+     "shares_to_sell": 425,
+     "market_value": 977.5,
+     "shares_outstanding": 387800,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "OTCQB",
+     "broker": "Canaccord Genuity Corp"
+    }
+   ]
+  },
+  {
+   "ticker": "GDLC",
+   "cik": "1729997",
+   "issuer": "Grayscale CoinDesk Crypto 5 ETF",
+   "name": "DCG International Investments Ltd",
+   "relationships": [
+    "Affiliate"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001977454-26-000272",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "Common",
+     "shares_to_sell": 4000,
+     "market_value": 144824.4,
+     "shares_outstanding": 11297400,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "OTCQX",
+     "broker": "Canaccord Genuity Corp"
+    }
+   ]
+  },
+  {
+   "ticker": "FILG",
+   "cik": "1852039",
+   "issuer": "GRAYSCALE FILECOIN TRUST (FIL)",
+   "name": "DCG International Investments Ltd",
+   "relationships": [
+    "Affiliate"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001977454-26-000273",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "Common",
+     "shares_to_sell": 1650,
+     "market_value": 3586.94,
+     "shares_outstanding": 3117100,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "OTCQB",
+     "broker": "Canaccord Genuity Corp"
+    }
+   ]
+  },
+  {
+   "ticker": "GAVA",
+   "cik": "2035053",
+   "issuer": "Grayscale Avalanche Staking ETF (Ticker: GAVA)",
+   "name": "DCG International Investments Ltd",
+   "relationships": [
+    "Affiliate"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001977454-26-000274",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "Common",
+     "shares_to_sell": 341,
+     "market_value": 7318.78,
+     "shares_outstanding": 367980,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NasdaqGM",
+     "broker": "Canaccord Genuity Corp"
+    }
+   ]
+  },
+  {
+   "ticker": "BCHG",
+   "cik": "1732409",
+   "issuer": "GRAYSCALE BITCOIN CASH TRUST (BCH)",
+   "name": "DCG International Investments Ltd",
+   "relationships": [
+    "Affiliate"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0001977454-26-000275",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "Common",
+     "shares_to_sell": 20000,
+     "market_value": 43282,
+     "shares_outstanding": 47123300,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "OTCQX",
+     "broker": "Canaccord Genuity Corp"
+    }
+   ]
+  },
+  {
+   "ticker": "NTRA",
+   "cik": "1604821",
+   "issuer": "NATERA, INC.",
+   "name": "SOLOMON MOSHKEVICH",
+   "relationships": [
+    "OFFICER"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0002010019-26-000032",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "Common Stock",
+     "shares_to_sell": 997,
+     "market_value": 403685.3,
+     "shares_outstanding": 144144170,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NASDAQ",
+     "broker": "ETrade Corporation"
+    }
+   ]
+  },
+  {
+   "ticker": "NTRA",
+   "cik": "1604821",
+   "issuer": "NATERA, INC.",
+   "name": "JOHN FESKO",
+   "relationships": [
+    "OFFICER"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0002010135-26-000022",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "Common Stock",
+     "shares_to_sell": 771,
+     "market_value": 312177.9,
+     "shares_outstanding": 144144170,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NASDAQ",
+     "broker": "ETrade Corporation"
+    }
+   ]
+  },
+  {
+   "ticker": "ZGN",
+   "cik": "1877787",
+   "issuer": "Ermenegildo Zegna N.V.",
+   "name": "Norsa Michele",
+   "relationships": [
+    "Director"
+   ],
+   "form_type": "144",
+   "filing_date": "2026-10-27",
+   "notice_date": "2026-10-27",
+   "accession_number": "0002116289-26-000009",
+   "replaces_accession_number": null,
+   "plan_adoption_dates": [],
+   "securities": [
+    {
+     "security_title": "Ordinary Shares, nominal value €0.02 per share",
+     "shares_to_sell": 8000,
+     "market_value": 107280,
+     "shares_outstanding": 268889388,
+     "approximate_sale_date": "2026-10-27",
+     "exchange": "NYSE",
+     "broker": "JP Morgan Securities LLC"
+    }
+   ]
+  }
+ ]
+}

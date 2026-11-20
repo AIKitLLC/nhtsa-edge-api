@@ -1,0 +1,143 @@
+{
+  "source": "SEC EDGAR daily form index (Form 144)",
+  "generatedAt": "2026-11-20T13:23:27.935Z",
+  "coverage": {
+    "from": "2026-10-20",
+    "to": "2026-11-19"
+  },
+  "totalRecords": 2955,
+  "days": [
+    {
+      "date": "2026-10-20",
+      "count": 52,
+      "indexCount": 52,
+      "failed": 0
+    },
+    {
+      "date": "2026-10-21",
+      "count": 46,
+      "indexCount": 46,
+      "failed": 0
+    },
+    {
+      "date": "2026-10-22",
+      "count": 49,
+      "indexCount": 49,
+      "failed": 0
+    },
+    {
+      "date": "2026-10-23",
+      "count": 62,
+      "indexCount": 62,
+      "failed": 0
+    },
+    {
+      "date": "2026-10-26",
+      "count": 75,
+      "indexCount": 75,
+      "failed": 0
+    },
+    {
+      "date": "2026-10-27",
+      "count": 71,
+      "indexCount": 71,
+      "failed": 0
+    },
+    {
+      "date": "2026-10-28",
+      "count": 54,
+      "indexCount": 54,
+      "failed": 0
+    },
+    {
+      "date": "2026-10-29",
+      "count": 100,
+      "indexCount": 100,
+      "failed": 0
+    },
+    {
+      "date": "2026-10-30",
+      "count": 97,
+      "indexCount": 97,
+      "failed": 0
+    },
+    {
+      "date": "2026-11-02",
+      "count": 272,
+      "indexCount": 272,
+      "failed": 0
+    },
+    {
+      "date": "2026-11-03",
+      "count": 142,
+      "indexCount": 142,
+      "failed": 0
+    },
+    {
+      "date": "2026-11-04",
+      "count": 190,
+      "indexCount": 190,
+      "failed": 0
+    },
+    {
+      "date": "2026-11-05",
+      "count": 148,
+      "indexCount": 148,
+      "failed": 0
+    },
+    {
+      "date": "2026-11-06",
+      "count": 127,
+      "indexCount": 127,
+      "failed": 0
+    },
+    {
+      "date": "2026-11-09",
+      "count": 217,
+      "indexCount": 217,
+      "failed": 0
+    },
+    {
+      "date": "2026-11-10",
+      "count": 202,
+      "indexCount": 202,
+      "failed": 0
+    },
+    {
+      "date": "2026-11-12",
+      "count": 240,
+      "indexCount": 240,
+      "failed": 0
+    },
+    {
+      "date": "2026-11-13",
+      "count": 127,
+      "indexCount": 127,
+      "failed": 0
+    },
+    {
+      "date": "2026-11-16",
+      "count": 248,
+      "indexCount": 248,
+      "failed": 0
+    },
+    {
+      "date": "2026-11-17",
+      "count": 184,
+      "indexCount": 184,
+      "failed": 0
+    },
+    {
+      "date": "2026-11-18",
+      "count": 154,
+      "indexCount": 154,
+      "failed": 0
+    },
+    {
+      "date": "2026-11-19",
+      "count": 98,
+      "indexCount": 98,
+      "failed": 0
+    }
+  ]
+}
