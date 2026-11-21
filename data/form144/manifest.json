@@ -1,11 +1,11 @@
 {
   "source": "SEC EDGAR daily form index (Form 144)",
-  "generatedAt": "2026-11-20T13:23:27.935Z",
+  "generatedAt": "2026-11-21T13:23:07.570Z",
   "coverage": {
     "from": "2026-10-20",
-    "to": "2026-11-19"
+    "to": "2026-11-20"
   },
-  "totalRecords": 2955,
+  "totalRecords": 3070,
   "days": [
     {
       "date": "2026-10-20",
@@ -137,6 +137,12 @@
       "date": "2026-11-19",
       "count": 98,
       "indexCount": 98,
+      "failed": 0
+    },
+    {
+      "date": "2026-11-20",
+      "count": 115,
+      "indexCount": 115,
       "failed": 0
     }
   ]
