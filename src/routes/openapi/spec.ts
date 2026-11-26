@@ -50,6 +50,7 @@ export const OPENAPI = {
     { name: "VIN", description: "Offline decoding" },
     { name: "Catalog", description: "Makes and models in the bundled dataset" },
     { name: "Fuel economy", description: "EPA and DOE FuelEconomy.gov vehicle records, bundled" },
+    { name: "Form 144", description: "SEC Form 144 insider sale notices, bundled from EDGAR" },
     { name: "vPIC drop-in", description: "Same paths and JSON shape as vpic.nhtsa.dot.gov" },
     { name: "Recalls", description: "Proxied to NHTSA and cached" },
     { name: "Leak check", description: "Breach data from Have I Been Pwned (CC BY 4.0, https://haveibeenpwned.com)" },
@@ -149,6 +150,28 @@ export const OPENAPI = {
           "200": { description: "Matching records", content: { "application/json": { schema: { type: "object" } } } },
           "400": errorResponse("Missing or invalid year or make"),
           "404": errorResponse("No EPA vehicles match"),
+          "429": errorResponse("Rate limited"),
+        },
+      },
+    },
+    "/api/v1/form144": {
+      get: {
+        tags: ["Form 144"],
+        operationId: "insiderSaleNotices",
+        summary: "SEC Form 144 insider sale notices",
+        description:
+          "Advance notices insiders file before selling shares, ingested from SEC EDGAR's daily index and served from a bundled cache (the response states the cached window in `coverage`). Filter by ticker or issuer CIK, filing-date range and limit; newest first.",
+        parameters: [
+          { name: "ticker", in: "query", description: "Issuer ticker, from SEC's CIK-to-ticker mapping.", schema: { type: "string" }, example: "AAPL" },
+          { name: "cik", in: "query", description: "Issuer CIK (leading zeros optional).", schema: { type: "string", pattern: "^\\d{1,10}$" }, example: "320193" },
+          { name: "from", in: "query", description: "First filing date (YYYY-MM-DD).", schema: { type: "string", pattern: "^\\d{4}-\\d{2}-\\d{2}$" }, example: "2026-11-01" },
+          { name: "to", in: "query", description: "Last filing date (YYYY-MM-DD).", schema: { type: "string", pattern: "^\\d{4}-\\d{2}-\\d{2}$" }, example: "2026-11-18" },
+          { name: "limit", in: "query", description: "Records to return (default 50, maximum 500); `total` counts every match.", schema: { type: "integer", minimum: 1, maximum: 500 }, example: 50 },
+        ],
+        responses: {
+          "200": { description: "Matching sale notices", content: { "application/json": { schema: { type: "object" } } } },
+          "400": errorResponse("Invalid query parameter"),
+          "404": errorResponse("No Form 144 data bundled"),
           "429": errorResponse("Rate limited"),
         },
       },

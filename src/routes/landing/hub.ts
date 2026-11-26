@@ -54,6 +54,17 @@ export const DATASETS: readonly Dataset[] = [
     ],
   },
   {
+    id: "form144",
+    name: "Insider sale notices (Form 144)",
+    agency: "SEC",
+    status: "live",
+    summary: "Advance notices insiders file with the SEC before selling shares: who is selling, how many shares, the market value and the approximate sale date. Ingested from EDGAR's daily index and cached on this site; the cached window is stated in the API response.",
+    links: [
+      ["API", "/docs#t-Form-144"],
+      ["Guide", "https://github.com/AIKitLLC/nhtsa-edge-api/blob/main/docs/FORM144.md"],
+    ],
+  },
+  {
     id: "complaints-ncap",
     name: "Complaints and crash test ratings",
     agency: "NHTSA",
